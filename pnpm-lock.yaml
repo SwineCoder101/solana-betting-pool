@@ -80,7 +80,7 @@ devDependencies:
     specifier: ^4.3.4
     version: 4.3.4(vite@6.0.7)
   esbuild:
-    specifier: ^0.14.54
+    specifier: ^0.14.0
     version: 0.14.54
   eslint:
     specifier: ^9.9.0
