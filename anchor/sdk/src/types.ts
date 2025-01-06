@@ -1,12 +1,12 @@
 import { Program } from "@coral-xyz/anchor";
-import { Tokenescrow } from "@project/anchor";
 import { Connection, Signer } from "@solana/web3.js";
+import { HorseRace } from "../../target/types/horse_race";
 
 export type SdkConfig = {
     connection: Connection;
-    program: Program<Tokenescrow>;
+    program: Program<HorseRace>;
     url: string;
-    idl: Tokenescrow;
+    idl: HorseRace;
     signer: Signer;
     debug: boolean;
     prioritizationFee?: number;
