@@ -3,7 +3,7 @@ import { Program } from "@coral-xyz/anchor";
 import { Keypair } from "@solana/web3.js";
 import { assert, expect } from "chai";
 import { BettingApp } from "../target/types/betting_app";
-import { BettingAppSDK } from "../sdk";
+import { BettingAppSDK } from "../sdk/src";
 
 describe("Update Competition", () => {
   const provider = anchor.AnchorProvider.env();

@@ -1,8 +1,8 @@
 import { Program, web3 } from "@coral-xyz/anchor";
-import { BettingApp } from "../target/types/betting_app";
+import { HorseRace } from "../../../target/types/horse_race";
 
 export async function createCompetitionInstruction(
-  program: Program<BettingApp>,
+  program: Program<HorseRace>,
   competitionPubkey: web3.PublicKey,
   tokenA: web3.PublicKey,
   priceFeedId: string,
@@ -24,13 +24,12 @@ export async function createCompetitionInstruction(
     .accounts({
       competition: competitionPubkey,
       authority,
-      systemProgram: web3.SystemProgram.programId,
     })
     .rpc();
 }
 
 export async function updateCompetitionInstruction(
-  program: Program<BettingApp>,
+  program: Program<HorseRace>,
   competitionPubkey: web3.PublicKey,
   tokenA: web3.PublicKey,
   priceFeedId: string,

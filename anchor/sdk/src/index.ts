@@ -1,12 +1,12 @@
 import { Connection, PublicKey, Keypair } from "@solana/web3.js";
 import { Program, AnchorProvider, Idl } from "@coral-xyz/anchor";
-import idl from "../target/idl/betting_app.json"; // Adjust path as necessary
-import { BettingApp } from "../target/types/betting_app";
-import { createCompetitionInstruction, updateCompetitionInstruction } from "./instructions";
-import { getCompetitionAccount } from "./accounts";
+import idl from "../../target/idl/horse_race.json"; // Adjust path as necessary
+import { HorseRace } from "../../target/types/horse_race";
+import { createCompetitionInstruction, updateCompetitionInstruction } from "./instructions/instructions";
+import { getCompetitionAccount } from "./accounts/accounts";
 
 export class BettingAppSDK {
-  public program: Program<BettingApp>;
+  public program: Program<HorseRace>;
 
   constructor(
     connection: Connection,
@@ -14,7 +14,7 @@ export class BettingAppSDK {
     programId: PublicKey
   ) {
     const provider = new AnchorProvider(connection, { publicKey: wallet.publicKey, signAllTransactions: wallet.signAllTransactions, signTransaction: wallet.signTransaction } as any, {});
-    this.program = new Program<BettingApp>(idl as Idl, programId, provider);
+    this.program = new Program<HorseRace>(idl as Idl, programId, provider);
   }
 
   async createCompetition(
@@ -61,5 +61,5 @@ export class BettingAppSDK {
   }
 }
 
-export * from "./instructions";
-export * from "./accounts";
+export * from "./instructions/instructions"; // Ensure that the './instructions' module exists and is correctly named
+export * from "./accounts/accounts";

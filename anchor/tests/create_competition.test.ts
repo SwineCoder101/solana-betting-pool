@@ -3,7 +3,7 @@ import { Program } from "@coral-xyz/anchor";
 import { PublicKey, Keypair, SystemProgram } from "@solana/web3.js";
 import { assert } from "chai";
 import { BettingApp } from "../target/types/betting_app";
-import { BettingAppSDK } from "../sdk";
+import { BettingAppSDK } from "../sdk/src";
 
 describe("Create Competition", () => {
   const provider = anchor.AnchorProvider.env();
