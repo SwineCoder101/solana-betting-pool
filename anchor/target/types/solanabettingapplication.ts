@@ -138,14 +138,14 @@ export type Solanabettingapplication = {
     {
       "name": "solanabettingapplication",
       "discriminator": [
-        255,
-        176,
-        4,
-        245,
-        188,
-        253,
-        124,
-        25
+        251,
+        216,
+        196,
+        159,
+        51,
+        97,
+        248,
+        31
       ]
     }
   ],

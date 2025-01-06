@@ -1,9 +1,9 @@
 import { Program } from "@coral-xyz/anchor";
 import { PublicKey } from "@solana/web3.js";
-import { BettingApp } from "../target/types/betting_app";
+import { HorseRace } from "../target/types/horse_race";
 
 export async function getCompetitionAccount(
-  program: Program<BettingApp>,
+  program: Program<HorseRace>,
   competitionPubkey: PublicKey
 ) {
   return program.account.competition.fetch(competitionPubkey);

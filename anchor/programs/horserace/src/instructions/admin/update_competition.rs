@@ -1,5 +1,5 @@
 use anchor_lang::prelude::*;
-use crate::state::Competition;
+use crate::states::Competition;
 
 #[derive(Accounts)]
 pub struct UpdateCompetition<'info> {
