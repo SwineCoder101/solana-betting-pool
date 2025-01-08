@@ -7,7 +7,7 @@ pub struct CreateCompetition<'info> {
         init, 
         payer = authority,
         space = 8 + 32 + (4 + 200) + (4 + 32*5) + 1 + 1, // Adjust space as needed
-        // If you want a PDA with a known seed, you can do seeds = [b"competition"], bump
+        seeds = [b"competition"], bump
     )]
     pub competition: Account<'info, Competition>,
 

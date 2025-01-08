@@ -1,7 +1,7 @@
 import { Program, web3 } from "@coral-xyz/anchor";
 import { HorseRace } from "../../../../target/types/horse_race";
 
-export async function createCompetitionInstruction(
+export async function createCompetition(
   program: Program<HorseRace>,
   competitionPubkey: web3.PublicKey,
   tokenA: web3.PublicKey,

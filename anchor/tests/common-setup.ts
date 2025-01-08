@@ -2,7 +2,17 @@ import * as anchor from "@coral-xyz/anchor";
 import { Keypair, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import * as Util from "./test-utils";
 import { SdkConfig } from "../sdk/src/types";
-import { HorseRace, CompetitionData, createCompetition } from "../sdk/src";
+import { HorseRace, CompetitionData, createCompetition, IDL, getCompetitionData } from "../sdk/src";
+
+export type SetupDTO = {
+    competitionPubkey: PublicKey;
+    competitionData: CompetitionData;
+    fakeAdmin: Keypair;
+    program: anchor.Program<HorseRace>;
+    sdkConfig: SdkConfig;
+}
+
+export const setup = async function (): Promise<SetupDTO> {
 
 const provider = anchor.AnchorProvider.env();
 anchor.setProvider(provider);
@@ -13,13 +23,6 @@ const adminKp = Keypair.fromSecretKey(adminPayer.secretKey);
 
 let fakeAdmin: Keypair;
 
-export const setup = async function (): Promise<{
-  competitionPubkey: PublicKey;
-  competitonData: CompetitionData;
-  fakeAdmin: Keypair;
-  tokenescrowProgram: anchor.Program<HorseRace>;
-  sdkConfig: SdkConfig;
-}> {
   const program = anchor.workspace.HorseRace as anchor.Program<HorseRace>;
 
   // Airdrop SOL to the admin account
@@ -40,6 +43,7 @@ export const setup = async function (): Promise<{
   const minPayoutRatio = 2;
 
   await createCompetition(
+    program,
     competitionPubkey,
     tokenA,
     priceFeedId,
@@ -48,18 +52,23 @@ export const setup = async function (): Promise<{
     minPayoutRatio
   );
 
-  const configPubkey = competitionPubkey; // Assuming competitionPubkey is used as configPubkey
-  const configData = await getCompetition(configPubkey);
+  const competitionData = await getCompetitionData(program);
+
+  const sdkConfig :SdkConfig = {
+    connection: provider.connection,
+    program,
+    url: '',
+    idl: IDL,
+    signer: adminKp.publicKey.toString(),
+    debug: true,
+  }
+
 
   return {
-    configPubkey,
-    configData,
+    competitionPubkey,
+    competitionData,
     fakeAdmin,
-    tokenescrowProgram: program,
-    sdkConfig: {
-      connection: provider.connection,
-      wallet: adminKp,
-      programId: program.programId,
-    },
+    program,
+    sdkConfig,
   };
 };

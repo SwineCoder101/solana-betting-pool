@@ -1,5 +1,5 @@
-import { Program } from "@coral-xyz/anchor";
-import { Connection, Signer } from "@solana/web3.js";
+import { AnchorProvider, Program } from "@coral-xyz/anchor";
+import { Connection } from "@solana/web3.js";
 import { HorseRace } from "../../target/types/horse_race";
 
 export type SdkConfig = {
@@ -7,7 +7,17 @@ export type SdkConfig = {
     program: Program<HorseRace>;
     url: string;
     idl: HorseRace;
-    signer: Signer;
+    signer: string;
     debug: boolean;
     prioritizationFee?: number;
+  };
+
+  export type SdkConfigData = {
+    url?: string;
+    idl?: HorseRace;
+    signer: string;
+    debug?: boolean;
+    prioritizationFee?: number;
+    provider?: AnchorProvider;
+    connection?: Connection;
   };
