@@ -41,6 +41,9 @@ jobs:
 
       - name: Check solana config
         run: solana config get
+      
+      - run: pnpm install
+        shell: bash
 
       - run: pnpm run anchor build
         shell: bash
