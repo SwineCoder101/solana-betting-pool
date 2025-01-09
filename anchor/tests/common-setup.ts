@@ -32,7 +32,6 @@ const program = anchor.workspace.HorseRace as anchor.Program<HorseRace>;
   await Util.logSolBalance("Admin balance", adminPayer.publicKey);
 //   await Util.waitAndConfirmSignature(provider.connection, airTx);
 
-
   // Create a fake admin keypair
   const fakeAdmin = Keypair.generate();
 
