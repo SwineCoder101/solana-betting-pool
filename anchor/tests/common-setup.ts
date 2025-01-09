@@ -29,10 +29,9 @@ const program = anchor.workspace.HorseRace as anchor.Program<HorseRace>;
 
   // Airdrop SOL to the admin account
   const airTx = await provider.connection.requestAirdrop(adminKp.publicKey, LAMPORTS_PER_SOL);
-  await Util.waitAndConfirmSignature(provider.connection, airTx);
-
-  console.log("Admin balance", adminPayer.publicKey);
   await Util.logSolBalance("Admin balance", adminPayer.publicKey);
+//   await Util.waitAndConfirmSignature(provider.connection, airTx);
+
 
   // Create a fake admin keypair
   const fakeAdmin = Keypair.generate();
