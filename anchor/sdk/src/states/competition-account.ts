@@ -1,4 +1,4 @@
-import { BN, Program } from "@coral-xyz/anchor";
+import { Program, BN } from "@coral-xyz/anchor";
 import { PublicKey } from "@solana/web3.js";
 import { HorseRace } from "../../../target/types/horse_race";
 import { COMPETITION_SEED } from "../constants";
@@ -15,8 +15,8 @@ export type CompetitionProgramData = {
   tokenA: PublicKey,
   priceFeedId: string,
   admin: PublicKey[],
-  houseCutFactor: BN,
-  minPayoutRatio: BN,
+  houseCutFactor: BN | number,
+  minPayoutRatio: BN | number,
 }
 
 export function convertCompetitionToProgramData(competitionData: CompetitionData) : CompetitionProgramData{
@@ -30,13 +30,15 @@ export function convertCompetitionToProgramData(competitionData: CompetitionData
 }
 
 export function convertProgramToCompetitionData(programData : CompetitionProgramData) : CompetitionData {
+  console.log(typeof programData.minPayoutRatio);
+  
   return {
     tokenA : programData.tokenA.toString(),
     priceFeedId: programData.priceFeedId,
     admin: programData.admin.map(a=> a.toString()),
-    houseCutFactor: programData.houseCutFactor.toNumber(),
-    minPayoutRatio: programData.minPayoutRatio.toNumber()
-  }
+    houseCutFactor: typeof programData.houseCutFactor === 'number' ? programData.houseCutFactor : programData.houseCutFactor.toNumber(),
+    minPayoutRatio: typeof programData.minPayoutRatio === 'number' ? programData.minPayoutRatio : programData.minPayoutRatio.toNumber()
+   }
 }
 
 //------------------------------------------------------- Data Finders

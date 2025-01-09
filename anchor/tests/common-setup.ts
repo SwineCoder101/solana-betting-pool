@@ -28,7 +28,7 @@ console.log("admin: ", adminKp);
 const program = anchor.workspace.HorseRace as anchor.Program<HorseRace>;
 
   // Airdrop SOL to the admin account
-  const airTx = await provider.connection.requestAirdrop(adminKp.publicKey, LAMPORTS_PER_SOL);
+  await provider.connection.requestAirdrop(adminKp.publicKey, LAMPORTS_PER_SOL);
   await Util.logSolBalance("Admin balance", adminPayer.publicKey);
 //   await Util.waitAndConfirmSignature(provider.connection, airTx);
 

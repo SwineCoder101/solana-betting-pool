@@ -6,7 +6,7 @@ pub mod constants;
 
 use instructions::*;
 
-declare_id!("YourProgramPubkey11111111111111111111111111");
+declare_id!("3U8ZsW8cd3GNcu69AhksaNEoeBCh8sHywvCHbm7mxaHz");
 
 #[program]
 pub mod horse_race {
