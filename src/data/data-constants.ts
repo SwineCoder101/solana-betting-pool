@@ -1,7 +1,7 @@
 export const tokens = [
     {
       symbol: "BONK",
-      priceFeedId: "BONK_PRICE_FEED",
+      priceFeedId: "0x72b021217ca3fe68922a19aaf990109cb9d84e9ad004b4d2025ad6f529314419",
       devnet: "bonk-devnet",
       localnet: "bonk-localnet",
       testnet: "bonk-testnet",
@@ -10,7 +10,7 @@ export const tokens = [
     },
     {
       symbol: "SOL",
-      priceFeedId: "SOL_PRICE_FEED",
+      priceFeedId: "0xef0d8b6fda2ceba41da15d4095d1da392a0d2f8ed0c6c7bc0f4cfac8c280b56d",
       devnet: "sol-devnet",
       localnet: "sol-localnet",
       testnet: "sol-testnet",

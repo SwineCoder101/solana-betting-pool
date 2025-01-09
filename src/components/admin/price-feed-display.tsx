@@ -1,19 +1,43 @@
-// src/components/admin/PriceFeedDisplay.tsx
-import { tokens } from "@/data/data-constants";
 import React, { useState, useEffect } from "react";
+import { PriceServiceConnection } from "@pythnetwork/price-service-client";
+import { tokens } from "@/data/data-constants";
 
 const PriceFeedDisplay: React.FC = () => {
   const [selectedToken, setSelectedToken] = useState(tokens[0]);
   const [price, setPrice] = useState<number | null>(null);
 
   useEffect(() => {
+    const connection = new PriceServiceConnection("https://hermes.pyth.network");
+
     const fetchPrice = async () => {
-      // Simulate fetching price data based on selectedToken.priceFeedId
-      const simulatedPrice = Math.random() * 10; // Replace with actual API call
-      setPrice(simulatedPrice);
+      try {
+        const currentPrices = await connection.getLatestPriceFeeds([selectedToken.priceFeedId]);
+        if (currentPrices && currentPrices.length > 0) {
+          const priceData = currentPrices[0].getPriceUnchecked();
+          if (priceData) {
+            setPrice(parseFloat(priceData.price) / Math.pow(10, Math.abs(priceData.expo)));
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching price: ", error);
+      }
     };
 
     fetchPrice();
+
+    connection.subscribePriceFeedUpdates(
+      [selectedToken.priceFeedId],
+      (priceFeed) => {
+        const priceData = priceFeed.getPriceUnchecked();
+        if (priceData) {
+          setPrice(parseFloat(priceData.price) / Math.pow(10, Math.abs(priceData.expo)));
+        }
+      }
+    );
+
+    return () => {
+      connection.closeWebSocket();
+    };
   }, [selectedToken]);
 
   return (
@@ -51,7 +75,7 @@ const PriceFeedDisplay: React.FC = () => {
           </p>
         </div>
         <div className="ml-auto text-right">
-          <p className="text-xl font-bold text-gray-800">{price ? price.toFixed(2) : "Loading..."} SOL</p>
+          <p className="text-xl font-bold text-gray-800">{price ? price.toFixed(6) : "Loading..."} USD</p>
         </div>
       </div>
     </div>
