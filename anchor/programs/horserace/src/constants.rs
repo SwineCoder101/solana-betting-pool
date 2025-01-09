@@ -1,0 +1,1 @@
+pub const COMPETITION_SEED: &[u8] = b"competition";

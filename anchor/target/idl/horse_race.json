@@ -1,0 +1,184 @@
+{
+  "address": "3U8ZsW8cd3GNcu69AhksaNEoeBCh8sHywvCHbm7mxaHz",
+  "metadata": {
+    "name": "horse_race",
+    "version": "0.1.0",
+    "spec": "0.1.0",
+    "description": "Created with Anchor"
+  },
+  "instructions": [
+    {
+      "name": "run_create_competition",
+      "discriminator": [
+        85,
+        21,
+        141,
+        208,
+        23,
+        187,
+        111,
+        68
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "competition",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  109,
+                  112,
+                  101,
+                  116,
+                  105,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "token_a",
+          "type": "pubkey"
+        },
+        {
+          "name": "price_feed_id",
+          "type": "string"
+        },
+        {
+          "name": "admin",
+          "type": {
+            "vec": "pubkey"
+          }
+        },
+        {
+          "name": "house_cut_factor",
+          "type": "u8"
+        },
+        {
+          "name": "min_payout_ratio",
+          "type": "u8"
+        }
+      ]
+    },
+    {
+      "name": "run_update_competition",
+      "discriminator": [
+        210,
+        126,
+        133,
+        97,
+        83,
+        143,
+        202,
+        83
+      ],
+      "accounts": [
+        {
+          "name": "competition",
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "signer": true
+        }
+      ],
+      "args": [
+        {
+          "name": "token_a",
+          "type": "pubkey"
+        },
+        {
+          "name": "price_feed_id",
+          "type": "string"
+        },
+        {
+          "name": "admin",
+          "type": {
+            "vec": "pubkey"
+          }
+        },
+        {
+          "name": "house_cut_factor",
+          "type": "u8"
+        },
+        {
+          "name": "min_payout_ratio",
+          "type": "u8"
+        }
+      ]
+    }
+  ],
+  "accounts": [
+    {
+      "name": "Competition",
+      "discriminator": [
+        193,
+        49,
+        76,
+        118,
+        106,
+        22,
+        221,
+        106
+      ]
+    }
+  ],
+  "errors": [
+    {
+      "code": 6000,
+      "name": "Unauthorized",
+      "msg": "Unauthorized: Not a whitelisted admin or deployer."
+    }
+  ],
+  "types": [
+    {
+      "name": "Competition",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "token_a",
+            "type": "pubkey"
+          },
+          {
+            "name": "price_feed_id",
+            "type": "string"
+          },
+          {
+            "name": "house_cut_factor",
+            "type": "u8"
+          },
+          {
+            "name": "min_payout_ratio",
+            "type": "u8"
+          },
+          {
+            "name": "admin",
+            "type": {
+              "vec": "pubkey"
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
