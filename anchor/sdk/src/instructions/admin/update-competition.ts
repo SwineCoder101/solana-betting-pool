@@ -9,7 +9,7 @@ export async function updateCompetitionInstruction(
   adminPubkeys: web3.PublicKey[],
   houseCutFactor: number,
   minPayoutRatio: number
-) {
+){
   const authority = program.provider.publicKey;
 
   return program.methods
