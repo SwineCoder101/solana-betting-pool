@@ -40,11 +40,11 @@ export function convertProgramToCompetitionData(programData : CompetitionProgram
 }
 
 //------------------------------------------------------- Data Finders
-export const findCompetitonAddress = (programId?: string): string => {
+export const findCompetitonAddress = (programId?: string): PublicKey => {
   return PublicKey.findProgramAddressSync(
     [Buffer.from(COMPETITION_SEED)],
     new PublicKey(programId || "")
-  )[0].toString();
+  )[0];
 };
 
 // ------------------------------------------------------- Data Fetchers

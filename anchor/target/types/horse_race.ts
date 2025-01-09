@@ -27,14 +27,33 @@ export type HorseRace = {
       ],
       "accounts": [
         {
-          "name": "competition",
+          "name": "authority",
           "writable": true,
           "signer": true
         },
         {
-          "name": "authority",
+          "name": "competition",
           "writable": true,
-          "signer": true
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  109,
+                  112,
+                  101,
+                  116,
+                  105,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              }
+            ]
+          }
         },
         {
           "name": "systemProgram",
@@ -151,18 +170,18 @@ export type HorseRace = {
             "type": "string"
           },
           {
-            "name": "admin",
-            "type": {
-              "vec": "pubkey"
-            }
-          },
-          {
             "name": "houseCutFactor",
             "type": "u8"
           },
           {
             "name": "minPayoutRatio",
             "type": "u8"
+          },
+          {
+            "name": "admin",
+            "type": {
+              "vec": "pubkey"
+            }
           }
         ]
       }

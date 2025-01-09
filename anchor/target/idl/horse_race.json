@@ -1,5 +1,5 @@
 {
-  "address": "YourProgramPubkey11111111111111111111111111",
+  "address": "3U8ZsW8cd3GNcu69AhksaNEoeBCh8sHywvCHbm7mxaHz",
   "metadata": {
     "name": "horse_race",
     "version": "0.1.0",
@@ -21,14 +21,33 @@
       ],
       "accounts": [
         {
-          "name": "competition",
+          "name": "authority",
           "writable": true,
           "signer": true
         },
         {
-          "name": "authority",
+          "name": "competition",
           "writable": true,
-          "signer": true
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  99,
+                  111,
+                  109,
+                  112,
+                  101,
+                  116,
+                  105,
+                  116,
+                  105,
+                  111,
+                  110
+                ]
+              }
+            ]
+          }
         },
         {
           "name": "system_program",
@@ -145,18 +164,18 @@
             "type": "string"
           },
           {
-            "name": "admin",
-            "type": {
-              "vec": "pubkey"
-            }
-          },
-          {
             "name": "house_cut_factor",
             "type": "u8"
           },
           {
             "name": "min_payout_ratio",
             "type": "u8"
+          },
+          {
+            "name": "admin",
+            "type": {
+              "vec": "pubkey"
+            }
           }
         ]
       }

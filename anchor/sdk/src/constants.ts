@@ -1,1 +1,1 @@
-export const COMPETITION_SEED = "";
+export const COMPETITION_SEED = "competition";

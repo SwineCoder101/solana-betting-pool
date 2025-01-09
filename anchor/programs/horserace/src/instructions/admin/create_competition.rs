@@ -1,18 +1,20 @@
 use anchor_lang::prelude::*;
-use crate::accounts::Competition;
+use crate::states::Competition;
+use crate::constants::*;
 
 #[derive(Accounts)]
 pub struct CreateCompetition<'info> {
+    #[account(mut)]
+    pub authority: Signer<'info>,
+
     #[account(
         init, 
+        seeds = [COMPETITION_SEED], 
+        bump,
         payer = authority,
-        space = 8 + 32 + (4 + 200) + (4 + 32*5) + 1 + 1, // Adjust space as needed
-        seeds = [b"competition"], bump
+        space = 8 + Competition::INIT_SPACE
     )]
     pub competition: Account<'info, Competition>,
-
-    #[account(mut)]
-    pub authority: Signer<'info>, // The account that pays for the creation
 
     pub system_program: Program<'info, System>,
 }

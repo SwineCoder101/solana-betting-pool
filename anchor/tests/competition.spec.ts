@@ -1,24 +1,22 @@
-import * as anchor from "@coral-xyz/anchor";
-import { Program } from "@coral-xyz/anchor";
-import { PublicKey, Keypair } from "@solana/web3.js";
-import { assert } from "chai";
-import {HorseRace} from "../sdk/src/index";
-describe("Create Competition", () => {
-  const provider = anchor.AnchorProvider.env();
-  anchor.setProvider(provider);
+import { setup as commonSetup, SetupDTO } from "./common-setup";
 
-  const program = anchor.workspace.BettingApp as Program<HorseRace>;
-  const wallet = provider.wallet as anchor.Wallet;
-  let sdk: RaceHorseSDK;
+describe("Competition", () => {
+  let setupDto: SetupDTO;
 
-  let competitionKeypair: Keypair;
-  const tokenA = Keypair.generate().publicKey;
-  const adminPubkeys = [wallet.publicKey];
-  const priceFeedId = "SOME_FEED";
-  const houseCutFactor = 3;
-  const minPayoutRatio = 2;
+  beforeAll(async () => {
+    setupDto = await commonSetup();
+  });
 
-  before(async () => {});
+  it("Create competition successfully", async () => {
+    const competitionData = setupDto.competitionData;
+    console.log(competitionData);
+    // assert.ok(competitionData.tokenA.equals(setupData.competitionData.tokenA));
+    // assert.equal(competitionData.priceFeedId, setupData.competitionData.priceFeedId);
+    // assert.equal(competitionData.houseCutFactor, setupData.competitionData.houseCutFactor);
+    // assert.equal(competitionData.minPayoutRatio, setupData.competitionData.minPayoutRatio);
+  });
 
-  it("Create competition successfully", async () => {});
+  // it("Update competition successfully", async () => {
+  //   // Add your update competition test logic here
+  // });
 });
