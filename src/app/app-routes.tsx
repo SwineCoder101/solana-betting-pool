@@ -1,3 +1,4 @@
+import AdminFeatures from '@/components/admin/admin-features'
 import { UiLayout } from '@/components/ui/ui-layout'
 import { lazy } from 'react'
 import { Navigate, RouteObject, useRoutes } from 'react-router-dom'
@@ -19,6 +20,7 @@ const routes: RouteObject[] = [
   { path: '/account/:address', element: <AccountDetailFeature /> },
   { path: '/solanabettingapplication', element: <SolanabettingapplicationFeature /> },
   { path: '/clusters', element: <ClusterFeature /> },
+  { path: '/admin/', element: <AdminFeatures/>}
 ]
 
 export function AppRoutes() {
