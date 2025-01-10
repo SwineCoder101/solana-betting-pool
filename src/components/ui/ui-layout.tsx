@@ -4,7 +4,7 @@ import { Link, useLocation } from 'react-router-dom'
 
 import { AccountChecker } from '../account/account-ui'
 import { ClusterChecker, ClusterUiSelect, ExplorerLink } from '../cluster/cluster-ui'
-import { WalletButton } from '../solana/solana-provider'
+import { WalletMultiButton } from '@solana/wallet-adapter-react-ui'
 
 export function UiLayout({ children, links }: { children: ReactNode; links: { label: string; path: string }[] }) {
   const pathname = useLocation().pathname
@@ -27,7 +27,7 @@ export function UiLayout({ children, links }: { children: ReactNode; links: { la
           </ul>
         </div>
         <div className="flex-none space-x-2">
-          <WalletButton />
+          <WalletMultiButton />
           <ClusterUiSelect />
         </div>
       </div>
@@ -137,6 +137,7 @@ export function AppHero({
   )
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function ellipsify(str = '', len = 4) {
   if (str.length > 30) {
     return str.substring(0, len) + '..' + str.substring(str.length - len, str.length)
@@ -144,6 +145,7 @@ export function ellipsify(str = '', len = 4) {
   return str
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useTransactionToast() {
   return (signature: string) => {
     toast.success(
