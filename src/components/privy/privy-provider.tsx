@@ -1,24 +1,32 @@
 import { PrivyProvider } from "@privy-io/react-auth";
 import { toSolanaWalletConnectors } from "@privy-io/react-auth/solana";
-
+import React from "react";
 const solanaConnectors = toSolanaWalletConnectors({
   // By default, shouldAutoConnect is enabled
   shouldAutoConnect: true,
 });
 
 export default function Providers({ children }: { children: React.ReactNode }) {
+  const privyAppId = import.meta.env.VITE_PRIVY_APP_ID;
   return (
-    <PrivyProvider
-      appId={process.env.PRIVY_APP_ID!}
-      config={{
-        embeddedWallets: {
-          createOnLogin: "all-users",
-        },
-        appearance: { theme: "light", accentColor: "#676FFF", walletChainType: "solana-only" },
-        externalWallets: { solana: { connectors: solanaConnectors } },
-      }}
-    >
-      <div>{children}</div>
-    </PrivyProvider>
+    <React.StrictMode>
+      <PrivyProvider
+        appId={privyAppId}
+        config={{
+          loginMethods: ['wallet'],
+          appearance: {
+            theme: 'light',
+            accentColor: '#676FFF',
+            logo: '',
+          },
+          solanaClusters: [{
+            name: 'mainnet-beta', rpcUrl: 'https://api.mainnet-beta.solana.com'}, {name: 'testnet', rpcUrl: 'https://api.testnet.solana.com'}, {name: 'devnet' , rpcUrl: 'https://api.devnet.solana.com'} ],
+
+          externalWallets: { solana: { connectors: solanaConnectors } },
+        }}
+      >
+        {children}
+      </PrivyProvider>
+    </React.StrictMode>
   );
 }
