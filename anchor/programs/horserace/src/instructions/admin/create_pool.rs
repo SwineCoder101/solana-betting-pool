@@ -1,7 +1,6 @@
 use anchor_lang::{prelude::*, solana_program::system_program};
 use crate::{
-    states::Pool,
-    errors::BettingError,
+    constants::POOL_SEED, errors::BettingError, states::Pool
 };
 
 #[derive(Accounts)]
@@ -9,10 +8,13 @@ pub struct CreatePool<'info> {
     #[account(mut)]
     pub authority: Signer<'info>, // The "admin" or competition owner
 
+
     #[account(
         init,
+        seeds = [POOL_SEED.as_ref(), id.to_le_bytes().as_ref()],
+        bump,
         payer = authority,
-        space = 8 + 1 + 32 + 1 + 8 + 8 + 32
+        space = Pool::INIT_SPACE
     )]
     pub pool: Account<'info, Pool>,
 

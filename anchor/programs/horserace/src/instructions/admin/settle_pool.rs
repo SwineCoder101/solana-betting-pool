@@ -1,4 +1,4 @@
-use anchor_lang::prelude::*;
+use anchor_lang::{prelude::*, system_program};
 use crate::{
     states::{Pool, Bet, BetStatus},
     utils::*,
@@ -10,19 +10,11 @@ pub struct SettlePool<'info> {
     #[account(mut)]
     pub authority: Signer<'info>, // The "admin" or competition owner
 
-    #[account(
-        mut,
-        // If you want seeds, define them. 
-        // We'll omit seeds for this example.
-    )]
-    pub pool: Account<'info, Pool>,
+    pub pool_to_settle: Pubkey,
 
-    // We only need system program for transfers, or additional accounts as needed
-    #[account(address = system_program::ID)]
+    pub bets: Vec<Pubkey>,
+Ø
     pub system_program: Program<'info, System>,
-
-    /// All bet accounts referencing this pool would be fetched on client side
-    /// or you can pass them in as remaining_accounts
 }
 
 pub fn run_settle_pool(

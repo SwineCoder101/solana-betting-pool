@@ -1,4 +1,6 @@
 export const COMPETITION_SEED = "competition";
+export const POOL_SEED = "pool";
+export const BET_SEED = "bet";
 
 // tokenA: 'Gv6vt9vuCTeqmjJtfZBhzkkqLg3EZ5mLJbg9q9ZkGpZA',
 // priceFeedId: 'SOME_FEED',
