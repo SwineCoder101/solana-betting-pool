@@ -8,6 +8,116 @@
   },
   "instructions": [
     {
+      "name": "run_cancel_bet",
+      "docs": [
+        "Cancel a Bet"
+      ],
+      "discriminator": [
+        154,
+        97,
+        164,
+        238,
+        225,
+        178,
+        79,
+        134
+      ],
+      "accounts": [
+        {
+          "name": "user",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "bet"
+          ]
+        },
+        {
+          "name": "bet",
+          "writable": true
+        },
+        {
+          "name": "pool",
+          "docs": [
+            "The Pool account from which funds are returned"
+          ],
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "run_create_bet",
+      "docs": [
+        "Create a Bet"
+      ],
+      "discriminator": [
+        83,
+        62,
+        238,
+        252,
+        115,
+        109,
+        59,
+        27
+      ],
+      "accounts": [
+        {
+          "name": "user",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "bet",
+          "docs": [
+            "The Bet account (to be created).",
+            "If you want seeds, define them. We'll omit seeds for now."
+          ],
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "pool",
+          "docs": [
+            "The Pool account where funds are stored"
+          ],
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "docs": [
+            "System program"
+          ],
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "lower_bound_price",
+          "type": "u64"
+        },
+        {
+          "name": "upper_bound_price",
+          "type": "u64"
+        },
+        {
+          "name": "pool_key",
+          "type": "pubkey"
+        },
+        {
+          "name": "competition",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
       "name": "run_create_competition",
       "discriminator": [
         85,
@@ -80,6 +190,172 @@
       ]
     },
     {
+      "name": "run_create_pool",
+      "docs": [
+        "Create a Pool"
+      ],
+      "discriminator": [
+        225,
+        56,
+        189,
+        2,
+        220,
+        61,
+        209,
+        12
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "pool_id_counter",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  105,
+                  100,
+                  95,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116,
+                  101,
+                  114
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "pool",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool_id_counter.next_id",
+                "account": "PoolIdCounter"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "competition_key",
+          "type": "pubkey"
+        },
+        {
+          "name": "start_time",
+          "type": "u64"
+        },
+        {
+          "name": "end_time",
+          "type": "u64"
+        },
+        {
+          "name": "treasury",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "run_init_pool_counter_id",
+      "discriminator": [
+        194,
+        83,
+        111,
+        138,
+        38,
+        95,
+        123,
+        86
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "pool_id_counter",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108,
+                  95,
+                  105,
+                  100,
+                  95,
+                  99,
+                  111,
+                  117,
+                  110,
+                  116,
+                  101,
+                  114
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "run_settle_pool",
+      "docs": [
+        "Settle a Pool"
+      ],
+      "discriminator": [
+        96,
+        137,
+        173,
+        253,
+        147,
+        165,
+        192,
+        218
+      ],
+      "accounts": [],
+      "args": [
+        {
+          "name": "competition_key",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
       "name": "run_update_competition",
       "discriminator": [
         210,
@@ -129,6 +405,19 @@
   ],
   "accounts": [
     {
+      "name": "Bet",
+      "discriminator": [
+        147,
+        23,
+        35,
+        59,
+        15,
+        75,
+        155,
+        32
+      ]
+    },
+    {
       "name": "Competition",
       "discriminator": [
         193,
@@ -140,16 +429,119 @@
         221,
         106
       ]
+    },
+    {
+      "name": "Pool",
+      "discriminator": [
+        241,
+        154,
+        109,
+        4,
+        17,
+        177,
+        109,
+        188
+      ]
+    },
+    {
+      "name": "PoolIdCounter",
+      "discriminator": [
+        206,
+        89,
+        150,
+        80,
+        215,
+        148,
+        46,
+        10
+      ]
     }
   ],
   "errors": [
     {
       "code": 6000,
+      "name": "NotEligible",
+      "msg": "User is not eligible to create a bet."
+    },
+    {
+      "code": 6001,
+      "name": "BetOwnershipMismatch",
+      "msg": "User does not own this bet."
+    },
+    {
+      "code": 6002,
+      "name": "InvalidTimeRange",
+      "msg": "Invalid time range."
+    },
+    {
+      "code": 6003,
       "name": "Unauthorized",
-      "msg": "Unauthorized: Not a whitelisted admin or deployer."
+      "msg": "Unauthorized: Not the competition owner."
+    },
+    {
+      "code": 6004,
+      "name": "PoolNotEnded",
+      "msg": "Pool not finished yet."
     }
   ],
   "types": [
+    {
+      "name": "Bet",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "competition",
+            "type": "pubkey"
+          },
+          {
+            "name": "lower_bound_price",
+            "type": "u64"
+          },
+          {
+            "name": "upper_bound_price",
+            "type": "u64"
+          },
+          {
+            "name": "pool_key",
+            "type": "pubkey"
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": {
+                "name": "BetStatus"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "BetStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Active"
+          },
+          {
+            "name": "Cancelled"
+          },
+          {
+            "name": "Settled"
+          }
+        ]
+      }
+    },
     {
       "name": "Competition",
       "type": {
@@ -176,6 +568,50 @@
             "type": {
               "vec": "pubkey"
             }
+          }
+        ]
+      }
+    },
+    {
+      "name": "Pool",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "id",
+            "type": "u8"
+          },
+          {
+            "name": "competition_key",
+            "type": "pubkey"
+          },
+          {
+            "name": "competition_id",
+            "type": "u8"
+          },
+          {
+            "name": "start_time",
+            "type": "u64"
+          },
+          {
+            "name": "end_time",
+            "type": "u64"
+          },
+          {
+            "name": "treasury",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PoolIdCounter",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "next_id",
+            "type": "u8"
           }
         ]
       }

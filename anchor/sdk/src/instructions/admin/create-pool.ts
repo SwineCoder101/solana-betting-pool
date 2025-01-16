@@ -11,7 +11,7 @@ export async function createPool(
   treasury: web3.PublicKey,
   id: number
 ): Promise<web3.TransactionSignature> {
-  const [poolPda, bump] = await web3.PublicKey.findProgramAddress(
+  const [poolPda] = await web3.PublicKey.findProgramAddressSync(
     [Buffer.from('pool'), new anchor.BN(id).toArrayLike(Buffer, 'le', 8)],
     program.programId
   );
@@ -20,7 +20,7 @@ export async function createPool(
     .runCreatePool(competitionKey, new anchor.BN(startTime), new anchor.BN(endTime), treasury)
     .accounts({
       authority,
-      pool: poolPda,
+      poolIdCounter: poolPda,
       systemProgram: web3.SystemProgram.programId,
     })
     .signers([])

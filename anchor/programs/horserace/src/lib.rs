@@ -100,4 +100,9 @@ pub mod horse_race {
     ) -> Result<()> {
         instructions::admin::settle_pool::run_settle_pool(ctx, competition_key)
     }
+
+    pub fn run_init_pool_counter_id(ctx: Context<InitPoolIdCounter>) -> Result<()> {
+        instructions::admin::init_pool_id_counter::run_init_pool_id_counter(ctx)
+    }
+
 }
