@@ -1,31 +1,34 @@
-import { Program, web3 } from "@coral-xyz/anchor";
-import { HorseRace } from "../../../../target/types/horse_race";
-import {SystemProgram} from "@solana/web3.js"
+import { Program, BN, web3 } from '@coral-xyz/anchor';
+import { HorseRace } from '../../../../target/types/horse_race';
 
 export async function createCompetition(
   program: Program<HorseRace>,
+  authority: web3.PublicKey,
   competitionPubkey: web3.PublicKey,
   tokenA: web3.PublicKey,
   priceFeedId: string,
   adminPubkeys: web3.PublicKey[],
   houseCutFactor: number,
-  minPayoutRatio: number
-) {
-  // Typically you would also derive PDAs or use your own competitionPubkey.
-  const authority = program.provider.publicKey;
-  
+  minPayoutRatio: number,
+  interval: number,
+  startTime: number,
+  endTime: number
+): Promise<web3.TransactionSignature> {
   return program.methods
     .runCreateCompetition(
       tokenA,
       priceFeedId,
       adminPubkeys,
-      houseCutFactor,
-      minPayoutRatio
+      new BN(houseCutFactor),
+      new BN(minPayoutRatio),
+      new BN(interval),
+      new BN(startTime),
+      new BN(endTime)
     )
     .accountsStrict({
       competition: competitionPubkey,
       authority,
-      systemProgram: SystemProgram.programId,
+      systemProgram: web3.SystemProgram.programId,
     })
     .rpc();
 }

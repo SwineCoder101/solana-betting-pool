@@ -1,5 +1,6 @@
 import { Program, web3 } from "@coral-xyz/anchor";
 import { HorseRace } from "../../../../target/types/horse_race";
+import { BN } from "@coral-xyz/anchor";
 
 export async function updateCompetitionInstruction(
   program: Program<HorseRace>,
@@ -8,7 +9,10 @@ export async function updateCompetitionInstruction(
   priceFeedId: string,
   adminPubkeys: web3.PublicKey[],
   houseCutFactor: number,
-  minPayoutRatio: number
+  minPayoutRatio: number,
+  interval: number,
+  startTime: number,
+  endTime: number
 ){
   const authority = program.provider.publicKey;
 
@@ -17,8 +21,11 @@ export async function updateCompetitionInstruction(
       tokenA,
       priceFeedId,
       adminPubkeys,
-      houseCutFactor,
-      minPayoutRatio
+      new BN(houseCutFactor),
+      new BN(minPayoutRatio),
+      new BN(interval),
+      new BN(startTime),
+      new BN(endTime)
     )
     .accounts({
       competition: competitionPubkey,

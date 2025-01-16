@@ -1,7 +1,7 @@
 import { updateCompetitionInstruction } from "../sdk/src";
 import { HOUSE_CUT_FACTOR, MIN_PAYOUT_RATIO, PRICE_FEED_ID } from "../sdk/src/constants";
 import { setup as commonSetup, SetupDTO } from "./common-setup";
-import {Keypair, PublicKey } from "@solana/web3.js";
+import {Keypair } from "@solana/web3.js";
 
 describe("Competition", () => {
   let setupDto: SetupDTO;
@@ -17,6 +17,9 @@ describe("Competition", () => {
     expect(competitionData.admin.length).toBeGreaterThan(0);
     expect(competitionData.houseCutFactor).toEqual(HOUSE_CUT_FACTOR);
     expect(competitionData.minPayoutRatio).toEqual(MIN_PAYOUT_RATIO);
+    expect(competitionData.interval).toBeGreaterThan(0);
+    expect(competitionData.startTime).toBeGreaterThan(0);
+    expect(competitionData.endTime).toBeGreaterThan(0);
   });
 
   it("Update competition successfully", async () => {
@@ -25,6 +28,9 @@ describe("Competition", () => {
     const newAdminPubkeys = [Keypair.generate().publicKey];
     const newHouseCutFactor = 2;
     const newMinPayoutRatio = 1;
+    const interval = 12000;
+    const startTime = 4070908800;
+    const endTime = 4070910600;
 
     await updateCompetitionInstruction(
       setupDto.sdkConfig.program,
@@ -33,7 +39,10 @@ describe("Competition", () => {
       newPriceFeedId,
       newAdminPubkeys,
       newHouseCutFactor,
-      newMinPayoutRatio
+      newMinPayoutRatio,
+      interval,
+      startTime,
+      endTime
     );
 
     const updatedCompetitionData = await setupDto.sdkConfig.program.account.competition.fetch(setupDto.competitionPubkey);
@@ -43,5 +52,8 @@ describe("Competition", () => {
     expect(updatedCompetitionData.admin.map(a => a.toString())).toEqual(newAdminPubkeys.map(a => a.toString()));
     expect(updatedCompetitionData.houseCutFactor).toEqual(newHouseCutFactor);
     expect(updatedCompetitionData.minPayoutRatio).toEqual(newMinPayoutRatio);
+    expect(updatedCompetitionData.interval.toNumber()).toEqual(interval);
+    expect(updatedCompetitionData.startTime.toNumber()).toEqual(startTime);
+    expect(updatedCompetitionData.endTime.toNumber()).toEqual(endTime);
   });
 });

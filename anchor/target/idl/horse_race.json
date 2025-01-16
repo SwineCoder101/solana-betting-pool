@@ -186,6 +186,18 @@
         {
           "name": "min_payout_ratio",
           "type": "u8"
+        },
+        {
+          "name": "interval",
+          "type": "u64"
+        },
+        {
+          "name": "start_time",
+          "type": "u64"
+        },
+        {
+          "name": "end_time",
+          "type": "u64"
         }
       ]
     },
@@ -399,6 +411,18 @@
         {
           "name": "min_payout_ratio",
           "type": "u8"
+        },
+        {
+          "name": "interval",
+          "type": "u64"
+        },
+        {
+          "name": "start_time",
+          "type": "u64"
+        },
+        {
+          "name": "end_time",
+          "type": "u64"
         }
       ]
     }
@@ -568,6 +592,18 @@
             "type": {
               "vec": "pubkey"
             }
+          },
+          {
+            "name": "interval",
+            "type": "u64"
+          },
+          {
+            "name": "start_time",
+            "type": "u64"
+          },
+          {
+            "name": "end_time",
+            "type": "u64"
           }
         ]
       }

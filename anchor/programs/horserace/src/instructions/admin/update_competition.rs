@@ -20,6 +20,9 @@ pub fn run_update_competition(
     admin: Vec<Pubkey>,
     house_cut_factor: u8,
     min_payout_ratio: u8,
+    interval: u64,
+    start_time: u64,
+    end_time: u64,
 ) -> Result<()> {
     // Logic:
     // 1. Check if the authority is the same as the "deployer" or if it is in the `admin` array
@@ -38,6 +41,9 @@ pub fn run_update_competition(
     competition.admin = admin;
     competition.house_cut_factor = house_cut_factor;
     competition.min_payout_ratio = min_payout_ratio;
+    competition.interval = interval;
+    competition.start_time = start_time;
+    competition.end_time = end_time;
 
     Ok(())
 }

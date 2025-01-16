@@ -21,6 +21,9 @@ pub mod horse_race {
         admin: Vec<Pubkey>,
         house_cut_factor: u8,
         min_payout_ratio: u8,
+        interval: u64,
+        start_time: u64,
+        end_time: u64,
     ) -> Result<()> {
         instructions::admin::create_competition::run_create_competition(
             ctx,
@@ -29,6 +32,9 @@ pub mod horse_race {
             admin,
             house_cut_factor,
             min_payout_ratio,
+            interval,
+            start_time,
+            end_time,
         )
     }
 
@@ -39,6 +45,10 @@ pub mod horse_race {
         admin: Vec<Pubkey>,
         house_cut_factor: u8,
         min_payout_ratio: u8,
+        interval: u64,
+        start_time: u64,
+        end_time: u64,
+        
     ) -> Result<()> {
         instructions::admin::update_competition::run_update_competition(
             ctx,
@@ -47,6 +57,9 @@ pub mod horse_race {
             admin,
             house_cut_factor,
             min_payout_ratio,
+            interval,
+            start_time,
+            end_time,
         )
     }
 

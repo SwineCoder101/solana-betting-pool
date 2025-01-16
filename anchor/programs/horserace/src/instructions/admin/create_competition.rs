@@ -9,7 +9,7 @@ pub struct CreateCompetition<'info> {
 
     #[account(
         init, 
-        seeds = [COMPETITION_SEED], 
+        seeds = [COMPETITION_SEED],
         bump,
         payer = authority,
         space = 8 + Competition::INIT_SPACE
@@ -26,11 +26,11 @@ pub fn run_create_competition(
     admin: Vec<Pubkey>,
     house_cut_factor: u8,
     min_payout_ratio: u8,
+    interval: u64,
+    start_time: u64,
+    end_time: u64,
 ) -> Result<()> {
-    // Business logic:
-    // 1. Only the signer (authority) can create the competition
-    // 2. Possibly check if `admin` contains the same authority, or check the "deployer" logic
-
+    
     let competition = &mut ctx.accounts.competition;
 
     competition.token_a = token_a;
@@ -38,6 +38,9 @@ pub fn run_create_competition(
     competition.admin = admin;
     competition.house_cut_factor = house_cut_factor;
     competition.min_payout_ratio = min_payout_ratio;
+    competition.interval = interval;
+    competition.start_time = start_time;
+    competition.end_time = end_time;
 
     Ok(())
 }

@@ -192,6 +192,18 @@ export type HorseRace = {
         {
           "name": "minPayoutRatio",
           "type": "u8"
+        },
+        {
+          "name": "interval",
+          "type": "u64"
+        },
+        {
+          "name": "startTime",
+          "type": "u64"
+        },
+        {
+          "name": "endTime",
+          "type": "u64"
         }
       ]
     },
@@ -405,6 +417,18 @@ export type HorseRace = {
         {
           "name": "minPayoutRatio",
           "type": "u8"
+        },
+        {
+          "name": "interval",
+          "type": "u64"
+        },
+        {
+          "name": "startTime",
+          "type": "u64"
+        },
+        {
+          "name": "endTime",
+          "type": "u64"
         }
       ]
     }
@@ -574,6 +598,18 @@ export type HorseRace = {
             "type": {
               "vec": "pubkey"
             }
+          },
+          {
+            "name": "interval",
+            "type": "u64"
+          },
+          {
+            "name": "startTime",
+            "type": "u64"
+          },
+          {
+            "name": "endTime",
+            "type": "u64"
           }
         ]
       }

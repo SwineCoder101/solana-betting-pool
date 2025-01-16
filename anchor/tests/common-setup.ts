@@ -44,14 +44,22 @@ const program = anchor.workspace.HorseRace as anchor.Program<HorseRace>;
   const houseCutFactor = 1.1;
   const minPayoutRatio = 0.9;
 
+  const startTime = 4070908800;
+  const endTime = 4070910600;
+  const interval = 6000;
+
   await createCompetition(
     program,
+    adminKp.publicKey,
     competitionPubkey,
     tokenA,
     priceFeedId,
     adminPubkeys,
     houseCutFactor,
-    minPayoutRatio
+    minPayoutRatio,
+    interval,
+    startTime,
+    endTime,
   );
 
   const competitionData = await getCompetitionData(program);
