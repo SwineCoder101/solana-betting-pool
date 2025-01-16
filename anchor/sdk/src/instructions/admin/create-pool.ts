@@ -18,7 +18,7 @@ export async function createPool(
 
   const tx = await program.methods
     .runCreatePool(competitionKey, new anchor.BN(startTime), new anchor.BN(endTime), treasury)
-    .accounts({
+    .accountsStrict({
       authority,
       poolIdCounter: poolPda,
       systemProgram: web3.SystemProgram.programId,
