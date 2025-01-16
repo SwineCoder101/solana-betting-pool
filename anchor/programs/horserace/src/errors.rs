@@ -12,4 +12,11 @@ pub enum BettingError {
     Unauthorized,
     #[msg("Pool not finished yet.")]
     PoolNotEnded,
+
+}
+
+#[error_code]
+pub enum PoolError {
+    #[msg("invalid pool id provided, please check the latest pool id")]
+    InvalidPoolId,
 }
