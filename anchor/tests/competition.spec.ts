@@ -56,4 +56,9 @@ describe("Competition", () => {
     expect(updatedCompetitionData.startTime.toNumber()).toEqual(startTime);
     expect(updatedCompetitionData.endTime.toNumber()).toEqual(endTime);
   });
+
+
+  it("create pool with competition", async () => {  
+    
+  });
 });
