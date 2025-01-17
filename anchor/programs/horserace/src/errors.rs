@@ -6,8 +6,7 @@ pub enum BettingError {
     NotEligible,
     #[msg("User does not own this bet.")]
     BetOwnershipMismatch,
-    #[msg("Invalid time range.")]
-    InvalidTimeRange,
+
     #[msg("Unauthorized: Not the competition owner.")]
     Unauthorized,
     #[msg("Pool not finished yet.")]
@@ -19,4 +18,6 @@ pub enum BettingError {
 pub enum PoolError {
     #[msg("invalid pool id provided, please check the latest pool id")]
     InvalidPoolId,
+    #[msg("Invalid time range.")]
+    InvalidTimeRange,
 }

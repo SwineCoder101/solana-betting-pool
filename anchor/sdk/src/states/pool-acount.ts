@@ -3,19 +3,18 @@ import { PublicKey } from "@solana/web3.js";
 import { HorseRace } from "../../../target/types/horse_race";
 import { POOL_SEED } from "../constants";
 
+
 export type PoolData = {
-  id: number,
+  poolHash: string,
   competitionKey: string,
-  competitionId: number,
   startTime: number,
   endTime: number,
   treasury: string,
 }
 
 export type PoolProgramData = {
-  id: number,
+  poolHash: PublicKey,
   competitionKey: PublicKey,
-  competitionId: number,
   startTime: BN | number,
   endTime: BN | number,
   treasury: PublicKey,
@@ -23,20 +22,18 @@ export type PoolProgramData = {
 
 export function convertPoolToProgramData(poolData: PoolData): PoolProgramData {
   return {
-    id: poolData.id,
-    competitionKey: new PublicKey(poolData.competitionKey),
-    competitionId: poolData.competitionId,
-    startTime: new BN(poolData.startTime),
-    endTime: new BN(poolData.endTime),
-    treasury: new PublicKey(poolData.treasury),
-  };
+  competitionKey: new PublicKey(poolData.competitionKey),
+  startTime: new BN(poolData.startTime),
+  endTime: new BN(poolData.endTime),
+  treasury: new PublicKey(poolData.treasury),
+  poolHash: new PublicKey(poolData.poolHash),
+};
 }
 
 export function convertProgramToPoolData(programData: PoolProgramData): PoolData {
   return {
-    id: programData.id,
+    poolHash: programData.poolHash.toString(),
     competitionKey: programData.competitionKey.toString(),
-    competitionId: programData.competitionId,
     startTime: typeof programData.startTime === 'number' ? programData.startTime : programData.startTime.toNumber(),
     endTime: typeof programData.endTime === 'number' ? programData.endTime : programData.endTime.toNumber(),
     treasury: programData.treasury.toString(),

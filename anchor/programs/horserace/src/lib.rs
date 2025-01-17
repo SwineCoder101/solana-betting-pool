@@ -92,14 +92,12 @@ pub mod horse_race {
     /// Create a Pool
     pub fn run_create_pool(
         ctx: Context<CreatePool>,
-        competition_key: Pubkey,
         start_time: u64,
         end_time: u64,
         treasury: Pubkey,
     ) -> Result<()> {
         instructions::admin::create_pool::run_create_pool(
             ctx,
-            competition_key,
             start_time,
             end_time,
             treasury,
@@ -112,10 +110,6 @@ pub mod horse_race {
         competition_key: Pubkey,
     ) -> Result<()> {
         instructions::admin::settle_pool::run_settle_pool(ctx, competition_key)
-    }
-
-    pub fn run_init_pool_counter_id(ctx: Context<InitPoolIdCounter>) -> Result<()> {
-        instructions::admin::init_pool_id_counter::run_init_pool_id_counter(ctx)
     }
 
 }

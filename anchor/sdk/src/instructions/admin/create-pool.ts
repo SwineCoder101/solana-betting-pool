@@ -5,23 +5,31 @@ import { HorseRace } from '../../../../target/types/horse_race';
 export async function createPool(
   program: Program<HorseRace>,
   authority: web3.PublicKey,
-  competitionKey: web3.PublicKey,
+  competitionAddr: web3.PublicKey,
   startTime: number,
   endTime: number,
   treasury: web3.PublicKey,
-  id: number
+  poolHash: web3.PublicKey
 ): Promise<web3.TransactionSignature> {
+
+  console.log('Creating pool with hash:', poolHash.toBase58());
+  console.log('Competition:', competitionAddr.toBase58());
+
   const [poolPda] = await web3.PublicKey.findProgramAddressSync(
-    [Buffer.from('pool'), new anchor.BN(id).toArrayLike(Buffer, 'le', 8)],
+    [Buffer.from('pool'), competitionAddr.toBuffer(), poolHash.toBuffer()],
     program.programId
   );
 
+  console.log('Pool PDA:', poolPda.toBase58());
+
   const tx = await program.methods
-    .runCreatePool(competitionKey, new anchor.BN(startTime), new anchor.BN(endTime), treasury)
+    .runCreatePool(new anchor.BN(startTime), new anchor.BN(endTime), treasury)
     .accountsStrict({
       authority,
-      poolIdCounter: poolPda,
+      pool: poolPda,
       systemProgram: web3.SystemProgram.programId,
+      poolHashAcc: poolHash,
+      competitionAcc: competitionAddr,
     })
     .signers([])
     .rpc();

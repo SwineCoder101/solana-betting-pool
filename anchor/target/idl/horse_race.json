@@ -223,27 +223,12 @@
           "signer": true
         },
         {
-          "name": "pool_id_counter",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  105,
-                  100,
-                  95,
-                  99,
-                  111,
-                  117,
-                  110,
-                  116,
-                  101,
-                  114
-                ]
-              }
-            ]
-          }
+          "name": "pool_hash_acc",
+          "writable": true
+        },
+        {
+          "name": "competition_acc",
+          "writable": true
         },
         {
           "name": "pool",
@@ -261,8 +246,11 @@
               },
               {
                 "kind": "account",
-                "path": "pool_id_counter.next_id",
-                "account": "PoolIdCounter"
+                "path": "competition_acc"
+              },
+              {
+                "kind": "account",
+                "path": "pool_hash_acc"
               }
             ]
           }
@@ -273,10 +261,6 @@
         }
       ],
       "args": [
-        {
-          "name": "competition_key",
-          "type": "pubkey"
-        },
         {
           "name": "start_time",
           "type": "u64"
@@ -290,59 +274,6 @@
           "type": "pubkey"
         }
       ]
-    },
-    {
-      "name": "run_init_pool_counter_id",
-      "discriminator": [
-        194,
-        83,
-        111,
-        138,
-        38,
-        95,
-        123,
-        86
-      ],
-      "accounts": [
-        {
-          "name": "authority",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "pool_id_counter",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  112,
-                  111,
-                  111,
-                  108,
-                  95,
-                  105,
-                  100,
-                  95,
-                  99,
-                  111,
-                  117,
-                  110,
-                  116,
-                  101,
-                  114
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "name": "system_program",
-          "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": []
     },
     {
       "name": "run_settle_pool",
@@ -466,19 +397,6 @@
         109,
         188
       ]
-    },
-    {
-      "name": "PoolIdCounter",
-      "discriminator": [
-        206,
-        89,
-        150,
-        80,
-        215,
-        148,
-        46,
-        10
-      ]
     }
   ],
   "errors": [
@@ -494,16 +412,11 @@
     },
     {
       "code": 6002,
-      "name": "InvalidTimeRange",
-      "msg": "Invalid time range."
-    },
-    {
-      "code": 6003,
       "name": "Unauthorized",
       "msg": "Unauthorized: Not the competition owner."
     },
     {
-      "code": 6004,
+      "code": 6003,
       "name": "PoolNotEnded",
       "msg": "Pool not finished yet."
     }
@@ -614,16 +527,12 @@
         "kind": "struct",
         "fields": [
           {
-            "name": "id",
-            "type": "u8"
+            "name": "pool_hash",
+            "type": "pubkey"
           },
           {
             "name": "competition_key",
             "type": "pubkey"
-          },
-          {
-            "name": "competition_id",
-            "type": "u8"
           },
           {
             "name": "start_time",
@@ -636,18 +545,6 @@
           {
             "name": "treasury",
             "type": "pubkey"
-          }
-        ]
-      }
-    },
-    {
-      "name": "PoolIdCounter",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "next_id",
-            "type": "u8"
           }
         ]
       }

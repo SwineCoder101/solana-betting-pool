@@ -229,27 +229,12 @@ export type HorseRace = {
           "signer": true
         },
         {
-          "name": "poolIdCounter",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  105,
-                  100,
-                  95,
-                  99,
-                  111,
-                  117,
-                  110,
-                  116,
-                  101,
-                  114
-                ]
-              }
-            ]
-          }
+          "name": "poolHashAcc",
+          "writable": true
+        },
+        {
+          "name": "competitionAcc",
+          "writable": true
         },
         {
           "name": "pool",
@@ -267,8 +252,11 @@ export type HorseRace = {
               },
               {
                 "kind": "account",
-                "path": "pool_id_counter.next_id",
-                "account": "poolIdCounter"
+                "path": "competitionAcc"
+              },
+              {
+                "kind": "account",
+                "path": "poolHashAcc"
               }
             ]
           }
@@ -279,10 +267,6 @@ export type HorseRace = {
         }
       ],
       "args": [
-        {
-          "name": "competitionKey",
-          "type": "pubkey"
-        },
         {
           "name": "startTime",
           "type": "u64"
@@ -296,59 +280,6 @@ export type HorseRace = {
           "type": "pubkey"
         }
       ]
-    },
-    {
-      "name": "runInitPoolCounterId",
-      "discriminator": [
-        194,
-        83,
-        111,
-        138,
-        38,
-        95,
-        123,
-        86
-      ],
-      "accounts": [
-        {
-          "name": "authority",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "poolIdCounter",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  112,
-                  111,
-                  111,
-                  108,
-                  95,
-                  105,
-                  100,
-                  95,
-                  99,
-                  111,
-                  117,
-                  110,
-                  116,
-                  101,
-                  114
-                ]
-              }
-            ]
-          }
-        },
-        {
-          "name": "systemProgram",
-          "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": []
     },
     {
       "name": "runSettlePool",
@@ -472,19 +403,6 @@ export type HorseRace = {
         109,
         188
       ]
-    },
-    {
-      "name": "poolIdCounter",
-      "discriminator": [
-        206,
-        89,
-        150,
-        80,
-        215,
-        148,
-        46,
-        10
-      ]
     }
   ],
   "errors": [
@@ -500,16 +418,11 @@ export type HorseRace = {
     },
     {
       "code": 6002,
-      "name": "invalidTimeRange",
-      "msg": "Invalid time range."
-    },
-    {
-      "code": 6003,
       "name": "unauthorized",
       "msg": "Unauthorized: Not the competition owner."
     },
     {
-      "code": 6004,
+      "code": 6003,
       "name": "poolNotEnded",
       "msg": "Pool not finished yet."
     }
@@ -620,16 +533,12 @@ export type HorseRace = {
         "kind": "struct",
         "fields": [
           {
-            "name": "id",
-            "type": "u8"
+            "name": "poolHash",
+            "type": "pubkey"
           },
           {
             "name": "competitionKey",
             "type": "pubkey"
-          },
-          {
-            "name": "competitionId",
-            "type": "u8"
           },
           {
             "name": "startTime",
@@ -642,18 +551,6 @@ export type HorseRace = {
           {
             "name": "treasury",
             "type": "pubkey"
-          }
-        ]
-      }
-    },
-    {
-      "name": "poolIdCounter",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "nextId",
-            "type": "u8"
           }
         ]
       }
