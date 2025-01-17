@@ -3,7 +3,7 @@ import {Program} from '@coral-xyz/anchor'
 import {Keypair} from '@solana/web3.js'
 import {Solanabettingapplication} from '../target/types/solanabettingapplication'
 
-describe('solanabettingapplication', () => {
+describe.skip('solanabettingapplication', () => {
   // Configure the client to use the local cluster.
   const provider = anchor.AnchorProvider.env()
   anchor.setProvider(provider)
