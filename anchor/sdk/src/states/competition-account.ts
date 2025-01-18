@@ -55,16 +55,16 @@ export function convertProgramToCompetitionData(programData : CompetitionProgram
 }
 
 //------------------------------------------------------- Data Finders
-export const findCompetitonAddress = (programId?: string): PublicKey => {
+export const findCompetitonAddress = (competitionHash: PublicKey,programId?: string): PublicKey => {
   return PublicKey.findProgramAddressSync(
-    [Buffer.from(COMPETITION_SEED)],
+    [Buffer.from(COMPETITION_SEED), Buffer.from(competitionHash.toBuffer())],
     new PublicKey(programId || "")
   )[0];
 };
 
 // ------------------------------------------------------- Data Fetchers
-export async function getCompetitionData(program: Program<HorseRace>) : Promise<CompetitionData> {
-  const compAddress = findCompetitonAddress(program.programId.toString());
+export async function getCompetitionData(competitionHash: PublicKey, program: Program<HorseRace>) : Promise<CompetitionData> {
+  const compAddress = findCompetitonAddress(competitionHash, program.programId.toString());
   const fetchedData = await program.account.competition.fetch(compAddress);
   return convertProgramToCompetitionData(fetchedData);
 }

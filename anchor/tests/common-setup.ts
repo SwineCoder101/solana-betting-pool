@@ -7,12 +7,13 @@ import { HorseRace, CompetitionData, createCompetition, IDL, getCompetitionData,
 export type SetupDTO = {
     competitionPubkey: PublicKey;
     competitionData: CompetitionData;
+    pools?: PublicKey[];
     fakeAdmin: Keypair;
     program: anchor.Program<HorseRace>;
     sdkConfig: SdkConfig;
 }
 
-export const setup = async function (): Promise<SetupDTO> {
+export const setupCompetition = async function (): Promise<SetupDTO> {
 
 console.log("setting up.........");
 
@@ -23,8 +24,6 @@ anchor.setProvider(provider);
 const adminPayer = provider.wallet.payer;
 const adminKp = Keypair.fromSecretKey(adminPayer.secretKey);
 
-console.log("admin: ", adminKp);
-
 const program = anchor.workspace.HorseRace as anchor.Program<HorseRace>;
 
   // Airdrop SOL to the admin account
@@ -34,9 +33,10 @@ const program = anchor.workspace.HorseRace as anchor.Program<HorseRace>;
 
   // Create a fake admin keypair
   const fakeAdmin = Keypair.generate();
+  const competitionHash = Keypair.generate().publicKey;
 
   // Create competition
-  const competitionPubkey = findCompetitonAddress(program.programId.toString());
+  const competitionPubkey = findCompetitonAddress(competitionHash , program.programId.toString());
 
   const tokenA = Keypair.generate().publicKey;
   const priceFeedId = "SOME_FEED";
@@ -48,7 +48,7 @@ const program = anchor.workspace.HorseRace as anchor.Program<HorseRace>;
   const endTime = 4070910600;
   const interval = 6000;
 
-  const competitionHash = Keypair.generate().publicKey;
+
 
   await createCompetition(
     program,
@@ -65,7 +65,7 @@ const program = anchor.workspace.HorseRace as anchor.Program<HorseRace>;
     endTime,
   );
 
-  const competitionData = await getCompetitionData(program);
+  const competitionData = await getCompetitionData(competitionHash, program);
 
   const sdkConfig :SdkConfig = {
     connection: provider.connection,
@@ -85,3 +85,10 @@ const program = anchor.workspace.HorseRace as anchor.Program<HorseRace>;
     sdkConfig,
   };
 };
+
+export const setupCompetitionWithPools = async function (): Promise<SetupDTO> {
+
+  const setupDto = await setupCompetition();
+
+  return setupDto;
+}
