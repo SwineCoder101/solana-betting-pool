@@ -3,7 +3,7 @@ import { HOUSE_CUT_FACTOR, MIN_PAYOUT_RATIO, PRICE_FEED_ID } from "../sdk/src/co
 import { setup as commonSetup, SetupDTO } from "./common-setup";
 import {Keypair } from "@solana/web3.js";
 
-describe("Competition", () => {
+describe("Competition with Pools", () => {
   let setupDto: SetupDTO;
 
   beforeAll(async () => {

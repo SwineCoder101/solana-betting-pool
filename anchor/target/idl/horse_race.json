@@ -136,6 +136,10 @@
           "signer": true
         },
         {
+          "name": "comp_hash_acc",
+          "writable": true
+        },
+        {
           "name": "competition",
           "writable": true,
           "pda": {
@@ -155,6 +159,10 @@
                   111,
                   110
                 ]
+              },
+              {
+                "kind": "account",
+                "path": "comp_hash_acc"
               }
             ]
           }

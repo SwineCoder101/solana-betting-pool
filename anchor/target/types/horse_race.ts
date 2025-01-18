@@ -142,6 +142,10 @@ export type HorseRace = {
           "signer": true
         },
         {
+          "name": "compHashAcc",
+          "writable": true
+        },
+        {
           "name": "competition",
           "writable": true,
           "pda": {
@@ -161,6 +165,10 @@ export type HorseRace = {
                   111,
                   110
                 ]
+              },
+              {
+                "kind": "account",
+                "path": "compHashAcc"
               }
             ]
           }

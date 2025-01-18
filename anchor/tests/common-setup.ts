@@ -48,9 +48,12 @@ const program = anchor.workspace.HorseRace as anchor.Program<HorseRace>;
   const endTime = 4070910600;
   const interval = 6000;
 
+  const competitionHash = Keypair.generate().publicKey;
+
   await createCompetition(
     program,
     adminKp.publicKey,
+    competitionHash,
     competitionPubkey,
     tokenA,
     priceFeedId,

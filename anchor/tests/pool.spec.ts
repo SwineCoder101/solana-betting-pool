@@ -12,7 +12,7 @@ describe("Pool", () => {
   const authority = provider.wallet.publicKey;
   const competitionKey = Keypair.generate().publicKey;
   const treasury = Keypair.generate().publicKey;
-  const startTime = Math.floor(Date.now() / 1000);
+  const startTime = Math.floor(Date.now() / 1000)
   const endTime = startTime + 3600; // 1 hour later
 
   it("Create pool successfully", async () => {

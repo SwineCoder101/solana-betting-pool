@@ -7,9 +7,13 @@ pub struct CreateCompetition<'info> {
     #[account(mut)]
     pub authority: Signer<'info>,
 
+    /// CHECK: The comp_hash_acc is mutable because the comp_hash is stored in the competition account.
+    #[account(mut)]
+    pub comp_hash_acc: UncheckedAccount<'info>,
+
     #[account(
         init, 
-        seeds = [COMPETITION_SEED],
+        seeds = [COMPETITION_SEED, comp_hash_acc.key().as_ref()],
         bump,
         payer = authority,
         space = 8 + Competition::INIT_SPACE
