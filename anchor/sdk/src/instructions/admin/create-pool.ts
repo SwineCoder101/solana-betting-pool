@@ -2,6 +2,13 @@ import * as anchor from '@coral-xyz/anchor';
 import { Program, web3 } from '@coral-xyz/anchor';
 import { HorseRace } from '../../../../target/types/horse_race';
 
+export type CreatePoolResponse = {
+  poolKey: web3.PublicKey,
+  poolHash: web3.PublicKey,
+  tx: web3.TransactionSignature,
+}
+
+
 export async function createPool(
   program: Program<HorseRace>,
   authority: web3.PublicKey,
@@ -10,7 +17,7 @@ export async function createPool(
   endTime: number,
   treasury: web3.PublicKey,
   poolHash: web3.PublicKey
-): Promise<web3.TransactionSignature> {
+): Promise<CreatePoolResponse> {
 
   console.log('Creating pool with hash:', poolHash.toBase58());
   console.log('Competition:', competitionAddr.toBase58());
@@ -34,5 +41,9 @@ export async function createPool(
     .signers([])
     .rpc();
 
-  return tx;
+  return {
+    poolKey: poolPda,
+    poolHash,
+    tx,
+  };
 }

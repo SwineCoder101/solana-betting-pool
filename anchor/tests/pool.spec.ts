@@ -20,7 +20,7 @@ describe("Pool", () => {
     const poolHash = Keypair.generate().publicKey;
 
     // Create the pool
-    const tx = await createPool(program, authority, competitionKey, startTime, endTime, treasury, poolHash);
+    const {tx} = await createPool(program, authority, competitionKey, startTime, endTime, treasury, poolHash);
     console.log('Transaction signature:', tx);
 
     // Fetch the pool account to verify it was created successfully

@@ -1,59 +1,77 @@
-import { updateCompetitionInstruction } from "../sdk/src";
-import { HOUSE_CUT_FACTOR, MIN_PAYOUT_RATIO, PRICE_FEED_ID } from "../sdk/src/constants";
-import { setup as commonSetup, SetupDTO } from "./common-setup";
-import {Keypair } from "@solana/web3.js";
+import { setupCompetitionWithPools, SetupDTO } from "./common-setup";
 
 describe("Competition with Pools", () => {
   let setupDto: SetupDTO;
 
   beforeAll(async () => {
-    setupDto = await commonSetup();
+    setupDto = await setupCompetitionWithPools();
   });
 
-  it("Create competition successfully", async () => {
-    const competitionData = setupDto.competitionData;
-    expect(competitionData.tokenA).toBeDefined();
-    expect(competitionData.priceFeedId).toEqual(PRICE_FEED_ID);
-    expect(competitionData.admin.length).toBeGreaterThan(0);
-    expect(competitionData.houseCutFactor).toEqual(HOUSE_CUT_FACTOR);
-    expect(competitionData.minPayoutRatio).toEqual(MIN_PAYOUT_RATIO);
-    expect(competitionData.interval).toBeGreaterThan(0);
-    expect(competitionData.startTime).toBeGreaterThan(0);
-    expect(competitionData.endTime).toBeGreaterThan(0);
+  it("Create competition with pools successfully", async () => {
+    const { program, competitionPubkey, competitionData, poolKeys, fakeAdmin } = setupDto;
+
+    // Assert competition is created
+    const fetchedCompetition = await program.account.competition.fetch(competitionPubkey);
+    expect(fetchedCompetition.tokenA.toString()).toEqual(competitionData.tokenA.toString());
+    expect(fetchedCompetition.priceFeedId).toEqual(competitionData.priceFeedId);
+    expect(fetchedCompetition.admin.map(pb => pb.toBase58())).toEqual(competitionData.admin);
+    expect(fetchedCompetition.houseCutFactor).toEqual(competitionData.houseCutFactor);
+    expect(fetchedCompetition.minPayoutRatio).toEqual(competitionData.minPayoutRatio);
+    expect(fetchedCompetition.interval.toNumber()).toEqual(competitionData.interval);
+    expect(fetchedCompetition.startTime.toNumber()).toEqual(competitionData.startTime);
+    expect(fetchedCompetition.endTime.toNumber()).toEqual(competitionData.endTime);
+
+    // Assert correct number of pools are created
+    const numOfPools = Math.floor((competitionData.endTime - competitionData.startTime) / competitionData.interval);
+    expect(poolKeys?.length).toEqual(numOfPools);
+
+    if (poolKeys  && poolKeys.length > 0){
+        for (let i = 0; i < poolKeys.length; i++) {
+            const pool = await program.account.pool.fetch(poolKeys[i]);
+            expect(pool.competitionKey.toString()).toEqual(competitionPubkey.toString());
+            expect(pool.startTime.toNumber()).toEqual(competitionData.startTime + i * competitionData.interval);
+            expect(pool.endTime.toNumber()).toEqual(pool.startTime.toNumber() + competitionData.interval);
+            expect(pool.treasury.toString()).toEqual(fakeAdmin.toString());
+          }
+    }   
   });
 
-  it("Update competition successfully", async () => {
-    const newTokenA = Keypair.generate().publicKey;
-    const newPriceFeedId = "NEW_FEED";
-    const newAdminPubkeys = [Keypair.generate().publicKey];
-    const newHouseCutFactor = 2;
-    const newMinPayoutRatio = 1;
-    const interval = 12000;
-    const startTime = 4070908800;
-    const endTime = 4070910600;
+  it("Create multiple competitions with pools successfully", async () => {
+    const numCompetitions = 3;
+    const competitions: SetupDTO[] = [];
 
-    await updateCompetitionInstruction(
-      setupDto.sdkConfig.program,
-      setupDto.competitionPubkey,
-      newTokenA,
-      newPriceFeedId,
-      newAdminPubkeys,
-      newHouseCutFactor,
-      newMinPayoutRatio,
-      interval,
-      startTime,
-      endTime
-    );
+    for (let i = 0; i < numCompetitions; i++) {
+      const setupDto = await setupCompetitionWithPools();
+      competitions.push(setupDto);
+    }
 
-    const updatedCompetitionData = await setupDto.sdkConfig.program.account.competition.fetch(setupDto.competitionPubkey);
+    for (const setupDto of competitions) {
+      const { program, fakeAdmin, competitionPubkey, competitionData, poolKeys } = setupDto;
 
-    expect(updatedCompetitionData.tokenA.toString()).toEqual(newTokenA.toString());
-    expect(updatedCompetitionData.priceFeedId).toEqual(newPriceFeedId);
-    expect(updatedCompetitionData.admin.map(a => a.toString())).toEqual(newAdminPubkeys.map(a => a.toString()));
-    expect(updatedCompetitionData.houseCutFactor).toEqual(newHouseCutFactor);
-    expect(updatedCompetitionData.minPayoutRatio).toEqual(newMinPayoutRatio);
-    expect(updatedCompetitionData.interval.toNumber()).toEqual(interval);
-    expect(updatedCompetitionData.startTime.toNumber()).toEqual(startTime);
-    expect(updatedCompetitionData.endTime.toNumber()).toEqual(endTime);
+      // Assert competition is created
+      const fetchedCompetition = await program.account.competition.fetch(competitionPubkey);
+      expect(fetchedCompetition.tokenA.toString()).toEqual(competitionData.tokenA.toString());
+      expect(fetchedCompetition.priceFeedId).toEqual(competitionData.priceFeedId);
+      expect(fetchedCompetition.admin.map(pb => pb.toBase58())).toEqual(competitionData.admin);
+      expect(fetchedCompetition.houseCutFactor).toEqual(competitionData.houseCutFactor);
+      expect(fetchedCompetition.minPayoutRatio).toEqual(competitionData.minPayoutRatio);
+      expect(fetchedCompetition.interval.toNumber()).toEqual(competitionData.interval);
+      expect(fetchedCompetition.startTime.toNumber()).toEqual(competitionData.startTime);
+      expect(fetchedCompetition.endTime.toNumber()).toEqual(competitionData.endTime);
+
+      // Assert correct number of pools are created
+      const numOfPools = Math.floor((competitionData.endTime - competitionData.startTime) / competitionData.interval);
+      expect(poolKeys?.length).toEqual(numOfPools);
+
+      if (poolKeys  && poolKeys.length > 0){
+        for (let i = 0; i < poolKeys?.length; i++) {
+            const pool = await program.account.pool.fetch(poolKeys[i]);
+            expect(pool.competitionKey.toString()).toEqual(competitionPubkey.toString());
+            expect(pool.startTime.toNumber()).toEqual(competitionData.startTime + i * competitionData.interval);
+            expect(pool.endTime.toNumber()).toEqual(pool.startTime.toNumber() + competitionData.interval);
+            expect(pool.treasury.toString()).toEqual(fakeAdmin.toString());
+          }
+      }
+    }
   });
 });

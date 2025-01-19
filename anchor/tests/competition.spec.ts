@@ -1,13 +1,13 @@
 import { updateCompetitionInstruction } from "../sdk/src";
 import { HOUSE_CUT_FACTOR, MIN_PAYOUT_RATIO, PRICE_FEED_ID } from "../sdk/src/constants";
-import { setup as commonSetup, SetupDTO } from "./common-setup";
+import { setupCompetition, SetupDTO } from "./common-setup";
 import {Keypair } from "@solana/web3.js";
 
 describe("Competition", () => {
   let setupDto: SetupDTO;
 
   beforeAll(async () => {
-    setupDto = await commonSetup();
+    setupDto = await setupCompetition();
   });
 
   it("Create competition successfully", async () => {
