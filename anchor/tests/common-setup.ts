@@ -3,68 +3,112 @@ import { Keypair, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import * as Util from "./test-utils";
 import { SdkConfig } from "../sdk/src/types";
 import { HorseRace, CompetitionData, createCompetition, IDL, getCompetitionData, findCompetitonAddress } from "../sdk/src";
+import { createCompetitionWithPools } from "../sdk/src/instructions/admin/create-competition-with-pools";
 
 export type SetupDTO = {
     competitionPubkey: PublicKey;
     competitionData: CompetitionData;
+    poolKeys?: PublicKey[];
     fakeAdmin: Keypair;
     program: anchor.Program<HorseRace>;
     sdkConfig: SdkConfig;
 }
 
-export const setup = async function (): Promise<SetupDTO> {
+export type EnvironmentSetupDTO = {
+  fakeAdmin: Keypair;
+  adminKp: Keypair;
+  adminKeys: PublicKey[];
+  program: anchor.Program<HorseRace>;
+  sdkConfig: SdkConfig;
+  provider: anchor.AnchorProvider;
+}
+
+export const setupEnvironment = async function (): Promise<EnvironmentSetupDTO> {
+  const provider = anchor.AnchorProvider.env();
+  anchor.setProvider(provider);
+  
+  // @ts-expect-error-ignore
+  const adminPayer = provider.wallet.payer;
+  const adminKp = Keypair.fromSecretKey(adminPayer.secretKey);
+  
+  const program = anchor.workspace.HorseRace as anchor.Program<HorseRace>;
+  
+    // Airdrop SOL to the admin account
+    await provider.connection.requestAirdrop(adminKp.publicKey, LAMPORTS_PER_SOL);
+    await Util.logSolBalance("Admin balance", adminPayer.publicKey);
+  //   await Util.waitAndConfirmSignature(provider.connection, airTx);
+  
+    // Create a fake admin keypair
+    const fakeAdmin = Keypair.generate();
+
+    const sdkConfig :SdkConfig = {
+      connection: provider.connection,
+      program,
+      url: '',
+      idl: IDL,
+      signer: adminKp.publicKey.toString(),
+      debug: true,
+    }
+
+    const adminKeys = [adminKp.publicKey];
+
+    return {
+      provider,
+      fakeAdmin,
+      adminKp,
+      adminKeys,
+      program,
+      sdkConfig,
+  }
+}
+
+export const getCompetitionTestData = (program) => {
+  const tokenA = Keypair.generate().publicKey;
+  const priceFeedId = "SOME_FEED";
+  const houseCutFactor = 1.1;
+  const minPayoutRatio = 0.9;
+  const interval = 6000;
+  const startTime = 4070908800;
+  const endTime = 4070910600;
+
+  const competitionHash = Keypair.generate().publicKey;
+  const competitionPubkey = findCompetitonAddress(competitionHash , program.programId.toString());
+  return {
+    competitionPubkey,
+    competitionHash,
+    tokenA,
+    priceFeedId,
+    houseCutFactor,
+    minPayoutRatio,
+    interval,
+    startTime,
+    endTime,
+  };
+}
+
+export const setupCompetition = async function (): Promise<SetupDTO> {
 
 console.log("setting up.........");
 
-const provider = anchor.AnchorProvider.env();
-anchor.setProvider(provider);
-
-// @ts-ignore
-const adminPayer = provider.wallet.payer;
-const adminKp = Keypair.fromSecretKey(adminPayer.secretKey);
-
-console.log("admin: ", adminKp);
-
-const program = anchor.workspace.HorseRace as anchor.Program<HorseRace>;
-
-  // Airdrop SOL to the admin account
-  await provider.connection.requestAirdrop(adminKp.publicKey, LAMPORTS_PER_SOL);
-  await Util.logSolBalance("Admin balance", adminPayer.publicKey);
-//   await Util.waitAndConfirmSignature(provider.connection, airTx);
-
-  // Create a fake admin keypair
-  const fakeAdmin = Keypair.generate();
-
-  // Create competition
-  const competitionPubkey = findCompetitonAddress(program.programId.toString());
-
-  const tokenA = Keypair.generate().publicKey;
-  const priceFeedId = "SOME_FEED";
-  const adminPubkeys = [adminKp.publicKey];
-  const houseCutFactor = 1.1;
-  const minPayoutRatio = 0.9;
+  const {fakeAdmin,program, adminKp,sdkConfig, adminKeys} = await setupEnvironment();
+  const {tokenA, priceFeedId, houseCutFactor, minPayoutRatio, interval, startTime, endTime, competitionHash, competitionPubkey} = getCompetitionTestData(program);
 
   await createCompetition(
     program,
+    adminKp.publicKey,
+    competitionHash,
     competitionPubkey,
     tokenA,
     priceFeedId,
-    adminPubkeys,
+    adminKeys,
     houseCutFactor,
-    minPayoutRatio
+    minPayoutRatio,
+    interval,
+    startTime,
+    endTime,
   );
 
-  const competitionData = await getCompetitionData(program);
-
-  const sdkConfig :SdkConfig = {
-    connection: provider.connection,
-    program,
-    url: '',
-    idl: IDL,
-    signer: adminKp.publicKey.toString(),
-    debug: true,
-  }
-
+  const competitionData = await getCompetitionData(competitionHash, program);
 
   return {
     competitionPubkey,
@@ -74,3 +118,35 @@ const program = anchor.workspace.HorseRace as anchor.Program<HorseRace>;
     sdkConfig,
   };
 };
+
+export const setupCompetitionWithPools = async function (): Promise<SetupDTO> {
+
+  const {fakeAdmin,program, adminKp,sdkConfig, adminKeys} = await setupEnvironment();
+  const {tokenA, priceFeedId, houseCutFactor, minPayoutRatio, interval, startTime, endTime, competitionHash, competitionPubkey} = getCompetitionTestData(program);
+
+  const {poolKeys}  = await createCompetitionWithPools(
+    program,
+    adminKp.publicKey,
+    competitionHash,
+    tokenA,
+    priceFeedId,
+    adminKeys,
+    houseCutFactor,
+    minPayoutRatio,
+    interval,
+    startTime,
+    endTime,
+  )
+
+  const competitionData = await getCompetitionData(competitionHash, program);
+
+
+  return {
+    competitionPubkey,
+    competitionData,
+    fakeAdmin,
+    program,
+    sdkConfig,
+    poolKeys,
+  };
+}
