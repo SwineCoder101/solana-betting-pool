@@ -21,13 +21,13 @@ export async function createBet(
       poolKey,
       competition
     )
-    .accounts({
+    .accountsStrict({
       user,
       bet: bet.publicKey,
       pool: poolKey,
       systemProgram: web3.SystemProgram.programId,
     })
-    .signers([bet])
+    .signers([])
     .rpc();
 
   return tx;

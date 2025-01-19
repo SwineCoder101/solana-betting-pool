@@ -43,6 +43,7 @@ export const setupEnvironment = async function (): Promise<EnvironmentSetupDTO> 
 
     const sdkConfig :SdkConfig = {
       connection: provider.connection,
+      provider: provider,
       program,
       url: '',
       idl: IDL,
@@ -147,6 +148,6 @@ export const setupCompetitionWithPools = async function (): Promise<SetupDTO> {
     fakeAdmin,
     program,
     sdkConfig,
-    poolKeys,
+    poolKeys: poolKeys ?? [ Keypair.generate().publicKey],
   };
 }

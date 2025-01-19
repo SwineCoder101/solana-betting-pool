@@ -11,18 +11,15 @@ pub struct CreateBet<'info> {
     #[account(mut)]
     pub user: Signer<'info>,
 
-    /// The Bet account (to be created).  
-    /// If you want seeds, define them. We'll omit seeds for now.
     #[account(
         init,
         payer = user,
-        space = 8 + 32 + 8 + 32 + 8 + 8 + 32 + 1 // Adjust for Bet struct sizes
+        space = 8 + 
     )]
     pub bet: Account<'info, Bet>,
 
-    /// The Pool account where funds are stored
     #[account(mut)]
-    pub pool: SystemAccount<'info>, // or an Account<'info, Pool> if you want to store info
+    pub pool: SystemAccount<'info>,
 
     /// System program
     pub system_program: Program<'info, System>,

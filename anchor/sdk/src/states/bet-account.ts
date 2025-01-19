@@ -64,3 +64,21 @@ export async function getBetAccount(
 ) {
   return program.account.bet.fetch(betPubkey);
 }
+
+export async function getBetAccountsForUser(
+  program: Program<HorseRace>,
+  userPubkey: PublicKey
+): Promise<BetData[]> {
+  const accounts = await program.account.bet.all();
+  const betAccounts = accounts.filter((account) => account.account.user.equals(userPubkey));
+  return betAccounts.map((account) => convertProgramToBetData(account.account));
+}
+
+export async function getBetAccountsForPool(
+  program: Program<HorseRace>,
+  poolPubkey: PublicKey
+): Promise<BetData[]> {
+  const accounts = await program.account.bet.all();
+  const betAccounts = accounts.filter((account) => account.account.poolKey.equals(poolPubkey));
+  return betAccounts.map((account) => convertProgramToBetData(account.account));
+} 
