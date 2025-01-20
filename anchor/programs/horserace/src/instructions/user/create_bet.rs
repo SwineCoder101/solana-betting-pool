@@ -1,8 +1,6 @@
 use anchor_lang::prelude::*;
 use crate::{
-    states::{Bet, BetStatus},
-    utils::*,
-    errors::BettingError,
+    errors::BettingError, states::{Bet, BetStatus, Pool}, utils::*
 };
 
 #[derive(Accounts)]
@@ -14,12 +12,14 @@ pub struct CreateBet<'info> {
     #[account(
         init,
         payer = user,
-        space = 8 + 
+        space = 8 + Bet::INIT_SPACE,
+        seeds = [b"bet", user.key().as_ref(), pool_key.as_ref()],
+        bump,
     )]
     pub bet: Account<'info, Bet>,
 
     #[account(mut)]
-    pub pool: SystemAccount<'info>,
+    pub pool: Account<'info, Pool>,
 
     /// System program
     pub system_program: Program<'info, System>,

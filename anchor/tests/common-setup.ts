@@ -68,7 +68,7 @@ export const getCompetitionTestData = (program) => {
   const priceFeedId = "SOME_FEED";
   const houseCutFactor = 1.1;
   const minPayoutRatio = 0.9;
-  const interval = 6000;
+  const interval = 600;
   const startTime = 4070908800;
   const endTime = 4070910600;
 
@@ -122,12 +122,12 @@ console.log("setting up.........");
 
 export const setupCompetitionWithPools = async function (): Promise<SetupDTO> {
 
-  const {fakeAdmin,program, adminKp,sdkConfig, adminKeys} = await setupEnvironment();
+  const {fakeAdmin,program,sdkConfig, adminKeys} = await setupEnvironment();
   const {tokenA, priceFeedId, houseCutFactor, minPayoutRatio, interval, startTime, endTime, competitionHash, competitionPubkey} = getCompetitionTestData(program);
 
   const {poolKeys}  = await createCompetitionWithPools(
     program,
-    adminKp.publicKey,
+    fakeAdmin.publicKey,
     competitionHash,
     tokenA,
     priceFeedId,

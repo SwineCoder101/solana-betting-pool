@@ -13,6 +13,18 @@ export async function createBet(
 ): Promise<web3.TransactionSignature> {
   const bet = web3.Keypair.generate();
 
+  console.log('Creating bet with amount:', amount);
+  console.log('Lower bound price:', lowerBoundPrice);
+  console.log('Upper bound price:', upperBoundPrice);
+  console.log('Pool:', poolKey.toBase58());
+  console.log('Competition:', competition.toBase58());
+  console.log('User:', user.toBase58());
+
+  const [betPda] = await web3.PublicKey.findProgramAddressSync(
+    [Buffer.from('bet'), user.toBuffer(), poolKey.toBuffer()],
+    program.programId
+  );
+
   const tx = await program.methods
     .runCreateBet(
       new anchor.BN(amount),
@@ -23,11 +35,11 @@ export async function createBet(
     )
     .accountsStrict({
       user,
-      bet: bet.publicKey,
+      bet: betPda,
       pool: poolKey,
       systemProgram: web3.SystemProgram.programId,
     })
-    .signers([])
+    .signers([bet])
     .rpc();
 
   return tx;

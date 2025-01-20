@@ -23,6 +23,11 @@ describe("Competition with Pools", () => {
 
     // Assert correct number of pools are created
     const numOfPools = Math.floor((competitionData.endTime - competitionData.startTime) / competitionData.interval);
+    console.log('Start time:', competitionData.startTime);
+    console.log('End time:', competitionData.endTime);
+    console.log('Interval:', competitionData.interval);
+    console.log(competitionData.endTime - competitionData.startTime);
+    console.log('Num of pools:', numOfPools);
     expect(poolKeys?.length).toEqual(numOfPools);
 
     if (poolKeys  && poolKeys.length > 0){
@@ -31,7 +36,7 @@ describe("Competition with Pools", () => {
             expect(pool.competitionKey.toString()).toEqual(competitionPubkey.toString());
             expect(pool.startTime.toNumber()).toEqual(competitionData.startTime + i * competitionData.interval);
             expect(pool.endTime.toNumber()).toEqual(pool.startTime.toNumber() + competitionData.interval);
-            expect(pool.treasury.toString()).toEqual(fakeAdmin.toString());
+            expect(pool.treasury.toString()).toEqual(fakeAdmin.publicKey.toBase58());
           }
     }   
   });
@@ -69,7 +74,7 @@ describe("Competition with Pools", () => {
             expect(pool.competitionKey.toString()).toEqual(competitionPubkey.toString());
             expect(pool.startTime.toNumber()).toEqual(competitionData.startTime + i * competitionData.interval);
             expect(pool.endTime.toNumber()).toEqual(pool.startTime.toNumber() + competitionData.interval);
-            expect(pool.treasury.toString()).toEqual(fakeAdmin.toString());
+            expect(pool.treasury.toString()).toEqual(fakeAdmin.publicKey.toBase58());
           }
       }
     }

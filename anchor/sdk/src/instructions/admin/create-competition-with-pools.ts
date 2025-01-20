@@ -67,6 +67,7 @@ export async function createCompetitionWithPools(
   );
 
   const poolKeys = pools.map((pool) => pool.poolKey);
+  console.log('Pool keys:', poolKeys);
 
   return {
     tx,
