@@ -14,6 +14,116 @@ export type HorseRace = {
   },
   "instructions": [
     {
+      "name": "runCancelBet",
+      "docs": [
+        "Cancel a Bet"
+      ],
+      "discriminator": [
+        154,
+        97,
+        164,
+        238,
+        225,
+        178,
+        79,
+        134
+      ],
+      "accounts": [
+        {
+          "name": "user",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "bet"
+          ]
+        },
+        {
+          "name": "bet",
+          "writable": true
+        },
+        {
+          "name": "pool",
+          "docs": [
+            "The Pool account from which funds are returned"
+          ],
+          "writable": true
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "runCreateBet",
+      "docs": [
+        "Create a Bet"
+      ],
+      "discriminator": [
+        83,
+        62,
+        238,
+        252,
+        115,
+        109,
+        59,
+        27
+      ],
+      "accounts": [
+        {
+          "name": "user",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "bet",
+          "docs": [
+            "The Bet account (to be created).",
+            "If you want seeds, define them. We'll omit seeds for now."
+          ],
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "pool",
+          "docs": [
+            "The Pool account where funds are stored"
+          ],
+          "writable": true
+        },
+        {
+          "name": "systemProgram",
+          "docs": [
+            "System program"
+          ],
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "lowerBoundPrice",
+          "type": "u64"
+        },
+        {
+          "name": "upperBoundPrice",
+          "type": "u64"
+        },
+        {
+          "name": "poolKey",
+          "type": "pubkey"
+        },
+        {
+          "name": "competition",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
       "name": "runCreateCompetition",
       "discriminator": [
         85,
@@ -30,6 +140,10 @@ export type HorseRace = {
           "name": "authority",
           "writable": true,
           "signer": true
+        },
+        {
+          "name": "compHashAcc",
+          "writable": true
         },
         {
           "name": "competition",
@@ -51,6 +165,10 @@ export type HorseRace = {
                   111,
                   110
                 ]
+              },
+              {
+                "kind": "account",
+                "path": "compHashAcc"
               }
             ]
           }
@@ -82,6 +200,115 @@ export type HorseRace = {
         {
           "name": "minPayoutRatio",
           "type": "u8"
+        },
+        {
+          "name": "interval",
+          "type": "u64"
+        },
+        {
+          "name": "startTime",
+          "type": "u64"
+        },
+        {
+          "name": "endTime",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "runCreatePool",
+      "docs": [
+        "Create a Pool"
+      ],
+      "discriminator": [
+        225,
+        56,
+        189,
+        2,
+        220,
+        61,
+        209,
+        12
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "poolHashAcc",
+          "writable": true
+        },
+        {
+          "name": "competitionAcc",
+          "writable": true
+        },
+        {
+          "name": "pool",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "competitionAcc"
+              },
+              {
+                "kind": "account",
+                "path": "poolHashAcc"
+              }
+            ]
+          }
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "startTime",
+          "type": "u64"
+        },
+        {
+          "name": "endTime",
+          "type": "u64"
+        },
+        {
+          "name": "treasury",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "runSettlePool",
+      "docs": [
+        "Settle a Pool"
+      ],
+      "discriminator": [
+        96,
+        137,
+        173,
+        253,
+        147,
+        165,
+        192,
+        218
+      ],
+      "accounts": [],
+      "args": [
+        {
+          "name": "competitionKey",
+          "type": "pubkey"
         }
       ]
     },
@@ -129,11 +356,36 @@ export type HorseRace = {
         {
           "name": "minPayoutRatio",
           "type": "u8"
+        },
+        {
+          "name": "interval",
+          "type": "u64"
+        },
+        {
+          "name": "startTime",
+          "type": "u64"
+        },
+        {
+          "name": "endTime",
+          "type": "u64"
         }
       ]
     }
   ],
   "accounts": [
+    {
+      "name": "bet",
+      "discriminator": [
+        147,
+        23,
+        35,
+        59,
+        15,
+        75,
+        155,
+        32
+      ]
+    },
     {
       "name": "competition",
       "discriminator": [
@@ -146,16 +398,101 @@ export type HorseRace = {
         221,
         106
       ]
+    },
+    {
+      "name": "pool",
+      "discriminator": [
+        241,
+        154,
+        109,
+        4,
+        17,
+        177,
+        109,
+        188
+      ]
     }
   ],
   "errors": [
     {
       "code": 6000,
+      "name": "notEligible",
+      "msg": "User is not eligible to create a bet."
+    },
+    {
+      "code": 6001,
+      "name": "betOwnershipMismatch",
+      "msg": "User does not own this bet."
+    },
+    {
+      "code": 6002,
       "name": "unauthorized",
-      "msg": "Unauthorized: Not a whitelisted admin or deployer."
+      "msg": "Unauthorized: Not the competition owner."
+    },
+    {
+      "code": 6003,
+      "name": "poolNotEnded",
+      "msg": "Pool not finished yet."
     }
   ],
   "types": [
+    {
+      "name": "bet",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "competition",
+            "type": "pubkey"
+          },
+          {
+            "name": "lowerBoundPrice",
+            "type": "u64"
+          },
+          {
+            "name": "upperBoundPrice",
+            "type": "u64"
+          },
+          {
+            "name": "poolKey",
+            "type": "pubkey"
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": {
+                "name": "betStatus"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "betStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "active"
+          },
+          {
+            "name": "cancelled"
+          },
+          {
+            "name": "settled"
+          }
+        ]
+      }
+    },
     {
       "name": "competition",
       "type": {
@@ -182,6 +519,46 @@ export type HorseRace = {
             "type": {
               "vec": "pubkey"
             }
+          },
+          {
+            "name": "interval",
+            "type": "u64"
+          },
+          {
+            "name": "startTime",
+            "type": "u64"
+          },
+          {
+            "name": "endTime",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "pool",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "poolHash",
+            "type": "pubkey"
+          },
+          {
+            "name": "competitionKey",
+            "type": "pubkey"
+          },
+          {
+            "name": "startTime",
+            "type": "u64"
+          },
+          {
+            "name": "endTime",
+            "type": "u64"
+          },
+          {
+            "name": "treasury",
+            "type": "pubkey"
           }
         ]
       }

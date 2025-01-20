@@ -10,4 +10,7 @@ pub struct Competition {
     pub min_payout_ratio: u8,    // e.g., minimum ratio for payouts
     #[max_len(4)]
     pub admin: Vec<Pubkey>,      // Whitelisted admin array
+    pub interval: u64,
+    pub start_time: u64,
+    pub end_time: u64,
 }

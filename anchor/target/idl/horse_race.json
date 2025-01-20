@@ -8,6 +8,116 @@
   },
   "instructions": [
     {
+      "name": "run_cancel_bet",
+      "docs": [
+        "Cancel a Bet"
+      ],
+      "discriminator": [
+        154,
+        97,
+        164,
+        238,
+        225,
+        178,
+        79,
+        134
+      ],
+      "accounts": [
+        {
+          "name": "user",
+          "writable": true,
+          "signer": true,
+          "relations": [
+            "bet"
+          ]
+        },
+        {
+          "name": "bet",
+          "writable": true
+        },
+        {
+          "name": "pool",
+          "docs": [
+            "The Pool account from which funds are returned"
+          ],
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": []
+    },
+    {
+      "name": "run_create_bet",
+      "docs": [
+        "Create a Bet"
+      ],
+      "discriminator": [
+        83,
+        62,
+        238,
+        252,
+        115,
+        109,
+        59,
+        27
+      ],
+      "accounts": [
+        {
+          "name": "user",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "bet",
+          "docs": [
+            "The Bet account (to be created).",
+            "If you want seeds, define them. We'll omit seeds for now."
+          ],
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "pool",
+          "docs": [
+            "The Pool account where funds are stored"
+          ],
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "docs": [
+            "System program"
+          ],
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        },
+        {
+          "name": "lower_bound_price",
+          "type": "u64"
+        },
+        {
+          "name": "upper_bound_price",
+          "type": "u64"
+        },
+        {
+          "name": "pool_key",
+          "type": "pubkey"
+        },
+        {
+          "name": "competition",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
       "name": "run_create_competition",
       "discriminator": [
         85,
@@ -24,6 +134,10 @@
           "name": "authority",
           "writable": true,
           "signer": true
+        },
+        {
+          "name": "comp_hash_acc",
+          "writable": true
         },
         {
           "name": "competition",
@@ -45,6 +159,10 @@
                   111,
                   110
                 ]
+              },
+              {
+                "kind": "account",
+                "path": "comp_hash_acc"
               }
             ]
           }
@@ -76,6 +194,115 @@
         {
           "name": "min_payout_ratio",
           "type": "u8"
+        },
+        {
+          "name": "interval",
+          "type": "u64"
+        },
+        {
+          "name": "start_time",
+          "type": "u64"
+        },
+        {
+          "name": "end_time",
+          "type": "u64"
+        }
+      ]
+    },
+    {
+      "name": "run_create_pool",
+      "docs": [
+        "Create a Pool"
+      ],
+      "discriminator": [
+        225,
+        56,
+        189,
+        2,
+        220,
+        61,
+        209,
+        12
+      ],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "pool_hash_acc",
+          "writable": true
+        },
+        {
+          "name": "competition_acc",
+          "writable": true
+        },
+        {
+          "name": "pool",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "competition_acc"
+              },
+              {
+                "kind": "account",
+                "path": "pool_hash_acc"
+              }
+            ]
+          }
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "start_time",
+          "type": "u64"
+        },
+        {
+          "name": "end_time",
+          "type": "u64"
+        },
+        {
+          "name": "treasury",
+          "type": "pubkey"
+        }
+      ]
+    },
+    {
+      "name": "run_settle_pool",
+      "docs": [
+        "Settle a Pool"
+      ],
+      "discriminator": [
+        96,
+        137,
+        173,
+        253,
+        147,
+        165,
+        192,
+        218
+      ],
+      "accounts": [],
+      "args": [
+        {
+          "name": "competition_key",
+          "type": "pubkey"
         }
       ]
     },
@@ -123,11 +350,36 @@
         {
           "name": "min_payout_ratio",
           "type": "u8"
+        },
+        {
+          "name": "interval",
+          "type": "u64"
+        },
+        {
+          "name": "start_time",
+          "type": "u64"
+        },
+        {
+          "name": "end_time",
+          "type": "u64"
         }
       ]
     }
   ],
   "accounts": [
+    {
+      "name": "Bet",
+      "discriminator": [
+        147,
+        23,
+        35,
+        59,
+        15,
+        75,
+        155,
+        32
+      ]
+    },
     {
       "name": "Competition",
       "discriminator": [
@@ -140,16 +392,101 @@
         221,
         106
       ]
+    },
+    {
+      "name": "Pool",
+      "discriminator": [
+        241,
+        154,
+        109,
+        4,
+        17,
+        177,
+        109,
+        188
+      ]
     }
   ],
   "errors": [
     {
       "code": 6000,
+      "name": "NotEligible",
+      "msg": "User is not eligible to create a bet."
+    },
+    {
+      "code": 6001,
+      "name": "BetOwnershipMismatch",
+      "msg": "User does not own this bet."
+    },
+    {
+      "code": 6002,
       "name": "Unauthorized",
-      "msg": "Unauthorized: Not a whitelisted admin or deployer."
+      "msg": "Unauthorized: Not the competition owner."
+    },
+    {
+      "code": 6003,
+      "name": "PoolNotEnded",
+      "msg": "Pool not finished yet."
     }
   ],
   "types": [
+    {
+      "name": "Bet",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "competition",
+            "type": "pubkey"
+          },
+          {
+            "name": "lower_bound_price",
+            "type": "u64"
+          },
+          {
+            "name": "upper_bound_price",
+            "type": "u64"
+          },
+          {
+            "name": "pool_key",
+            "type": "pubkey"
+          },
+          {
+            "name": "status",
+            "type": {
+              "defined": {
+                "name": "BetStatus"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "name": "BetStatus",
+      "type": {
+        "kind": "enum",
+        "variants": [
+          {
+            "name": "Active"
+          },
+          {
+            "name": "Cancelled"
+          },
+          {
+            "name": "Settled"
+          }
+        ]
+      }
+    },
     {
       "name": "Competition",
       "type": {
@@ -176,6 +513,46 @@
             "type": {
               "vec": "pubkey"
             }
+          },
+          {
+            "name": "interval",
+            "type": "u64"
+          },
+          {
+            "name": "start_time",
+            "type": "u64"
+          },
+          {
+            "name": "end_time",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Pool",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool_hash",
+            "type": "pubkey"
+          },
+          {
+            "name": "competition_key",
+            "type": "pubkey"
+          },
+          {
+            "name": "start_time",
+            "type": "u64"
+          },
+          {
+            "name": "end_time",
+            "type": "u64"
+          },
+          {
+            "name": "treasury",
+            "type": "pubkey"
           }
         ]
       }

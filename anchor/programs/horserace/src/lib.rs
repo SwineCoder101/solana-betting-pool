@@ -3,6 +3,8 @@ use anchor_lang::prelude::*;
 pub mod states;
 pub mod instructions;
 pub mod constants;
+pub mod errors;
+pub mod utils;
 
 use instructions::*;
 
@@ -19,6 +21,9 @@ pub mod horse_race {
         admin: Vec<Pubkey>,
         house_cut_factor: u8,
         min_payout_ratio: u8,
+        interval: u64,
+        start_time: u64,
+        end_time: u64,
     ) -> Result<()> {
         instructions::admin::create_competition::run_create_competition(
             ctx,
@@ -27,6 +32,9 @@ pub mod horse_race {
             admin,
             house_cut_factor,
             min_payout_ratio,
+            interval,
+            start_time,
+            end_time,
         )
     }
 
@@ -37,6 +45,10 @@ pub mod horse_race {
         admin: Vec<Pubkey>,
         house_cut_factor: u8,
         min_payout_ratio: u8,
+        interval: u64,
+        start_time: u64,
+        end_time: u64,
+        
     ) -> Result<()> {
         instructions::admin::update_competition::run_update_competition(
             ctx,
@@ -45,6 +57,59 @@ pub mod horse_race {
             admin,
             house_cut_factor,
             min_payout_ratio,
+            interval,
+            start_time,
+            end_time,
         )
     }
+
+    /// Create a Bet
+    pub fn run_create_bet(
+        ctx: Context<CreateBet>,
+        amount: u64,
+        lower_bound_price: u64,
+        upper_bound_price: u64,
+        pool_key: Pubkey,
+        competition: Pubkey,
+    ) -> Result<()> {
+        instructions::user::create_bet::run_create_bet(
+            ctx,
+            amount,
+            lower_bound_price,
+            upper_bound_price,
+            pool_key,
+            competition,
+        )
+    }
+
+    /// Cancel a Bet
+    pub fn run_cancel_bet(
+        ctx: Context<CancelBet>,
+    ) -> Result<()> {
+        instructions::user::cancel_bet::run_cancel_bet(ctx)
+    }
+
+    /// Create a Pool
+    pub fn run_create_pool(
+        ctx: Context<CreatePool>,
+        start_time: u64,
+        end_time: u64,
+        treasury: Pubkey,
+    ) -> Result<()> {
+        instructions::admin::create_pool::run_create_pool(
+            ctx,
+            start_time,
+            end_time,
+            treasury,
+        )
+    }
+
+    /// Settle a Pool
+    pub fn run_settle_pool(
+        ctx: Context<SettlePool>,
+        competition_key: Pubkey,
+    ) -> Result<()> {
+        instructions::admin::settle_pool::run_settle_pool(ctx, competition_key)
+    }
+
 }
