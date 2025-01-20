@@ -21,8 +21,10 @@ export default function Providers({ children }: { children: React.ReactNode }) {
           },
           solanaClusters: [{
             name: 'mainnet-beta', rpcUrl: 'https://api.mainnet-beta.solana.com'}, {name: 'testnet', rpcUrl: 'https://api.testnet.solana.com'}, {name: 'devnet' , rpcUrl: 'https://api.devnet.solana.com'} ],
-
           externalWallets: { solana: { connectors: solanaConnectors } },
+          embeddedWallets: { 
+            createOnLogin: 'all-users'
+        } 
         }}
       >
         {children}

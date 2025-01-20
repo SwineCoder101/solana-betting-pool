@@ -1,11 +1,23 @@
-import { usePrivy } from "@privy-io/react-auth";
+import { usePrivy, useSolanaWallets } from "@privy-io/react-auth";
 import { useEffect } from "react";
 
 const ConnectWalletPrivyButton = () => {
     const {connectWallet, user, ready, authenticated} = usePrivy();
 
+    const {wallets, createWallet} = useSolanaWallets();
+
+
     const handleConnect = async () => {
-        await connectWallet(); 
+        const response = await connectWallet();
+        console.log("Response", response);
+        console.log("Wallets", wallets);
+
+        if (wallets.length === 0) {
+            console.log("Creating wallet");
+            const wallet = await createWallet();
+            console.log('Wallet', wallet);
+        }
+
     }
 
     useEffect(() => {
