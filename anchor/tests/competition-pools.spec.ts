@@ -8,7 +8,7 @@ describe("Competition with Pools", () => {
   });
 
   it("Create competition with pools successfully", async () => {
-    const { program, competitionPubkey, competitionData, poolKeys, fakeAdmin } = setupDto;
+    const { program, competitionPubkey, competitionData, poolKeys, adminKp } = setupDto;
 
     // Assert competition is created
     const fetchedCompetition = await program.account.competition.fetch(competitionPubkey);
@@ -36,7 +36,7 @@ describe("Competition with Pools", () => {
             expect(pool.competitionKey.toString()).toEqual(competitionPubkey.toString());
             expect(pool.startTime.toNumber()).toEqual(competitionData.startTime + i * competitionData.interval);
             expect(pool.endTime.toNumber()).toEqual(pool.startTime.toNumber() + competitionData.interval);
-            expect(pool.treasury.toString()).toEqual(fakeAdmin.publicKey.toBase58());
+            expect(pool.treasury.toString()).toEqual(adminKp.publicKey.toBase58());
           }
     }   
   });
@@ -51,7 +51,7 @@ describe("Competition with Pools", () => {
     }
 
     for (const setupDto of competitions) {
-      const { program, fakeAdmin, competitionPubkey, competitionData, poolKeys } = setupDto;
+      const { program, adminKp, competitionPubkey, competitionData, poolKeys } = setupDto;
 
       // Assert competition is created
       const fetchedCompetition = await program.account.competition.fetch(competitionPubkey);
@@ -74,7 +74,7 @@ describe("Competition with Pools", () => {
             expect(pool.competitionKey.toString()).toEqual(competitionPubkey.toString());
             expect(pool.startTime.toNumber()).toEqual(competitionData.startTime + i * competitionData.interval);
             expect(pool.endTime.toNumber()).toEqual(pool.startTime.toNumber() + competitionData.interval);
-            expect(pool.treasury.toString()).toEqual(fakeAdmin.publicKey.toBase58());
+            expect(pool.treasury.toString()).toEqual(adminKp.publicKey.toBase58());
           }
       }
     }

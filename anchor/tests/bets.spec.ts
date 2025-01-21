@@ -5,7 +5,7 @@ import { createUserWithFunds } from "./test-utils";
 import { createBet } from "../sdk/src/instructions/user/create-bet";
 import { cancelBet } from "../sdk/src/instructions/user/cancel-bet";
 
-describe.skip("Bets", () => {
+describe("Bets", () => {
   let setupDto: SetupDTO;
   let program, user, userOne, userTwo, userThree, poolKeys, competitionPubkey, connection;
 
@@ -30,8 +30,11 @@ describe.skip("Bets", () => {
     const upperBoundPrice = 150;
     const poolKey = poolKeys[0];
 
+
     const tx = await createBet(program, user.pubkey, amount, lowerBoundPrice, upperBoundPrice, poolKey, competitionPubkey);
     console.log('Transaction signature:', tx);
+
+    const userBalance = await connection.getBalance(user.pubkey);
 
     const betAccounts = await getBetAccountsForPool(program, poolKey);
     expect(betAccounts.length).toBeGreaterThan(0);
@@ -42,6 +45,8 @@ describe.skip("Bets", () => {
     expect(bet.upperBoundPrice).toEqual(upperBoundPrice);
     expect(bet.poolKey).toEqual(poolKey.toString());
     expect(bet.competition).toEqual(competitionPubkey.toString());
+    expect(bet.status).toEqual(BetStatus.Active);
+    expect(userBalance).toBeLessThan(100000000000000000000);
   });
 
   it("should create multiple bets against a pool", async () => {

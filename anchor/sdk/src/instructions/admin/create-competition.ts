@@ -3,7 +3,7 @@ import { HorseRace } from '../../../../target/types/horse_race';
 
 export async function createCompetition(
   program: Program<HorseRace>,
-  authority: web3.PublicKey,
+  authority: web3.Keypair,
   competitionHash: web3.PublicKey,
   competitionPubkey: web3.PublicKey,
   tokenA: web3.PublicKey,
@@ -29,8 +29,8 @@ export async function createCompetition(
     .accountsStrict({
       competition: competitionPubkey,
       compHashAcc: competitionHash,
-      authority,
+      authority: authority.publicKey,
       systemProgram: web3.SystemProgram.programId,
-    })
-    .rpc();
+    }).signers([authority]).rpc();
+
 }
