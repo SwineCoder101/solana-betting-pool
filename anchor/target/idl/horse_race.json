@@ -422,13 +422,23 @@
   "errors": [
     {
       "code": 6000,
-      "name": "InvalidPoolId",
-      "msg": "invalid pool id provided, please check the latest pool id"
+      "name": "NotEligible",
+      "msg": "User is not eligible to create a bet."
     },
     {
       "code": 6001,
-      "name": "InvalidTimeRange",
-      "msg": "Invalid time range."
+      "name": "BetOwnershipMismatch",
+      "msg": "User does not own this bet."
+    },
+    {
+      "code": 6002,
+      "name": "Unauthorized",
+      "msg": "Unauthorized: Not the competition owner."
+    },
+    {
+      "code": 6003,
+      "name": "PoolNotEnded",
+      "msg": "Pool not finished yet."
     }
   ],
   "types": [
