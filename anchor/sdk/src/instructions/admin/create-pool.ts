@@ -11,7 +11,7 @@ export type CreatePoolResponse = {
 
 export async function createPool(
   program: Program<HorseRace>,
-  authority: web3.PublicKey,
+  authority: web3.Keypair,
   competitionAddr: web3.PublicKey,
   startTime: number,
   endTime: number,
@@ -32,13 +32,13 @@ export async function createPool(
   const tx = await program.methods
     .runCreatePool(new anchor.BN(startTime), new anchor.BN(endTime), treasury)
     .accountsStrict({
-      authority,
+      authority: authority.publicKey,
       pool: poolPda,
       systemProgram: web3.SystemProgram.programId,
       poolHashAcc: poolHash,
       competitionAcc: competitionAddr,
     })
-    .signers([])
+    .signers([authority])
     .rpc();
 
   return {

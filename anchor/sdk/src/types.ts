@@ -5,6 +5,7 @@ import { HorseRace } from "../../target/types/horse_race";
 export type SdkConfig = {
     connection: Connection;
     program: Program<HorseRace>;
+    provider: AnchorProvider;
     url: string;
     idl: HorseRace;
     signer: string;

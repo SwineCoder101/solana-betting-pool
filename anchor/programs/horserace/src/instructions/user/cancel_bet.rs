@@ -16,7 +16,6 @@ pub struct CancelBet<'info> {
     )]
     pub bet: Account<'info, Bet>,
 
-    /// The Pool account from which funds are returned
     #[account(mut)]
     pub pool: SystemAccount<'info>, // or Account<'info, Pool>
 
@@ -24,7 +23,6 @@ pub struct CancelBet<'info> {
 }
 
 pub fn run_cancel_bet(ctx: Context<CancelBet>) -> Result<()> {
-    // Transfer lamports back to the user from the pool
     let amount = ctx.accounts.bet.amount;
 
     let ix = anchor_lang::solana_program::system_instruction::transfer(
@@ -40,7 +38,6 @@ pub fn run_cancel_bet(ctx: Context<CancelBet>) -> Result<()> {
         ],
     )?;
 
-    // Mark bet as Cancelled
     ctx.accounts.bet.status = BetStatus::Cancelled;
 
     Ok(())

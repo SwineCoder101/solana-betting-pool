@@ -43,9 +43,6 @@ export type HorseRace = {
         },
         {
           "name": "pool",
-          "docs": [
-            "The Pool account from which funds are returned"
-          ],
           "writable": true
         },
         {
@@ -77,19 +74,39 @@ export type HorseRace = {
           "signer": true
         },
         {
+          "name": "betHashAcc",
+          "writable": true
+        },
+        {
           "name": "bet",
-          "docs": [
-            "The Bet account (to be created).",
-            "If you want seeds, define them. We'll omit seeds for now."
-          ],
           "writable": true,
-          "signer": true
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  101,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "arg",
+                "path": "poolKey"
+              },
+              {
+                "kind": "account",
+                "path": "betHashAcc"
+              }
+            ]
+          }
         },
         {
           "name": "pool",
-          "docs": [
-            "The Pool account where funds are stored"
-          ],
           "writable": true
         },
         {
@@ -433,6 +450,16 @@ export type HorseRace = {
       "code": 6003,
       "name": "poolNotEnded",
       "msg": "Pool not finished yet."
+    },
+    {
+      "code": 6004,
+      "name": "competitionEnded",
+      "msg": "Competition has ended"
+    },
+    {
+      "code": 6005,
+      "name": "poolEnded",
+      "msg": "Pool has ended"
     }
   ],
   "types": [

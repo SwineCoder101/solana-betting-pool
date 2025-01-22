@@ -1,26 +1,23 @@
-import * as anchor from '@coral-xyz/anchor';
-import { Program, web3 } from '@coral-xyz/anchor';
-import { HorseRace } from '../target/types/horse_race';
-import { createPool } from '../sdk/src/instructions/admin/create-pool';
+import { web3 } from '@coral-xyz/anchor';
 import { Keypair } from '@solana/web3.js';
+import { createPool } from '../sdk/src/instructions/admin/create-pool';
+import { setupEnvironment } from './common-setup';
 
 describe("Pool", () => {
-  const provider = anchor.AnchorProvider.env();
-  anchor.setProvider(provider);
-  const program = anchor.workspace.HorseRace as Program<HorseRace>;
 
-  const authority = provider.wallet.publicKey;
   const competitionKey = Keypair.generate().publicKey;
   const treasury = Keypair.generate().publicKey;
   const startTime = Math.floor(Date.now() / 1000)
   const endTime = startTime + 3600; // 1 hour later
 
   it("Create pool successfully", async () => {
+
+    const {program, adminKp} = await setupEnvironment();
     // Generate a pool hash
     const poolHash = Keypair.generate().publicKey;
 
     // Create the pool
-    const {tx} = await createPool(program, authority, competitionKey, startTime, endTime, treasury, poolHash);
+    const {tx} = await createPool(program, adminKp, competitionKey, startTime, endTime, treasury, poolHash);
     console.log('Transaction signature:', tx);
 
     // Fetch the pool account to verify it was created successfully

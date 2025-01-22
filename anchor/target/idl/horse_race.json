@@ -37,9 +37,6 @@
         },
         {
           "name": "pool",
-          "docs": [
-            "The Pool account from which funds are returned"
-          ],
           "writable": true
         },
         {
@@ -71,19 +68,39 @@
           "signer": true
         },
         {
+          "name": "bet_hash_acc",
+          "writable": true
+        },
+        {
           "name": "bet",
-          "docs": [
-            "The Bet account (to be created).",
-            "If you want seeds, define them. We'll omit seeds for now."
-          ],
           "writable": true,
-          "signer": true
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  101,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "arg",
+                "path": "pool_key"
+              },
+              {
+                "kind": "account",
+                "path": "bet_hash_acc"
+              }
+            ]
+          }
         },
         {
           "name": "pool",
-          "docs": [
-            "The Pool account where funds are stored"
-          ],
           "writable": true
         },
         {
@@ -427,6 +444,16 @@
       "code": 6003,
       "name": "PoolNotEnded",
       "msg": "Pool not finished yet."
+    },
+    {
+      "code": 6004,
+      "name": "CompetitionEnded",
+      "msg": "Competition has ended"
+    },
+    {
+      "code": 6005,
+      "name": "PoolEnded",
+      "msg": "Pool has ended"
     }
   ],
   "types": [

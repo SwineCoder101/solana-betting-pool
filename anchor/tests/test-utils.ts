@@ -8,6 +8,7 @@ import {
 import {
     Connection,
     Keypair,
+    LAMPORTS_PER_SOL,
     PublicKey,
     Signer,
     VersionedTransaction
@@ -108,4 +109,23 @@ export async function signAndSendVTx(
     );
     return res.value.err ? false : true;
   }
+
+  export async function createUserWithFunds(connection: Connection): Promise<Keypair> {
+    const user = Keypair.generate();
+    const airTx = await connection.requestAirdrop(user.publicKey, 100 * LAMPORTS_PER_SOL);
+    await waitAndConfirmSignature(connection, airTx, true);
+    return user;
+  }
+
+  export function lamportsToSol(lamports: number): number {
+    return lamports / 1_000_000_000;
+  }
+  
+  export function solToLamports(sol: number): number {
+    return sol * 1_000_000_000;
+  }
+
+  
+
+  
   

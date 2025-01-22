@@ -1,8 +1,6 @@
 use anchor_lang::prelude::*;
 use crate::{
-    states::{Bet, BetStatus},
-    utils::*,
-    errors::BettingError,
+    errors::BettingError, states::{Bet, BetStatus, Pool}, utils::*
 };
 
 #[derive(Accounts)]
@@ -11,18 +9,21 @@ pub struct CreateBet<'info> {
     #[account(mut)]
     pub user: Signer<'info>,
 
-    /// The Bet account (to be created).  
-    /// If you want seeds, define them. We'll omit seeds for now.
+    /// CHECK: The pool_hash_acc is mutable because the pool_hash is stored in the pool account.
+    #[account(mut)]
+    pub bet_hash_acc: UncheckedAccount<'info>,
+
     #[account(
         init,
         payer = user,
-        space = 8 + 32 + 8 + 32 + 8 + 8 + 32 + 1 // Adjust for Bet struct sizes
+        space = 8 + Bet::INIT_SPACE,
+        seeds = [b"bet", user.key().as_ref(), pool_key.as_ref(), bet_hash_acc.key().as_ref()],
+        bump,
     )]
     pub bet: Account<'info, Bet>,
 
-    /// The Pool account where funds are stored
     #[account(mut)]
-    pub pool: SystemAccount<'info>, // or an Account<'info, Pool> if you want to store info
+    pub pool: Account<'info, Pool>,
 
     /// System program
     pub system_program: Program<'info, System>,
@@ -39,6 +40,14 @@ pub fn run_create_bet(
     // Check eligibility
     if !is_eligible(&ctx.accounts.user) {
         return err!(BettingError::NotEligible);
+    }
+
+    if ctx.accounts.pool.end_time < Clock::get()?.unix_timestamp as u64 {
+        return Err(BettingError::CompetitionEnded.into());
+    };
+
+    if ctx.accounts.pool.end_time < Clock::get()?.unix_timestamp as u64 {
+        return Err(BettingError::PoolEnded.into());
     }
 
     // Transfer lamports from user to pool

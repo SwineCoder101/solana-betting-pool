@@ -11,7 +11,10 @@ pub enum BettingError {
     Unauthorized,
     #[msg("Pool not finished yet.")]
     PoolNotEnded,
-
+    #[msg("Competition has ended")]
+    CompetitionEnded,
+    #[msg("Pool has ended")]
+    PoolEnded,
 }
 
 #[error_code]
