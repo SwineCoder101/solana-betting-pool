@@ -37,9 +37,6 @@
         },
         {
           "name": "pool",
-          "docs": [
-            "The Pool account from which funds are returned"
-          ],
           "writable": true
         },
         {
@@ -71,6 +68,10 @@
           "signer": true
         },
         {
+          "name": "bet_hash_acc",
+          "writable": true
+        },
+        {
           "name": "bet",
           "writable": true,
           "pda": {
@@ -90,6 +91,10 @@
               {
                 "kind": "arg",
                 "path": "pool_key"
+              },
+              {
+                "kind": "account",
+                "path": "bet_hash_acc"
               }
             ]
           }
@@ -439,6 +444,16 @@
       "code": 6003,
       "name": "PoolNotEnded",
       "msg": "Pool not finished yet."
+    },
+    {
+      "code": 6004,
+      "name": "CompetitionEnded",
+      "msg": "Competition has ended"
+    },
+    {
+      "code": 6005,
+      "name": "PoolEnded",
+      "msg": "Pool has ended"
     }
   ],
   "types": [

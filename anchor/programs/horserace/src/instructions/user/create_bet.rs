@@ -9,11 +9,15 @@ pub struct CreateBet<'info> {
     #[account(mut)]
     pub user: Signer<'info>,
 
+    /// CHECK: The pool_hash_acc is mutable because the pool_hash is stored in the pool account.
+    #[account(mut)]
+    pub bet_hash_acc: UncheckedAccount<'info>,
+
     #[account(
         init,
         payer = user,
         space = 8 + Bet::INIT_SPACE,
-        seeds = [b"bet", user.key().as_ref(), pool_key.as_ref()],
+        seeds = [b"bet", user.key().as_ref(), pool_key.as_ref(), bet_hash_acc.key().as_ref()],
         bump,
     )]
     pub bet: Account<'info, Bet>,
@@ -36,6 +40,14 @@ pub fn run_create_bet(
     // Check eligibility
     if !is_eligible(&ctx.accounts.user) {
         return err!(BettingError::NotEligible);
+    }
+
+    if ctx.accounts.pool.end_time < Clock::get()?.unix_timestamp as u64 {
+        return Err(BettingError::CompetitionEnded.into());
+    };
+
+    if ctx.accounts.pool.end_time < Clock::get()?.unix_timestamp as u64 {
+        return Err(BettingError::PoolEnded.into());
     }
 
     // Transfer lamports from user to pool
