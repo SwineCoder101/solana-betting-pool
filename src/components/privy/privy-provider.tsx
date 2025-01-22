@@ -8,10 +8,12 @@ const solanaConnectors = toSolanaWalletConnectors({
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   const privyAppId = import.meta.env.VITE_PRIVY_APP_ID;
+  const privyClientId = import.meta.env.VITE_PRIVY_CLIENT_ID;
   return (
     <React.StrictMode>
       <PrivyProvider
         appId={privyAppId}
+        clientId={privyClientId}
         config={{
           loginMethods: ['wallet'],
           appearance: {

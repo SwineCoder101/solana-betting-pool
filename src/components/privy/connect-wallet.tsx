@@ -11,11 +11,12 @@ const ConnectWalletPrivyButton = () => {
         const response = await connectWallet();
         console.log("Response", response);
         console.log("Wallets", wallets);
+        console.log("authenticated", authenticated);
 
         if (wallets.length === 0) {
             console.log("Creating wallet");
             const wallet = await createWallet();
-            console.log('Wallet', wallet);
+            console.log('Created Wallet: ', wallet);
         }
 
     }
