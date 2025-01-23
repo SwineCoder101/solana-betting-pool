@@ -24,3 +24,23 @@ pub enum PoolError {
     #[msg("Invalid time range.")]
     InvalidTimeRange,
 }
+
+#[error_code]
+pub enum CompetitionError {
+    #[msg("Invalid time range.")]
+    InvalidTimeRange,
+    #[msg("Invalid competition id provided, please check the latest competition id")]
+    InvalidCompetitionId,
+}
+
+#[error_code]
+pub enum OracleError {
+    #[msg("Invalid time range.")]
+    InvalidTimeRange,
+    #[msg("Invalid oracle id provided, please check the latest oracle id")]
+    InvalidOracleId,
+    #[msg("Oracle is inactive.")]
+    OracleInactive,
+    #[msg("Oracle is outside the time range.")]
+    OutsideOracleTimeRange,
+}

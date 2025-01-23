@@ -433,33 +433,13 @@ export type HorseRace = {
   "errors": [
     {
       "code": 6000,
-      "name": "notEligible",
-      "msg": "User is not eligible to create a bet."
+      "name": "invalidPoolId",
+      "msg": "invalid pool id provided, please check the latest pool id"
     },
     {
       "code": 6001,
-      "name": "betOwnershipMismatch",
-      "msg": "User does not own this bet."
-    },
-    {
-      "code": 6002,
-      "name": "unauthorized",
-      "msg": "Unauthorized: Not the competition owner."
-    },
-    {
-      "code": 6003,
-      "name": "poolNotEnded",
-      "msg": "Pool not finished yet."
-    },
-    {
-      "code": 6004,
-      "name": "competitionEnded",
-      "msg": "Competition has ended"
-    },
-    {
-      "code": 6005,
-      "name": "poolEnded",
-      "msg": "Pool has ended"
+      "name": "invalidTimeRange",
+      "msg": "Invalid time range."
     }
   ],
   "types": [
