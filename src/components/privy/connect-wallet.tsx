@@ -1,4 +1,4 @@
-import { UnsignedTransactionRequest, useLogin, usePrivy, useSolanaWallets } from "@privy-io/react-auth";
+import { usePrivy, useSolanaWallets } from "@privy-io/react-auth";
 import { useEffect, useState } from "react";
 import { Connection, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { LoginWalletButton } from "./login-wallet-button";
@@ -74,7 +74,7 @@ export function WalletManager() {
 
     // Handle funding between wallets
     const handleFund = async (fromAddress: string, toAddress: string) => {
-        const amount = parseFloat(fundAmount[fromAddress] || "0");
+        const amount = parseFloat(fundAmount[toAddress] || "0");
         if (!amount || amount <= 0) {
             alert(`Please enter a valid amount, amount appears to be ${amount}`);
             return;
@@ -91,10 +91,12 @@ export function WalletManager() {
         setLoading(true);
         try {
             const versionTx = await transferSolBetweenWallets(new PublicKey(fromAddress), new PublicKey(toAddress), amount);
-            const signature  = await sourceWallet?.sendTransaction(versionTx, connection);
+            const signature = await sourceWallet?.sendTransaction(versionTx, connection);
             console.log('Transaction signature', signature);
+            await fetchBalances();
         } catch (error) {
             console.error("Error funding wallet:", error);
+            alert("Transfer failed. Please try again.");
         } finally {
             setLoading(false);
         }
@@ -161,7 +163,7 @@ export function WalletManager() {
                                                 })}
                                             />
                                             <button
-                                                onClick={() => handleFund(wallets[0].address, user?.wallet?.address || "")}
+                                                onClick={() => handleFund(wallets[0].address, walletBalance.address)}
                                                 disabled={loading}
                                                 className="px-3 py-1 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400"
                                             >
