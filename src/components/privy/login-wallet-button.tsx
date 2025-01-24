@@ -1,0 +1,41 @@
+import { useLogin, usePrivy } from "@privy-io/react-auth";
+
+interface LoginWalletButtonProps {
+    connectedAddress?: string;
+    className?: string;
+}
+
+export function LoginWalletButton({ connectedAddress, className = '' }: LoginWalletButtonProps) {
+    const { authenticated, logout } = usePrivy();
+    const { login } = useLogin();
+
+    // Format address for display
+    const formatAddress = (address: string) => {
+        return `${address.slice(0, 4)}...${address.slice(-4)}`;
+    };
+
+    // Handle connect/disconnect
+    const handleConnectWallet = async () => {
+        if (authenticated) {
+            await logout();
+        } else {
+            await login({ loginMethods: ['wallet'] });
+        }
+    };
+
+    return (
+        <button
+            onClick={handleConnectWallet}
+            className={`px-4 py-2 rounded font-medium transition-colors ${
+                authenticated 
+                    ? 'bg-red-500 hover:bg-red-600 text-white'
+                    : 'bg-blue-500 hover:bg-blue-600 text-white'
+            } ${className}`}
+        >
+            {authenticated && connectedAddress
+                ? `Disconnect (${formatAddress(connectedAddress)})`
+                : 'Connect Wallet'
+            }
+        </button>
+    );
+}

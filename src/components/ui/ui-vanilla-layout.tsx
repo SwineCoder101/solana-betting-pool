@@ -1,13 +1,13 @@
 import React from 'react';
-import ConnectWalletPrivyButton from '../privy/connect-wallet';
 import Providers from '../privy/privy-provider';
+import { WalletManager } from '../privy/connect-wallet';
 
 const VanillaLayout: React.FC = () => {
   return (
     <Providers>
       <div className="vanilla-layout">
         <h1>Welcome to Solana DApp</h1>
-        <ConnectWalletPrivyButton />
+        <WalletManager />
       </div>
     </Providers>
   );
