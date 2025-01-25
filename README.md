@@ -50,3 +50,17 @@ export default tseslint.config({
 ```
 
 # template-react-vite-tailwind
+
+
+
+# Build steps
+
+Prequisites
+Node - v20.17.0
+
+1) Checkout to main branch and pull the latest changes
+2) Make sure to be in the root directory
+3) Run Pnpm install
+4) Build the package with pnpm build
+5) The assets will then be built under dist directory
+6) To test the build run pnpm preview
