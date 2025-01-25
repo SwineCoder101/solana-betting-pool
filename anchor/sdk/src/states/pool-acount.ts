@@ -62,6 +62,7 @@ export async function getPoolAccount(
   return program.account.pool.fetch(poolPubkey);
 }
 
+<<<<<<< Updated upstream
 export async function getPoolAccounts(
   program: Program<HorseRace>,
   poolPubkeys: PublicKey[]
@@ -76,4 +77,9 @@ export async function getPoolBalance(poolPubkey: PublicKey, program: Program<Hor
 export async function getPoolAccountsFromCompetition(program: Program<HorseRace>, competitionKey: PublicKey) {
   const pools = await program.account.pool.all();
   return pools.filter(pool => pool.account.competitionKey === competitionKey);
+=======
+export async function getAllPoolDataByCompetition(program: Program<HorseRace>, competition: PublicKey): Promise<PoolData[]> {
+  const pools = await program.account.pool.all();
+  return pools.filter((pool) => pool.account.competitionKey.toBase58() === competition.toBase58()).map((pool) => convertProgramToPoolData(pool.account));
+>>>>>>> Stashed changes
 }

@@ -16,7 +16,8 @@ export async function createPool(
   startTime: number,
   endTime: number,
   treasury: web3.PublicKey,
-  poolHash: web3.PublicKey
+  poolHash: web3.PublicKey,
+  signer: web3.Signer,
 ): Promise<CreatePoolResponse> {
 
   console.log('Creating pool with hash:', poolHash.toBase58());

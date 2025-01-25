@@ -22,7 +22,11 @@ export async function createCompetitionWithPools(
   interval: number,
   startTime: number,
   endTime: number,
+<<<<<<< Updated upstream
   treasury: web3.PublicKey,
+=======
+  signer: web3.Signer,
+>>>>>>> Stashed changes
 ): Promise<CompetitionPoolResponse> {
 
   const [competitionPda] = await web3.PublicKey.findProgramAddressSync(
@@ -47,6 +51,10 @@ export async function createCompetitionWithPools(
     interval,
     startTime,
     endTime,
+<<<<<<< Updated upstream
+=======
+    signer,
+>>>>>>> Stashed changes
   );
 
   const numOfPools = Math.floor((endTime - startTime) / interval);
@@ -63,8 +71,14 @@ export async function createCompetitionWithPools(
         competitionPda,
         poolStartTime,
         poolEndTime,
+<<<<<<< Updated upstream
         treasury,
         poolHash,
+=======
+        authority,
+        poolHash,
+        signer,
+>>>>>>> Stashed changes
       );
     })
   );

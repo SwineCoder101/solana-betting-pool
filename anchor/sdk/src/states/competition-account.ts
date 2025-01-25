@@ -75,3 +75,13 @@ export async function getCompetitionAccount(
 ) {
   return program.account.competition.fetch(competitionPubkey);
 }
+
+export async function getAllLiveCompetitions(program: Program<HorseRace>) : Promise<CompetitionData[]> {
+  const competitionAccounts = await program.account.competition.all();
+
+  const filteredComp =  competitionAccounts.filter((comp) => {
+    return comp.account.endTime > Date.now();
+  });
+
+  return filteredComp.map((comp) => convertProgramToCompetitionData(comp));
+}

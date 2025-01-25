@@ -1,14 +1,20 @@
-import { tokens } from "@/data/data-constants";
+import { tokens, intervals } from "@/data/data-constants";
 import React, { useState } from "react";
+import { useCreateCompetition } from '@/hooks/use-create-competition';
+import { Keypair } from '@solana/web3.js';
 
 const CompetitionForm: React.FC = () => {
+  const createCompetitionMutation = useCreateCompetition();
+
   const [formState, setFormState] = useState({
     token_a: "",
     price_feed_id: "",
     house_cut_factor: 0,
     min_payout_ratio: 0,
-    start_time: "",
-    end_time: "",
+    interval: intervals[0].value,
+    pool_count: 1,
+    pool_interval: 0,
+    admin_keys: [""],
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -16,9 +22,32 @@ const CompetitionForm: React.FC = () => {
     setFormState({ ...formState, [name]: value });
   };
 
-  const handleSubmit = (action: "create" | "update") => {
-    // Handle create or update logic here
-    console.log(action, formState);
+  const handleAdminKeysChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+    const keys = e.target.value.split('\n').filter(key => key.trim() !== '');
+    setFormState({ ...formState, admin_keys: keys });
+  };
+
+  const handleSubmit = async (action: "create" | "update") => {
+    if (action === "create") {
+      try {
+        const competitionHash = Keypair.generate().publicKey.toString();
+        const now = Math.floor(Date.now() / 1000);
+        
+        await createCompetitionMutation.mutateAsync({
+          competitionHash,
+          tokenA: formState.token_a,
+          priceFeedId: formState.price_feed_id,
+          adminKeys: formState.admin_keys,
+          houseCutFactor: formState.house_cut_factor,
+          minPayoutRatio: formState.min_payout_ratio,
+          interval: Number(formState.interval),
+          startTime: now,
+          endTime: now + Number(formState.interval),
+        });
+      } catch (error) {
+        console.error('Error creating competition:', error);
+      }
+    }
   };
 
   return (
@@ -41,7 +70,18 @@ const CompetitionForm: React.FC = () => {
           </select>
         </div>
         <div className="mb-2">
-          <label className="block mb-1">House Cut Factor</label>
+          <label className="block mb-1">Price Feed ID</label>
+          <input
+            type="text"
+            name="price_feed_id"
+            value={formState.price_feed_id}
+            onChange={handleInputChange}
+            className="input input-bordered w-full bg-gray-200"
+            placeholder="Enter Pyth price feed ID"
+          />
+        </div>
+        <div className="mb-2">
+          <label className="block mb-1">House Cut Factor (%)</label>
           <input
             type="number"
             name="house_cut_factor"
@@ -51,7 +91,7 @@ const CompetitionForm: React.FC = () => {
           />
         </div>
         <div className="mb-2">
-          <label className="block mb-1">Minimum Payout Ratio</label>
+          <label className="block mb-1">Minimum Payout Ratio (%)</label>
           <input
             type="number"
             name="min_payout_ratio"
@@ -61,24 +101,55 @@ const CompetitionForm: React.FC = () => {
           />
         </div>
         <div className="mb-2">
-          <label className="block mb-1">Start Time</label>
+          <label className="block mb-1">Competition Interval</label>
+          <select
+            name="interval"
+            value={formState.interval}
+            onChange={handleInputChange}
+            className="input input-bordered w-full bg-gray-200"
+          >
+            {intervals.map((interval) => (
+              <option key={interval.id} value={interval.value}>
+                {interval.label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="mb-2">
+          <label className="block mb-1">Admin Public Keys (one per line)</label>
+          <textarea
+            name="admin_keys"
+            value={formState.admin_keys.join('\n')}
+            onChange={handleAdminKeysChange}
+            className="input input-bordered w-full bg-gray-200 h-24"
+            placeholder="Enter admin public keys"
+          />
+        </div>
+        <div className="mb-2">
+          <label className="block mb-1">Number of Pools</label>
           <input
-            type="datetime-local"
-            name="start_time"
-            value={formState.start_time}
+            type="number"
+            name="pool_count"
+            value={formState.pool_count}
+            min="1"
             onChange={handleInputChange}
             className="input input-bordered w-full bg-gray-200"
           />
         </div>
         <div className="mb-2">
-          <label className="block mb-1">End Time</label>
-          <input
-            type="datetime-local"
-            name="end_time"
-            value={formState.end_time}
+          <label className="block mb-1">Pool Interval</label>
+          <select
+            name="pool_interval"
+            value={formState.pool_interval}
             onChange={handleInputChange}
             className="input input-bordered w-full bg-gray-200"
-          />
+          >
+            {intervals.map((interval) => (
+              <option key={interval.id} value={interval.value}>
+                {interval.label}
+              </option>
+            ))}
+          </select>
         </div>
         <div className="flex gap-2 mt-4">
           <button
@@ -97,6 +168,18 @@ const CompetitionForm: React.FC = () => {
           </button>
         </div>
       </form>
+      {createCompetitionMutation.isLoading && <div>Creating competition...</div>}
+      {createCompetitionMutation.isError && (
+        <div className="text-red-500">
+          Error creating competition: {createCompetitionMutation.error?.message}
+        </div>
+      )}
+      {createCompetitionMutation.isSuccess && (
+        <div className="text-green-500">
+          Competition created successfully!
+          Pool Keys: {createCompetitionMutation.data?.poolKeys.map(key => key.toString()).join(', ')}
+        </div>
+      )}
     </div>
   );
 };
