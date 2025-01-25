@@ -43,9 +43,6 @@ export type HorseRace = {
         },
         {
           "name": "pool",
-          "docs": [
-            "The Pool account from which funds are returned"
-          ],
           "writable": true
         },
         {
@@ -77,19 +74,39 @@ export type HorseRace = {
           "signer": true
         },
         {
+          "name": "betHashAcc",
+          "writable": true
+        },
+        {
           "name": "bet",
-          "docs": [
-            "The Bet account (to be created).",
-            "If you want seeds, define them. We'll omit seeds for now."
-          ],
           "writable": true,
-          "signer": true
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  98,
+                  101,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "user"
+              },
+              {
+                "kind": "arg",
+                "path": "poolKey"
+              },
+              {
+                "kind": "account",
+                "path": "betHashAcc"
+              }
+            ]
+          }
         },
         {
           "name": "pool",
-          "docs": [
-            "The Pool account where funds are stored"
-          ],
           "writable": true
         },
         {
@@ -416,23 +433,13 @@ export type HorseRace = {
   "errors": [
     {
       "code": 6000,
-      "name": "notEligible",
-      "msg": "User is not eligible to create a bet."
+      "name": "invalidPoolId",
+      "msg": "invalid pool id provided, please check the latest pool id"
     },
     {
       "code": 6001,
-      "name": "betOwnershipMismatch",
-      "msg": "User does not own this bet."
-    },
-    {
-      "code": 6002,
-      "name": "unauthorized",
-      "msg": "Unauthorized: Not the competition owner."
-    },
-    {
-      "code": 6003,
-      "name": "poolNotEnded",
-      "msg": "Pool not finished yet."
+      "name": "invalidTimeRange",
+      "msg": "Invalid time range."
     }
   ],
   "types": [

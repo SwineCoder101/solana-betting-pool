@@ -61,3 +61,19 @@ export async function getPoolAccount(
 ) {
   return program.account.pool.fetch(poolPubkey);
 }
+
+export async function getPoolAccounts(
+  program: Program<HorseRace>,
+  poolPubkeys: PublicKey[]
+) {
+  return program.account.pool.fetchMultiple(poolPubkeys);
+}
+
+export async function getPoolBalance(poolPubkey: PublicKey, program: Program<HorseRace>) {
+  return program.provider.connection.getBalance(poolPubkey);
+}
+
+export async function getPoolAccountsFromCompetition(program: Program<HorseRace>, competitionKey: PublicKey) {
+  const pools = await program.account.pool.all();
+  return pools.filter(pool => pool.account.competitionKey === competitionKey);
+}

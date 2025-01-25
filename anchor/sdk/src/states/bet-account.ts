@@ -8,14 +8,15 @@ export enum BetStatus {
   Settled,
 }
 
-export type BetData = {
-  user: string,
-  amount: number,
-  competition: string,
-  lowerBoundPrice: number,
-  upperBoundPrice: number,
-  poolKey: string,
-  status: BetStatus,
+export interface BetData {
+  publicKey: string;
+  user: string;
+  amount: number;
+  lowerBoundPrice: number;
+  upperBoundPrice: number;
+  poolKey: string;
+  competition: string;
+  status: BetStatus;
 }
 
 export type BetProgramData = {
@@ -25,8 +26,15 @@ export type BetProgramData = {
   lowerBoundPrice: BN | number,
   upperBoundPrice: BN | number,
   poolKey: PublicKey,
-  status: BetStatus,
+  status: StatusEnumProgram,
 }
+
+/* eslint-disable @typescript-eslint/ban-types */
+export type StatusEnumProgram =
+  | { active: {} }
+  | { cancelled: {} }
+  | { settled: {} }
+
 
 export function convertBetToProgramData(betData: BetData): BetProgramData {
   return {
@@ -36,19 +44,45 @@ export function convertBetToProgramData(betData: BetData): BetProgramData {
     lowerBoundPrice: new BN(betData.lowerBoundPrice),
     upperBoundPrice: new BN(betData.upperBoundPrice),
     poolKey: new PublicKey(betData.poolKey),
-    status: betData.status,
+    status: convertToBetProgramStatus(betData.status),
   };
+}
+
+export function convertToBetStatus(status): BetStatus {
+  if (status.active !== undefined) {
+    return BetStatus.Active;
+  } else if (status.cancelled !== undefined) {
+    return BetStatus.Cancelled;
+  } else if (status.settled !== undefined) {
+    return BetStatus.Settled;
+  } else {
+    throw new Error("Unknown BetStatus");
+  }
+}
+
+export function convertToBetProgramStatus(status: BetStatus): StatusEnumProgram {
+  switch (status) {
+    case BetStatus.Active:
+      return { active: {} };
+    case BetStatus.Cancelled:
+      return { cancelled: {} };
+    case BetStatus.Settled:
+      return { settled: {} };
+    default:
+      throw new Error("Unknown BetStatus");
+  }
 }
 
 export function convertProgramToBetData(programData: BetProgramData): BetData {
   return {
+    publicKey: programData.user.toString(),
     user: programData.user.toString(),
     amount: typeof programData.amount === 'number' ? programData.amount : programData.amount.toNumber(),
-    competition: programData.competition.toString(),
     lowerBoundPrice: typeof programData.lowerBoundPrice === 'number' ? programData.lowerBoundPrice : programData.lowerBoundPrice.toNumber(),
     upperBoundPrice: typeof programData.upperBoundPrice === 'number' ? programData.upperBoundPrice : programData.upperBoundPrice.toNumber(),
     poolKey: programData.poolKey.toString(),
-    status: programData.status,
+    competition: programData.competition.toString(),
+    status: convertToBetStatus(programData.status),
   };
 }
 
@@ -64,3 +98,60 @@ export async function getBetAccount(
 ) {
   return program.account.bet.fetch(betPubkey);
 }
+
+export async function getBetAccountsForUser(
+  program: Program<HorseRace>,
+  userPubkey: PublicKey
+): Promise<BetData[]> {
+  // Get all bet accounts
+  const accounts = await program.account.bet.all();
+  
+  console.log('Total bet accounts:', accounts.length);
+  console.log('Looking for user:', userPubkey.toBase58());
+
+  // Filter accounts where user matches
+  const betAccounts = accounts.filter((account) => {
+    const accountUser = account.account.user.toBase58();
+    const matches = accountUser === userPubkey.toBase58();
+    console.log('Comparing account user:', accountUser, 'with target:', userPubkey.toBase58(), 'matches:', matches);
+    return matches;
+  });
+
+  return betAccounts.map(account => ({
+    ...convertProgramToBetData(account.account),
+    publicKey: account.publicKey.toBase58()
+  }));
+}
+
+export async function getBetAccountsForPool(
+  program: Program<HorseRace>,
+  poolPubkey: PublicKey
+): Promise<BetData[]> {
+  // Get all bet accounts
+  const accounts = await program.account.bet.all();
+  
+  console.log('Total bet accounts:', accounts.length);
+  console.log('Looking for pool:', poolPubkey.toBase58());
+  
+  // Filter accounts where poolKey matches
+  const betAccounts = accounts.filter((account) => {
+    const accountPoolKey = account.account.poolKey.toBase58();
+    const matches = accountPoolKey === poolPubkey.toBase58();
+    console.log('Comparing account pool key:', accountPoolKey, 'with target:', poolPubkey.toBase58(), 'matches:', matches);
+    return matches;
+  });
+
+  console.log('Found bet accounts for pool:', betAccounts.length);
+  betAccounts.forEach(acc => {
+    console.log('Account:', {
+      pubkey: acc.publicKey.toBase58(),
+      poolKey: acc.account.poolKey.toBase58(),
+      user: acc.account.user.toBase58()
+    });
+  });
+
+  return betAccounts.map(account => ({
+    ...convertProgramToBetData(account.account),
+    publicKey: account.publicKey.toBase58()
+  }));
+} 

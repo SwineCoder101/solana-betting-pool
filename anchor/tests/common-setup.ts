@@ -6,6 +6,7 @@ import { HorseRace, CompetitionData, createCompetition, IDL, getCompetitionData,
 import { createCompetitionWithPools } from "../sdk/src/instructions/admin/create-competition-with-pools";
 
 export type SetupDTO = {
+    adminKp: Keypair;
     competitionPubkey: PublicKey;
     competitionData: CompetitionData;
     poolKeys?: PublicKey[];
@@ -21,10 +22,12 @@ export type EnvironmentSetupDTO = {
   program: anchor.Program<HorseRace>;
   sdkConfig: SdkConfig;
   provider: anchor.AnchorProvider;
+  treasury: PublicKey;
 }
 
 export const setupEnvironment = async function (): Promise<EnvironmentSetupDTO> {
   const provider = anchor.AnchorProvider.env();
+  const treasury = provider.wallet.publicKey;
   anchor.setProvider(provider);
   
   // @ts-expect-error-ignore
@@ -41,8 +44,9 @@ export const setupEnvironment = async function (): Promise<EnvironmentSetupDTO> 
     // Create a fake admin keypair
     const fakeAdmin = Keypair.generate();
 
-    const sdkConfig :SdkConfig = {
+    const sdkConfig: SdkConfig = {
       connection: provider.connection,
+      provider: provider,
       program,
       url: '',
       idl: IDL,
@@ -59,6 +63,7 @@ export const setupEnvironment = async function (): Promise<EnvironmentSetupDTO> 
       adminKeys,
       program,
       sdkConfig,
+      treasury,
   }
 }
 
@@ -67,7 +72,7 @@ export const getCompetitionTestData = (program) => {
   const priceFeedId = "SOME_FEED";
   const houseCutFactor = 1.1;
   const minPayoutRatio = 0.9;
-  const interval = 6000;
+  const interval = 600;
   const startTime = 4070908800;
   const endTime = 4070910600;
 
@@ -95,7 +100,7 @@ console.log("setting up.........");
 
   await createCompetition(
     program,
-    adminKp.publicKey,
+    adminKp,
     competitionHash,
     competitionPubkey,
     tokenA,
@@ -111,6 +116,7 @@ console.log("setting up.........");
   const competitionData = await getCompetitionData(competitionHash, program);
 
   return {
+    adminKp,
     competitionPubkey,
     competitionData,
     fakeAdmin,
@@ -121,12 +127,12 @@ console.log("setting up.........");
 
 export const setupCompetitionWithPools = async function (): Promise<SetupDTO> {
 
-  const {fakeAdmin,program, adminKp,sdkConfig, adminKeys} = await setupEnvironment();
+  const {fakeAdmin,program,sdkConfig, adminKeys, treasury, adminKp} = await setupEnvironment();
   const {tokenA, priceFeedId, houseCutFactor, minPayoutRatio, interval, startTime, endTime, competitionHash, competitionPubkey} = getCompetitionTestData(program);
 
   const {poolKeys}  = await createCompetitionWithPools(
     program,
-    adminKp.publicKey,
+    adminKp,
     competitionHash,
     tokenA,
     priceFeedId,
@@ -136,17 +142,19 @@ export const setupCompetitionWithPools = async function (): Promise<SetupDTO> {
     interval,
     startTime,
     endTime,
+    treasury,
   )
 
   const competitionData = await getCompetitionData(competitionHash, program);
 
 
   return {
+    adminKp,
     competitionPubkey,
     competitionData,
     fakeAdmin,
     program,
     sdkConfig,
-    poolKeys,
+    poolKeys: poolKeys ?? [ Keypair.generate().publicKey],
   };
 }

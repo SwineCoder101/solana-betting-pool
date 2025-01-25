@@ -11,7 +11,10 @@ pub enum BettingError {
     Unauthorized,
     #[msg("Pool not finished yet.")]
     PoolNotEnded,
-
+    #[msg("Competition has ended")]
+    CompetitionEnded,
+    #[msg("Pool has ended")]
+    PoolEnded,
 }
 
 #[error_code]
@@ -20,4 +23,24 @@ pub enum PoolError {
     InvalidPoolId,
     #[msg("Invalid time range.")]
     InvalidTimeRange,
+}
+
+#[error_code]
+pub enum CompetitionError {
+    #[msg("Invalid time range.")]
+    InvalidTimeRange,
+    #[msg("Invalid competition id provided, please check the latest competition id")]
+    InvalidCompetitionId,
+}
+
+#[error_code]
+pub enum OracleError {
+    #[msg("Invalid time range.")]
+    InvalidTimeRange,
+    #[msg("Invalid oracle id provided, please check the latest oracle id")]
+    InvalidOracleId,
+    #[msg("Oracle is inactive.")]
+    OracleInactive,
+    #[msg("Oracle is outside the time range.")]
+    OutsideOracleTimeRange,
 }
