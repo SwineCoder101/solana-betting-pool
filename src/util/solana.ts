@@ -33,7 +33,6 @@ export const transferSolBetweenWallets = async (fromPublicKey: PublicKey, toPubl
 
         const transaction = new VersionedTransaction(message);
 
-
         return transaction;
     } catch (error) {
         console.error('Error transferring SOL:', error);
