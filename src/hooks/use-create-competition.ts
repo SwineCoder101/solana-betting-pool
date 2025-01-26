@@ -1,7 +1,7 @@
 import { useMutation } from '@tanstack/react-query';
 import { createCompetitionWithPools } from '../../anchor/sdk/src/instructions/admin/create-competition-with-pools';
-import { usePrivy } from '@privy-io/react-auth';
-import { PublicKey, Signer } from '@solana/web3.js';
+import { usePrivy, useSolanaWallets } from '@privy-io/react-auth';
+import { PublicKey, Transaction, VersionedTransaction } from '@solana/web3.js';
 import { useAnchorProgram } from './use-anchor-program';
 
 interface CreateCompetitionParams {
@@ -15,20 +15,22 @@ interface CreateCompetitionParams {
   startTime: number;
   endTime: number;
   treasury: string;
-  signer: Signer;
 }
 
 export function useCreateCompetition() {
   const { user } = usePrivy();
+  const { wallets } = useSolanaWallets();
   const program = useAnchorProgram();
+  const wallet = wallets[0];
 
   return useMutation({
     mutationFn: async (params: CreateCompetitionParams) => {
-      if (!user?.wallet?.address || !program) {
+      if (!user?.wallet?.address || !program || !wallet) {
         throw new Error('Wallet not connected');
       }
 
-      const { poolKeys } = await createCompetitionWithPools(
+      // Get all instructions
+      const { instructions, poolKeys } = await createCompetitionWithPools(
         program,
         new PublicKey(user.wallet.address),
         new PublicKey(params.competitionHash),
@@ -40,17 +42,38 @@ export function useCreateCompetition() {
         params.interval,
         params.startTime,
         params.endTime,
-        new PublicKey(params.treasury),
-        params.signer
+        new PublicKey(params.treasury)
       );
 
-      return { poolKeys };
+      // Create a new transaction and add all instructions
+      const tx = new Transaction();
+      instructions.forEach(ix => tx.add(ix));
+
+      // Get latest blockhash
+      const latestBlockhash = await program.provider.connection.getLatestBlockhash();
+      tx.recentBlockhash = latestBlockhash.blockhash;
+      tx.feePayer = new PublicKey(user.wallet.address);
+
+      // Convert to versioned transaction
+      const versionedTx = new VersionedTransaction(tx.compileMessage());
+
+      // Sign with wallet
+      const signedTx = await wallet.signTransaction(versionedTx);
+
+      // Send and confirm
+      const signature = await program.provider.connection.sendTransaction(signedTx);
+      await program.provider.connection.confirmTransaction(signature, 'confirmed');
+
+      return {
+        signature,
+        poolKeys: poolKeys.map(key => key.toString())
+      };
     },
     onError: (error) => {
       console.error('Failed to create competition:', error);
     },
     onSuccess: (result) => {
-      console.log('Competition created successfully with pools:', result.poolKeys);
+      console.log('Competition and pools created successfully:', result);
     },
   });
 } 

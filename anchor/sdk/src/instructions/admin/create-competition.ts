@@ -1,5 +1,6 @@
 import { Program, BN, web3 } from '@coral-xyz/anchor';
 import { HorseRace } from '../../../../target/types/horse_race';
+import { Transaction, TransactionInstruction } from '@solana/web3.js';
 
 export async function createCompetition(
   program: Program<HorseRace>,
@@ -14,8 +15,7 @@ export async function createCompetition(
   interval: number,
   startTime: number,
   endTime: number,
-  signer: web3.Signer,
-): Promise<web3.TransactionSignature> {
+): Promise<TransactionInstruction> {
   return program.methods
     .runCreateCompetition(
       tokenA,
@@ -32,5 +32,5 @@ export async function createCompetition(
       compHashAcc: competitionHash,
       authority,
       systemProgram: web3.SystemProgram.programId,
-    }).signers([signer]).rpc();
+    }).instruction();
 }

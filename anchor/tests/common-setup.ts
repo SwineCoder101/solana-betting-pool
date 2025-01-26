@@ -4,6 +4,7 @@ import * as Util from "./test-utils";
 import { SdkConfig } from "../sdk/src/types";
 import { HorseRace, CompetitionData, createCompetition, IDL, getCompetitionData, findCompetitonAddress } from "../sdk/src";
 import { createCompetitionWithPools } from "../sdk/src/instructions/admin/create-competition-with-pools";
+import { getVersionTxFromInstructions } from "../sdk/src/utils";
 
 export type SetupDTO = {
     adminKp: Keypair;
@@ -92,13 +93,11 @@ export const getCompetitionTestData = (program) => {
 }
 
 export const setupCompetition = async function (): Promise<SetupDTO> {
-
-console.log("setting up.........");
-
-  const {fakeAdmin,program, adminKp,sdkConfig, adminKeys} = await setupEnvironment();
+  const {fakeAdmin, program, adminKp, sdkConfig, adminKeys} = await setupEnvironment();
   const {tokenA, priceFeedId, houseCutFactor, minPayoutRatio, interval, startTime, endTime, competitionHash, competitionPubkey} = getCompetitionTestData(program);
 
-  await createCompetition(
+  // Get competition creation instruction
+  const ix = await createCompetition(
     program,
     adminKp.publicKey,
     competitionHash,
@@ -110,9 +109,21 @@ console.log("setting up.........");
     minPayoutRatio,
     interval,
     startTime,
-    endTime,
-    adminKp
+    endTime
   );
+
+  // Create and send versioned transaction
+  const tx = await getVersionTxFromInstructions(program.provider.connection, [ix]);
+  tx.sign([adminKp]);
+  const signature = await program.provider.connection.sendTransaction(tx);
+  
+  // Use the new confirmation strategy
+  const latestBlockhash = await program.provider.connection.getLatestBlockhash();
+  await program.provider.connection.confirmTransaction({
+    signature,
+    blockhash: latestBlockhash.blockhash,
+    lastValidBlockHeight: latestBlockhash.lastValidBlockHeight
+  });
 
   const competitionData = await getCompetitionData(competitionHash, program);
 
@@ -127,11 +138,11 @@ console.log("setting up.........");
 };
 
 export const setupCompetitionWithPools = async function (): Promise<SetupDTO> {
-
-  const {fakeAdmin,program,sdkConfig, adminKeys, treasury, adminKp} = await setupEnvironment();
+  const {fakeAdmin, program, sdkConfig, adminKeys, treasury, adminKp} = await setupEnvironment();
   const {tokenA, priceFeedId, houseCutFactor, minPayoutRatio, interval, startTime, endTime, competitionHash, competitionPubkey} = getCompetitionTestData(program);
 
-  const {poolKeys} = await createCompetitionWithPools(
+  // Get versioned transaction and pool keys
+  const { tx, poolKeys } = await createCompetitionWithPools(
     program,
     adminKp.publicKey,
     competitionHash,
@@ -143,12 +154,22 @@ export const setupCompetitionWithPools = async function (): Promise<SetupDTO> {
     interval,
     startTime,
     endTime,
-    treasury,
-    adminKp
-  )
+    treasury
+  );
+
+  // Sign and send transaction
+  tx.sign([adminKp]);
+  const signature = await program.provider.connection.sendTransaction(tx);
+  
+  // Use the new confirmation strategy
+  const latestBlockhash = await program.provider.connection.getLatestBlockhash();
+  await program.provider.connection.confirmTransaction({
+    signature,
+    blockhash: latestBlockhash.blockhash,
+    lastValidBlockHeight: latestBlockhash.lastValidBlockHeight
+  });
 
   const competitionData = await getCompetitionData(competitionHash, program);
-
 
   return {
     adminKp,
@@ -157,6 +178,6 @@ export const setupCompetitionWithPools = async function (): Promise<SetupDTO> {
     fakeAdmin,
     program,
     sdkConfig,
-    poolKeys: poolKeys ?? [ Keypair.generate().publicKey],
+    poolKeys: poolKeys ?? [Keypair.generate().publicKey],
   };
 }

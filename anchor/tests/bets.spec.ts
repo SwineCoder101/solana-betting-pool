@@ -1,11 +1,13 @@
 // bets.spec.ts
 
 import { setupCompetitionWithPools, SetupDTO } from "./common-setup";
-import { Keypair, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
+import { Keypair, LAMPORTS_PER_SOL, PublicKey, Transaction } from "@solana/web3.js";
 import { BetStatus, getBetAccountsForPool, getBetAccountsForUser, getBetData } from "../sdk/src";
 import { createUserWithFunds } from "./test-utils";
 import { createBet } from "../sdk/src/instructions/user/create-bet";
 import { cancelBet } from "../sdk/src/instructions/user/cancel-bet";
+import { web3 } from '@coral-xyz/anchor';
+import { getVersionTxFromInstructions } from '../sdk/src/utils';
 
 describe("Bets", () => {
   let setupDto: SetupDTO;
@@ -47,11 +49,14 @@ describe("Bets", () => {
     console.log('Initial bet count:', initialBetCount);
 
     const tx = await createBet(program, signer, amount, lowerBoundPrice, upperBoundPrice, poolKey, competitionPubkey);
-    const txId = await program.provider.sendAndConfirm(tx, [signer]);
+    const versionedTx = await getVersionTxFromInstructions(program.provider.connection, [tx]);
+    versionedTx.sign([signer]);
+    const signature = await program.provider.connection.sendTransaction(versionedTx);
+    await program.provider.connection.confirmTransaction(signature, 'confirmed');
     
-    if (txId.err) {
-      console.error('Transaction failed:', txId.err);
-      throw new Error('Transaction failed: ' + txId.err);
+    if (signature.err) {
+      console.error('Transaction failed:', signature.err);
+      throw new Error('Transaction failed: ' + signature.err);
     }
 
     await new Promise(resolve => setTimeout(resolve, 2000));
@@ -87,7 +92,10 @@ describe("Bets", () => {
 
     for (let i = 0; i < numBets; i++) {
       const tx = await createBet(program, signer, amount, lowerBoundPrice, upperBoundPrice, poolKey, competitionPubkey);
-      await program.provider.sendAndConfirm(tx, [signer]);
+      const versionedTx = await getVersionTxFromInstructions(program.provider.connection, [tx]);
+      versionedTx.sign([signer]);
+      const signature = await program.provider.connection.sendTransaction(versionedTx);
+      await program.provider.connection.confirmTransaction(signature, 'confirmed');
     }
 
     const betAccounts = await getBetAccountsForUser(program, signer.publicKey);
@@ -111,7 +119,10 @@ describe("Bets", () => {
     for (const poolKey of poolKeys) {
       for (let i = 0; i < numBetsPerPool; i++) {
         const tx = await createBet(program, signer, amount, lowerBoundPrice, upperBoundPrice, poolKey, competitionPubkey);
-        await program.provider.sendAndConfirm(tx, [signer]);
+        const versionedTx = await getVersionTxFromInstructions(program.provider.connection, [tx]);
+        versionedTx.sign([signer]);
+        const signature = await program.provider.connection.sendTransaction(versionedTx);
+        await program.provider.connection.confirmTransaction(signature, 'confirmed');
       }
     }
 
@@ -138,12 +149,14 @@ describe("Bets", () => {
 
     // Create a new bet
     const tx = await createBet(program, signer, amount, lowerBoundPrice, upperBoundPrice, poolKey, competitionPubkey);
-    const betHash = tx.signatures[0].publicKey; // Get the first signature as betHash
-    const txId = await program.provider.sendAndConfirm(tx, [signer]);
+    const versionedTx = await getVersionTxFromInstructions(program.provider.connection, [tx]);
+    versionedTx.sign([signer]);
+    const signature = await program.provider.connection.sendTransaction(versionedTx);
+    await program.provider.connection.confirmTransaction(signature, 'confirmed');
     
-    if (txId.err) {
-      console.error('Transaction failed:', txId.err);
-      throw new Error('Transaction failed: ' + txId.err);
+    if (signature.err) {
+      console.error('Transaction failed:', signature.err);
+      throw new Error('Transaction failed: ' + signature.err);
     }
 
     await new Promise(resolve => setTimeout(resolve, 2000));
@@ -159,7 +172,7 @@ describe("Bets", () => {
     console.log('Found bet to cancel:', bet);
     expect(bet).toBeDefined();
 
-    const cancelBetTx = await cancelBet(program, signer, poolKey, betHash);
+    const cancelBetTx = await cancelBet(program, signer, poolKey, signature.signature);
     await program.provider.connection.confirmTransaction(cancelBetTx, 'confirmed');
 
 
@@ -170,7 +183,7 @@ describe("Bets", () => {
         Buffer.from("bet"),
         signer.publicKey.toBuffer(),
         poolKey.toBuffer(),
-        betHash.toBuffer(),
+        signature.signature.toBuffer(),
       ],
       program.programId
     );

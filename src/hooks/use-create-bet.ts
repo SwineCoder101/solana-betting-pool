@@ -3,6 +3,7 @@ import { createBet } from '../../anchor/sdk/src/instructions/user/create-bet';
 import { usePrivy, useSolanaWallets } from '@privy-io/react-auth';
 import { Keypair, PublicKey } from '@solana/web3.js';
 import { useAnchorProgram } from './use-anchor-program';
+import { convertToVersionedTransaction } from '@/utils/transaction';
 
 interface CreateBetParams {
   amount: number;
@@ -14,7 +15,7 @@ interface CreateBetParams {
 
 export function useCreateBet() {
   const { user } = usePrivy();
-  const {wallets} = useSolanaWallets();
+  const { wallets } = useSolanaWallets();
   const program = useAnchorProgram();
 
   const wallet = wallets[0];  
@@ -35,15 +36,26 @@ export function useCreateBet() {
         new PublicKey(params.competition)
       );
 
-      const stx = await wallet.signTransaction(tx);
+      // Convert to versioned transaction
+      const versionedTx = await convertToVersionedTransaction(
+        program.provider.connection,
+        tx
+      );
 
-      return stx;
+      // Sign the versioned transaction
+      const signedTx = await wallet.signTransaction(versionedTx);
+
+      // Send and confirm
+      const signature = await program.provider.connection.sendTransaction(signedTx);
+      await program.provider.connection.confirmTransaction(signature);
+
+      return signature;
     },
     onError: (error) => {
       console.error('Failed to create bet:', error);
     },
-    onSuccess: (tx) => {
-      console.log('Bet created successfully:', tx);
+    onSuccess: (signature) => {
+      console.log('Bet created successfully:', signature);
     },
   });
 } 

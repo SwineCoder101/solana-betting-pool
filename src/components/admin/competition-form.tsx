@@ -2,9 +2,11 @@ import { tokens, intervals } from "@/data/data-constants";
 import React, { useState } from "react";
 import { useCreateCompetition } from '@/hooks/use-create-competition';
 import { Keypair } from '@solana/web3.js';
+import { usePrivy } from '@privy-io/react-auth';
 
 const CompetitionForm: React.FC = () => {
   const createCompetitionMutation = useCreateCompetition();
+  const { user } = usePrivy();
 
   const [formState, setFormState] = useState({
     token_a: "",
@@ -13,7 +15,7 @@ const CompetitionForm: React.FC = () => {
     min_payout_ratio: 0,
     interval: intervals[0].value,
     pool_count: 1,
-    pool_interval: 0,
+    pool_interval: intervals[0].value,
     admin_keys: [""],
   });
 
@@ -28,7 +30,7 @@ const CompetitionForm: React.FC = () => {
   };
 
   const handleSubmit = async (action: "create" | "update") => {
-    if (action === "create") {
+    if (action === "create" && user?.wallet?.address) {
       try {
         const competitionHash = Keypair.generate().publicKey.toString();
         const now = Math.floor(Date.now() / 1000);
@@ -37,12 +39,13 @@ const CompetitionForm: React.FC = () => {
           competitionHash,
           tokenA: formState.token_a,
           priceFeedId: formState.price_feed_id,
-          adminKeys: formState.admin_keys,
+          adminKeys: [user.wallet.address, ...formState.admin_keys],
           houseCutFactor: formState.house_cut_factor,
           minPayoutRatio: formState.min_payout_ratio,
           interval: Number(formState.interval),
           startTime: now,
           endTime: now + Number(formState.interval),
+          treasury: user.wallet.address,
         });
       } catch (error) {
         console.error('Error creating competition:', error);
@@ -101,7 +104,7 @@ const CompetitionForm: React.FC = () => {
           />
         </div>
         <div className="mb-2">
-          <label className="block mb-1">Competition Interval</label>
+          <label className="block mb-1">Interval</label>
           <select
             name="interval"
             value={formState.interval}
@@ -177,7 +180,8 @@ const CompetitionForm: React.FC = () => {
       {createCompetitionMutation.isSuccess && (
         <div className="text-green-500">
           Competition created successfully!
-          Pool Keys: {createCompetitionMutation.data?.poolKeys.map(key => key.toString()).join(', ')}
+          Competition signature: {createCompetitionMutation.data?.competitionSignature}
+          Pool signatures: {createCompetitionMutation.data?.poolSignatures.join(', ')}
         </div>
       )}
     </div>
