@@ -12,7 +12,7 @@ export type CompetitionPoolResponse = {
 
 export async function createCompetitionWithPools(
   program: Program<HorseRace>,
-  authority: web3.Keypair,
+  authority: web3.PublicKey,
   competitionHash: web3.PublicKey,
   tokenA: web3.PublicKey,
   priceFeedId: string,
@@ -22,6 +22,7 @@ export async function createCompetitionWithPools(
   interval: number,
   startTime: number,
   endTime: number,
+  treasury: web3.PublicKey,
   signer: web3.Signer,
 ): Promise<CompetitionPoolResponse> {
 
@@ -32,7 +33,7 @@ export async function createCompetitionWithPools(
 
   console.log('Creating competition with hash:', competitionHash.toBase58());
   console.log('Competition:', competitionPda.toBase58());
-  console.log('from:', authority.publicKey.toBase58());
+  console.log('from:', authority.toBase58());
 
   const tx = await createCompetition(
     program,
@@ -64,9 +65,8 @@ export async function createCompetitionWithPools(
         competitionPda,
         poolStartTime,
         poolEndTime,
-        authority.publicKey,
+        treasury,
         poolHash,
-        signer,
       );
     })
   );

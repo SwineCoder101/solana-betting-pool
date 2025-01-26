@@ -8,16 +8,14 @@ export type CreatePoolResponse = {
   tx: web3.TransactionSignature,
 }
 
-
 export async function createPool(
   program: Program<HorseRace>,
-  authority: web3.Keypair,
+  authority: web3.PublicKey,
   competitionAddr: web3.PublicKey,
   startTime: number,
   endTime: number,
   treasury: web3.PublicKey,
   poolHash: web3.PublicKey,
-  signer: web3.Signer,
 ): Promise<CreatePoolResponse> {
 
   console.log('Creating pool with hash:', poolHash.toBase58());
@@ -33,13 +31,12 @@ export async function createPool(
   const tx = await program.methods
     .runCreatePool(new anchor.BN(startTime), new anchor.BN(endTime), treasury)
     .accountsStrict({
-      authority: authority.publicKey,
+      authority: authority,
       pool: poolPda,
       systemProgram: web3.SystemProgram.programId,
       poolHashAcc: poolHash,
       competitionAcc: competitionAddr,
     })
-    .signers([authority])
     .rpc();
 
   return {

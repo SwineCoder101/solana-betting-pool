@@ -14,10 +14,11 @@ interface CreateCompetitionParams {
   interval: number;
   startTime: number;
   endTime: number;
+  treasury: string;
   signer: Signer;
 }
 
-export function useCreateCompetition(wallet: Wallet) {
+export function useCreateCompetition() {
   const { user } = usePrivy();
   const program = useAnchorProgram();
 
@@ -39,6 +40,7 @@ export function useCreateCompetition(wallet: Wallet) {
         params.interval,
         params.startTime,
         params.endTime,
+        new PublicKey(params.treasury),
         params.signer
       );
 
