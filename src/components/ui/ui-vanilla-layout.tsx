@@ -3,7 +3,7 @@ import { usePrivy, useSolanaWallets } from "@privy-io/react-auth";
 import { useEffect, useState } from "react";
 import { Connection, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { LoginWalletButton } from "../privy/login-wallet-button";
-import { WalletManager } from "../privy/connect-wallet";
+import { WalletManager } from "../privy/wallet-manager";
 import AdminFeatures from '../admin/admin-features';
 
 interface WalletInfo {

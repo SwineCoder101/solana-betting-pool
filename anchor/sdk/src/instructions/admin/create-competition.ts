@@ -13,7 +13,8 @@ export async function createCompetition(
   minPayoutRatio: number,
   interval: number,
   startTime: number,
-  endTime: number
+  endTime: number,
+  signer: web3.Signer,
 ): Promise<web3.TransactionSignature> {
   return program.methods
     .runCreateCompetition(
@@ -31,6 +32,7 @@ export async function createCompetition(
       compHashAcc: competitionHash,
       authority: authority.publicKey,
       systemProgram: web3.SystemProgram.programId,
-    }).signers([authority]).rpc();
-
+    })
+    .signers([signer])
+    .rpc();
 }

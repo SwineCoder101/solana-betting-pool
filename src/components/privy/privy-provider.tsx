@@ -1,5 +1,6 @@
 import { PrivyProvider } from "@privy-io/react-auth";
 import { toSolanaWalletConnectors } from "@privy-io/react-auth/solana";
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import React from "react";
 const solanaConnectors = toSolanaWalletConnectors({
   // By default, shouldAutoConnect is enabled
@@ -9,7 +10,10 @@ const solanaConnectors = toSolanaWalletConnectors({
 export default function Providers({ children }: { children: React.ReactNode }) {
   const privyAppId = import.meta.env.VITE_PRIVY_APP_ID;
   const privyClientId = import.meta.env.VITE_PRIVY_CLIENT_ID;
+  const client = new QueryClient()
+
   return (
+    <QueryClientProvider client={client}>
     <React.StrictMode>
       <PrivyProvider
         appId={privyAppId}
@@ -32,5 +36,6 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         {children}
       </PrivyProvider>
     </React.StrictMode>
+    </QueryClientProvider>
   );
 }

@@ -49,10 +49,9 @@ export const findPoolAddress = (programId: string, id: number): PublicKey => {
 };
 
 // ------------------------------------------------------- Data Fetchers
-export async function getPoolData(program: Program<HorseRace>, id: number): Promise<PoolData> {
-  const poolAddress = findPoolAddress(program.programId.toString(), id);
-  const fetchedData = await program.account.pool.fetch(poolAddress);
-  return convertProgramToPoolData(fetchedData);
+export async function getPoolData(program: Program<HorseRace>, poolPubkey: PublicKey): Promise<PoolData> {
+  const pool = await getPoolAccount(program, poolPubkey);
+  return convertProgramToPoolData(pool);
 }
 
 export async function getPoolAccount(
@@ -76,4 +75,9 @@ export async function getPoolBalance(poolPubkey: PublicKey, program: Program<Hor
 export async function getPoolAccountsFromCompetition(program: Program<HorseRace>, competitionKey: PublicKey) {
   const pools = await program.account.pool.all();
   return pools.filter(pool => pool.account.competitionKey === competitionKey);
+}
+
+export async function getAllPoolDataByCompetition(program: Program<HorseRace>, competition: PublicKey): Promise<PoolData[]> {
+  const pools = await program.account.pool.all();
+  return pools.filter((pool) => pool.account.competitionKey.toBase58() === competition.toBase58()).map((pool) => convertProgramToPoolData(pool.account));
 }

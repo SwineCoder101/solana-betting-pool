@@ -3,24 +3,17 @@ import { UnsignedTransactionRequest, usePrivy, useSolanaWallets } from "@privy-i
 import { AnchorWallet } from "@solana/wallet-adapter-react";
 import { Connection, PublicKey } from "@solana/web3.js";
 
-export function useAnchorProvider() {
-    const { wallets, createWallet } = useSolanaWallets();
-    const { signTransaction, signMessage } = usePrivy();
+export function useAnchorProviderWithPrivy() {
+    const { wallets } = useSolanaWallets();
+    const { signTransaction, signMessage,sendTransaction } = usePrivy();
 
     // Create connection to Solana mainnet or devnet
     const connection = new Connection(
         process.env.NEXT_PUBLIC_SOLANA_RPC_URL || "https://api.devnet.solana.com"
     );
 
-    const getEmbeddedWallet = async () => {
-        if (!wallets || wallets.length === 0) {
-            return await createWallet();
-        }
-        return wallets[0];
-    };
-
-    const getAnchorWallet = async () => {
-        const privyWallet = await getEmbeddedWallet();
+    const getAnchorWallet = () => {
+        const privyWallet =  wallets[0];
 
         return {
             publicKey: new PublicKey(privyWallet.address),
@@ -34,17 +27,20 @@ export function useAnchorProvider() {
     };
 
     // Create and return the provider
-    const getProvider = async () => {
-        const wallet = await getAnchorWallet();
+    const getProvider = () => {
+        const wallet = getAnchorWallet();
         return new AnchorProvider(connection, wallet, {
             commitment: 'confirmed',
         });
     };
 
+    const provider = getProvider();
+
     return {
-        getProvider,
+        provider,
         getAnchorWallet,
         signMessage,
-        connection
+        connection,
+        sendTransaction
     };
 }

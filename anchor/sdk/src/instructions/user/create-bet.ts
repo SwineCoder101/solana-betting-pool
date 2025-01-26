@@ -1,7 +1,7 @@
 import * as anchor from '@coral-xyz/anchor';
 import { Program, web3 } from '@coral-xyz/anchor';
 import { HorseRace } from '../../../../target/types/horse_race';
-import { Keypair, PublicKey } from '@solana/web3.js';
+import { Keypair, PublicKey, Transaction } from '@solana/web3.js';
 
 export async function createBet(
   program: Program<HorseRace>,
@@ -11,7 +11,7 @@ export async function createBet(
   upperBoundPrice: number,
   poolKey: PublicKey,
   competitionKey: PublicKey,
-): Promise<{ tx: web3.TransactionSignature, betHash: PublicKey }> {
+): Promise<Transaction> {
   const betHash = Keypair.generate().publicKey;
 
   console.log('Creating bet with amount:', amount);
@@ -46,9 +46,7 @@ export async function createBet(
       pool: poolKey,
       betHashAcc: betHash,
       systemProgram: web3.SystemProgram.programId,
-    })
-    .signers([signer])
-    .rpc();
+    }).transaction();
 
-  return { tx, betHash };
+  return tx;
 }
