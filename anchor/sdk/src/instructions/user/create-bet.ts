@@ -12,15 +12,8 @@ export async function createBet(
   poolKey: PublicKey,
   competitionKey: PublicKey,
 ): Promise<Transaction> {
+  
   const betHash = Keypair.generate().publicKey;
-
-  console.log('Creating bet with amount:', amount);
-  console.log('Lower bound price:', lowerBoundPrice);
-  console.log('Upper bound price:', upperBoundPrice);
-  console.log('Pool:', poolKey.toBase58());
-  console.log('Competition:', competitionKey.toBase58());
-  console.log('User:', signer.publicKey.toBase58());
-  console.log('Bet hash:', betHash.toBase58());
 
   const [betPDA] = PublicKey.findProgramAddressSync(
     [

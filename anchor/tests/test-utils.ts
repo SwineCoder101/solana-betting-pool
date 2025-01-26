@@ -11,6 +11,7 @@ import {
     LAMPORTS_PER_SOL,
     PublicKey,
     Signer,
+    Transaction,
     VersionedTransaction
 } from "@solana/web3.js";
 
@@ -125,7 +126,12 @@ export async function signAndSendVTx(
     return sol * 1_000_000_000;
   }
 
-  
-
+export async function sendAndConfirmTx(
+  provider: anchor.AnchorProvider,
+  tx: Transaction,
+  signers: Keypair[]
+): Promise<string> {
+  return await provider.sendAndConfirm(tx, signers);
+}
   
   

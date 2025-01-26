@@ -100,7 +100,7 @@ console.log("setting up.........");
 
   await createCompetition(
     program,
-    adminKp,
+    adminKp.publicKey,
     competitionHash,
     competitionPubkey,
     tokenA,
@@ -111,6 +111,7 @@ console.log("setting up.........");
     interval,
     startTime,
     endTime,
+    adminKp
   );
 
   const competitionData = await getCompetitionData(competitionHash, program);
@@ -130,9 +131,9 @@ export const setupCompetitionWithPools = async function (): Promise<SetupDTO> {
   const {fakeAdmin,program,sdkConfig, adminKeys, treasury, adminKp} = await setupEnvironment();
   const {tokenA, priceFeedId, houseCutFactor, minPayoutRatio, interval, startTime, endTime, competitionHash, competitionPubkey} = getCompetitionTestData(program);
 
-  const {poolKeys}  = await createCompetitionWithPools(
+  const {poolKeys} = await createCompetitionWithPools(
     program,
-    adminKp,
+    adminKp.publicKey,
     competitionHash,
     tokenA,
     priceFeedId,
@@ -143,6 +144,7 @@ export const setupCompetitionWithPools = async function (): Promise<SetupDTO> {
     startTime,
     endTime,
     treasury,
+    adminKp
   )
 
   const competitionData = await getCompetitionData(competitionHash, program);

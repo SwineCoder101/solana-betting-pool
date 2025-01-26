@@ -46,12 +46,12 @@ describe("Bets", () => {
     const initialBetCount = (await getBetAccountsForPool(program, poolKey)).length;
     console.log('Initial bet count:', initialBetCount);
 
-    const { tx } = await createBet(program, signer, amount, lowerBoundPrice, upperBoundPrice, poolKey, competitionPubkey);
-    const confirmation = await program.provider.connection.confirmTransaction(tx, 'confirmed');
+    const tx = await createBet(program, signer, amount, lowerBoundPrice, upperBoundPrice, poolKey, competitionPubkey);
+    const txId = await program.provider.sendAndConfirm(tx, [signer]);
     
-    if (confirmation.value.err) {
-      console.error('Transaction failed:', confirmation.value.err);
-      throw new Error('Transaction failed: ' + confirmation.value.err);
+    if (txId.err) {
+      console.error('Transaction failed:', txId.err);
+      throw new Error('Transaction failed: ' + txId.err);
     }
 
     await new Promise(resolve => setTimeout(resolve, 2000));
@@ -86,8 +86,8 @@ describe("Bets", () => {
     const numBets = 3;
 
     for (let i = 0; i < numBets; i++) {
-      const {tx} = await createBet(program, signer, amount, lowerBoundPrice, upperBoundPrice, poolKey, competitionPubkey);
-      await program.provider.connection.confirmTransaction(tx);
+      const tx = await createBet(program, signer, amount, lowerBoundPrice, upperBoundPrice, poolKey, competitionPubkey);
+      await program.provider.sendAndConfirm(tx, [signer]);
     }
 
     const betAccounts = await getBetAccountsForUser(program, signer.publicKey);
@@ -110,8 +110,8 @@ describe("Bets", () => {
 
     for (const poolKey of poolKeys) {
       for (let i = 0; i < numBetsPerPool; i++) {
-        const {tx} = await createBet(program, signer, amount, lowerBoundPrice, upperBoundPrice, poolKey, competitionPubkey);
-        await program.provider.connection.confirmTransaction(tx);
+        const tx = await createBet(program, signer, amount, lowerBoundPrice, upperBoundPrice, poolKey, competitionPubkey);
+        await program.provider.sendAndConfirm(tx, [signer]);
       }
     }
 
@@ -137,12 +137,13 @@ describe("Bets", () => {
     console.log('Signer:', signer.publicKey.toBase58());
 
     // Create a new bet
-    const { tx: txCreate, betHash } = await createBet(program, signer, amount, lowerBoundPrice, upperBoundPrice, poolKey, competitionPubkey);
-    const confirmation = await program.provider.connection.confirmTransaction(txCreate, 'confirmed');
+    const tx = await createBet(program, signer, amount, lowerBoundPrice, upperBoundPrice, poolKey, competitionPubkey);
+    const betHash = tx.signatures[0].publicKey; // Get the first signature as betHash
+    const txId = await program.provider.sendAndConfirm(tx, [signer]);
     
-    if (confirmation.value.err) {
-      console.error('Transaction failed:', confirmation.value.err);
-      throw new Error('Transaction failed: ' + confirmation.value.err);
+    if (txId.err) {
+      console.error('Transaction failed:', txId.err);
+      throw new Error('Transaction failed: ' + txId.err);
     }
 
     await new Promise(resolve => setTimeout(resolve, 2000));
@@ -158,8 +159,8 @@ describe("Bets", () => {
     console.log('Found bet to cancel:', bet);
     expect(bet).toBeDefined();
 
-    const {tx} = await cancelBet(program, signer, poolKey, betHash);
-    await program.provider.connection.confirmTransaction(tx, 'confirmed');
+    const cancelBetTx = await cancelBet(program, signer, poolKey, betHash);
+    await program.provider.connection.confirmTransaction(cancelBetTx, 'confirmed');
 
 
     await new Promise(resolve => setTimeout(resolve, 2000));
