@@ -1,4 +1,5 @@
 import * as anchor from "@coral-xyz/anchor";
+import { web3 } from "@coral-xyz/anchor";
 import * as borsh from "@coral-xyz/borsh";
 import {
     Account,
@@ -11,6 +12,7 @@ import {
     LAMPORTS_PER_SOL,
     PublicKey,
     Signer,
+    Transaction,
     VersionedTransaction
 } from "@solana/web3.js";
 
@@ -70,26 +72,47 @@ export async function now(connection: Connection): Promise<number> {
 }
 
 export async function signAndSendVTx(
-    vTx: VersionedTransaction,
-    signer: Keypair,
-    connection: Connection
-  ): Promise<string> {
-    vTx.message.recentBlockhash = (await connection.getLatestBlockhash()).blockhash;
-  
-    vTx.sign([signer]);
-  
-    const simuTx = await connection.simulateTransaction(vTx);
-    if (simuTx.value.err) console.log("simulateTransaction Error logs", simuTx.value.logs);
-  
-    if (simuTx.value.logs && simuTx.value.logs.length > 100) {
-      console.log("logs", simuTx.value.logs.slice(0, 100));
-      if (simuTx.value.logs.length > 100) console.log("logs", simuTx.value.logs.slice(100));
+  vTx: VersionedTransaction,
+  signer: Keypair,
+  connection: Connection
+): Promise<string> {
+  const { blockhash } = await connection.getLatestBlockhash();
+
+  const message = vTx.message;
+  const newMessage = new web3.TransactionMessage({
+    payerKey: message.staticAccountKeys[0], // First account is always fee payer
+    instructions: message.compiledInstructions.map(ix => ({
+      programId: message.staticAccountKeys[ix.programIdIndex],
+      keys: ix.accountKeyIndexes.map(accountIndex => ({
+        pubkey: message.staticAccountKeys[accountIndex],
+        isSigner: message.isAccountSigner(accountIndex),
+        isWritable: message.isAccountWritable(accountIndex),
+      })),
+      data: Buffer.from(ix.data),
+    })),
+    recentBlockhash: blockhash,
+  });
+
+  const newTx = new web3.VersionedTransaction(newMessage.compileToV0Message());
+  newTx.sign([signer]);
+
+  try {
+    const simResult = await connection.simulateTransaction(newTx, {
+      replaceRecentBlockhash: true,
+      sigVerify: false,
+    });
+
+    if (simResult.value.err) {
+      const errorLogs = simResult.value.logs?.join('\n') || 'No logs available';
+      throw new Error(`Simulation failed: ${errorLogs}`);
     }
-    // simuTx.value.logs.map((log) => {
-    //   console.log(log);
-    // });
-    return await connection.sendTransaction(vTx);
+
+    return await connection.sendTransaction(newTx);
+  } catch (error) {
+    console.error('Transaction failed:', error);
+    throw new Error(`Submission failed: ${error.message}`);
   }
+}
   
   export async function waitAndConfirmSignature(
     connection: Connection,
@@ -125,7 +148,12 @@ export async function signAndSendVTx(
     return sol * 1_000_000_000;
   }
 
-  
-
+export async function sendAndConfirmTx(
+  provider: anchor.AnchorProvider,
+  tx: Transaction,
+  signers: Keypair[]
+): Promise<string> {
+  return await provider.sendAndConfirm(tx, signers);
+}
   
   

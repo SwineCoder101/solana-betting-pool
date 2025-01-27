@@ -20,10 +20,10 @@ export const tokens = [
   ];
   
   export const intervals = [
-    { id: 1, label: `ID:1 | Interval: 00:00 - 00:05`, value: 5 },
-    { id: 2, label: `ID:2 | Interval: 00:05 - 00:10`, value: 10 },
-    { id: 3, label: `ID:3 | Interval: 00:10 - 00:15`, value: 15 },
-    { id: 4, label: `ID:4 | Interval: 00:15 - 00:20`, value: 20 },
-    { id: 5, label: `ID:5 | Interval: 00:20 - 00:25`, value: 25 },
-    { id: 6, label: `ID:6 | Interval: 00:25 - 00:30`, value: 30 },
+    { id: 1, value: 10, label: "10 seconds" },
+    { id: 2, value: 30, label: "30 seconds" },
+    { id: 3, value: 60, label: "1 minute" },
+    { id: 4, value: 120, label: "2 minutes" },
+    { id: 5, value: 300, label: "5 minutes" },
+    { id: 6, value: 600, label: "10 minutes" },
   ];

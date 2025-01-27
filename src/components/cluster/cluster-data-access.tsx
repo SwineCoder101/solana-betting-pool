@@ -1,5 +1,4 @@
 import { clusterApiUrl, Connection } from '@solana/web3.js'
-
 import { atom, useAtomValue, useSetAtom } from 'jotai'
 import { atomWithStorage } from 'jotai/utils'
 import { createContext, ReactNode, useContext } from 'react'
@@ -12,6 +11,7 @@ export interface Cluster {
   active?: boolean
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export enum ClusterNetwork {
   Mainnet = 'mainnet-beta',
   Testnet = 'testnet',
@@ -22,6 +22,7 @@ export enum ClusterNetwork {
 // By default, we don't configure the mainnet-beta cluster
 // The endpoint provided by clusterApiUrl('mainnet-beta') does not allow access from the browser due to CORS restrictions
 // To use the mainnet-beta cluster, provide a custom endpoint
+// eslint-disable-next-line react-refresh/only-export-components
 export const defaultClusters: Cluster[] = [
   {
     name: 'devnet',
@@ -71,6 +72,9 @@ export function ClusterProvider({ children }: { children: ReactNode }) {
   const setCluster = useSetAtom(clusterAtom)
   const setClusters = useSetAtom(clustersAtom)
 
+ 
+
+
   const value: ClusterProviderContext = {
     cluster,
     clusters: clusters.sort((a, b) => (a.name > b.name ? 1 : -1)),
@@ -88,9 +92,12 @@ export function ClusterProvider({ children }: { children: ReactNode }) {
     setCluster: (cluster: Cluster) => setCluster(cluster),
     getExplorerUrl: (path: string) => `https://explorer.solana.com/${path}${getClusterUrlParam(cluster)}`,
   }
+
+  console.log('----------------------> ClusterProvider: cluster', cluster);
   return <Context.Provider value={value}>{children}</Context.Provider>
 }
 
+// eslint-disable-next-line react-refresh/only-export-components
 export function useCluster() {
   return useContext(Context)
 }

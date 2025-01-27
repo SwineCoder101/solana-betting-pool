@@ -47,13 +47,12 @@ export function convertBetToProgramData(betData: BetData): BetProgramData {
     status: convertToBetProgramStatus(betData.status),
   };
 }
-
-export function convertToBetStatus(status): BetStatus {
-  if (status.active !== undefined) {
+export function convertToBetStatus(status: StatusEnumProgram): BetStatus {
+  if ('active' in status) {
     return BetStatus.Active;
-  } else if (status.cancelled !== undefined) {
+  } else if ('cancelled' in status) {
     return BetStatus.Cancelled;
-  } else if (status.settled !== undefined) {
+  } else if ('settled' in status) {
     return BetStatus.Settled;
   } else {
     throw new Error("Unknown BetStatus");
@@ -155,3 +154,7 @@ export async function getBetAccountsForPool(
     publicKey: account.publicKey.toBase58()
   }));
 } 
+export async function getAllBetDataByUser(program: Program<HorseRace>, user: PublicKey): Promise<BetData[]> {
+  const bets = await program.account.bet.all();
+  return bets.filter((bet) => bet.account.user.toBase58() === user.toBase58()).map((bet) => convertProgramToBetData(bet.account));
+}

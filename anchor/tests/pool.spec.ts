@@ -2,6 +2,7 @@ import { web3 } from '@coral-xyz/anchor';
 import { Keypair } from '@solana/web3.js';
 import { createPool } from '../sdk/src/instructions/admin/create-pool';
 import { setupEnvironment } from './common-setup';
+import { getVersionTxFromInstructions } from '../sdk/src/utils';
 
 describe("Pool", () => {
 
@@ -17,8 +18,21 @@ describe("Pool", () => {
     const poolHash = Keypair.generate().publicKey;
 
     // Create the pool
-    const {tx} = await createPool(program, adminKp, competitionKey, startTime, endTime, treasury, poolHash);
-    console.log('Transaction signature:', tx);
+    const { ix } = await createPool(
+      program,
+      adminKp.publicKey,
+      competitionKey,
+      startTime,
+      endTime,
+      treasury,
+      poolHash
+    );
+
+    // Create and send transaction
+    const tx = await getVersionTxFromInstructions(program.provider.connection, [ix]);
+    tx.sign([adminKp]);
+    const signature = await program.provider.connection.sendTransaction(tx);
+    await program.provider.connection.confirmTransaction(signature, 'confirmed');
 
     // Fetch the pool account to verify it was created successfully
     const [poolPda] = await web3.PublicKey.findProgramAddressSync(
