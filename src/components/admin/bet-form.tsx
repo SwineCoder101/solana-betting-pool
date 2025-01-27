@@ -111,7 +111,7 @@ const BetForm: React.FC = () => {
           Submit Bet
         </button>
       </form>
-      {createBetMutation.isLoading && <div>Creating bet...</div>}
+      {createBetMutation.isPending && <div>Creating bet...</div>}
       {createBetMutation.isError && (
         <div className="text-red-500">
           Error creating bet: {createBetMutation.error?.message}

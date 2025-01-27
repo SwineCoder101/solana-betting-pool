@@ -5,6 +5,7 @@ import { createCompetitionWithPools } from '../../anchor/sdk/src/instructions/ad
 import { useAnchorProgram } from './use-anchor-program';
 
 interface CreateCompetitionParams {
+  competitionHash: PublicKey;
   tokenA: string;
   priceFeedId: string;
   adminKeys: string[];

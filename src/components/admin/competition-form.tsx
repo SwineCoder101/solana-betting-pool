@@ -42,7 +42,7 @@ const CompetitionForm: React.FC = () => {
   const handleSubmit = async (action: "create" | "update") => {
     if (action === "create" && user?.wallet?.address) {
       try {
-        const competitionHash = Keypair.generate().publicKey.toString();
+        const competitionHash = Keypair.generate().publicKey;
         const startTime = convertToEpoch(formState.start_date, formState.start_time);
         const endTime = convertToEpoch(formState.end_date, formState.end_time);
         
@@ -220,8 +220,8 @@ const CompetitionForm: React.FC = () => {
       {createCompetitionMutation.isSuccess && (
         <div className="text-green-500">
           Competition created successfully!
-          Competition signature: {createCompetitionMutation.data?.signature}
-          Pool signatures: {createCompetitionMutation.data?.signature}
+          Competition signature: {''}
+          Pool signatures: {''}
         </div>
       )}
     </div>

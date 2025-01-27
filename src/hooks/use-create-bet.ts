@@ -1,9 +1,8 @@
-import { useMutation } from '@tanstack/react-query';
-import { createBet } from '../../anchor/sdk/src/instructions/user/create-bet';
 import { usePrivy, useSolanaWallets } from '@privy-io/react-auth';
 import { Keypair, PublicKey } from '@solana/web3.js';
+import { useMutation } from '@tanstack/react-query';
+import { createBet } from '../../anchor/sdk/src/instructions/user/create-bet';
 import { useAnchorProgram } from './use-anchor-program';
-import { convertToVersionedTransaction } from '@/utils/transaction';
 
 interface CreateBetParams {
   amount: number;
@@ -26,7 +25,7 @@ export function useCreateBet() {
         throw new Error('Wallet not connected');
       }
 
-      const tx = await createBet(
+      const vtx = await createBet(
         program,
         Keypair.generate(),
         params.amount,
@@ -37,13 +36,13 @@ export function useCreateBet() {
       );
 
       // Convert to versioned transaction
-      const versionedTx = await convertToVersionedTransaction(
-        program.provider.connection,
-        tx
-      );
+      // const versionedTx = await convertToVersionedTransaction(
+      //   program.provider.connection,
+      //   tx
+      // );
 
       // Sign the versioned transaction
-      const signedTx = await wallet.signTransaction(versionedTx);
+      const signedTx = await wallet.signTransaction(vtx);
 
       // Send and confirm
       const signature = await program.provider.connection.sendTransaction(signedTx);
