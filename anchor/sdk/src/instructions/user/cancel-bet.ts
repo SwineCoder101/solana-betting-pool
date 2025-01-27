@@ -1,18 +1,18 @@
 import { Program } from '@coral-xyz/anchor';
-import { Keypair, PublicKey, SystemProgram, VersionedTransaction } from '@solana/web3.js';
+import { PublicKey, SystemProgram, VersionedTransaction } from '@solana/web3.js';
 import { HorseRace } from '../../../../target/types/horse_race';
 import { getVersionTxFromInstructions } from '../../utils';
 
 export async function cancelBet(
   program: Program<HorseRace>,
-  signer: Keypair,
+  user: PublicKey,
   poolKey: PublicKey,
   betHash: PublicKey,
 ): Promise<VersionedTransaction> {
   const [betPDA] = PublicKey.findProgramAddressSync(
     [
       Buffer.from("bet"),
-      signer.publicKey.toBuffer(),
+      user.toBuffer(),
       poolKey.toBuffer(),
       betHash.toBuffer(),
     ],
@@ -23,7 +23,7 @@ export async function cancelBet(
     .runCancelBet()
     .accountsStrict({
       bet: betPDA,
-      user: signer.publicKey,
+      user,
       pool: poolKey,
       systemProgram: SystemProgram.programId,
     }).instruction();

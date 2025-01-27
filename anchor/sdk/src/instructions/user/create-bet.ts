@@ -6,7 +6,7 @@ import { getVersionTxFromInstructions } from '../../utils';
 
 export async function createBet(
   program: Program<HorseRace>,
-  signer: Keypair,
+  user: PublicKey,
   amount: number,
   lowerBoundPrice: number,
   upperBoundPrice: number,
@@ -19,7 +19,7 @@ export async function createBet(
   const [betPDA] = PublicKey.findProgramAddressSync(
     [
       Buffer.from("bet"),
-      signer.publicKey.toBuffer(),
+      user.toBuffer(),
       poolKey.toBuffer(),
       betHash.toBuffer(),
     ],
@@ -35,7 +35,7 @@ export async function createBet(
       competitionKey
     )
     .accountsStrict({
-      user: signer.publicKey,
+      user,
       bet: betPDA,
       pool: poolKey,
       betHashAcc: betHash,

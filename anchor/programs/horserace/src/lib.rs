@@ -112,4 +112,22 @@ pub mod horse_race {
         instructions::admin::settle_pool::run_settle_pool(ctx, competition_key)
     }
 
+    /// Update a Pool Price Feed
+    pub fn run_update_pool_price_feed(
+        ctx: Context<UpdatePoolPriceFeed>,
+    ) -> Result<()> {
+        instructions::admin::update_pool_price_feed::run_update_pool_price_feed(ctx)
+    }
+
+    /// Create a Pool Oracle Transformer
+    pub fn run_create_pool_oracle_transformer(
+        ctx: Context<CreatePoolOracleTransformer>,
+        pool: Pubkey,
+        price_feed: String,
+        start_time: u64,
+        end_time: u64,
+    ) -> Result<()> {
+        instructions::admin::create_pool_oracle_transformer::run_init_pool_oracle(ctx, pool, price_feed, start_time, end_time)
+    }
+
 }

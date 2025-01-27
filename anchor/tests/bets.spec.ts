@@ -88,7 +88,7 @@ describe("Bets", () => {
     const numBets = 3;
 
     for (let i = 0; i < numBets; i++) {
-      const vtx = await createBet(program, signer, amount, lowerBoundPrice, upperBoundPrice, poolKey, competitionPubkey);
+      const vtx = await createBet(program, signer.publicKey, amount, lowerBoundPrice, upperBoundPrice, poolKey, competitionPubkey);
       vtx.sign([signer]);
       const signature = await program.provider.connection.sendTransaction(vtx);
       await program.provider.connection.confirmTransaction(signature, 'confirmed');
@@ -114,7 +114,7 @@ describe("Bets", () => {
 
     for (const poolKey of poolKeys) {
       for (let i = 0; i < numBetsPerPool; i++) {
-        const vtx = await createBet(program, signer, amount, lowerBoundPrice, upperBoundPrice, poolKey, competitionPubkey);
+        const vtx = await createBet(program, signer.publicKey, amount, lowerBoundPrice, upperBoundPrice, poolKey, competitionPubkey);
         vtx.sign([signer]);
         const signature = await program.provider.connection.sendTransaction(vtx);
         await program.provider.connection.confirmTransaction(signature, 'confirmed');
@@ -143,7 +143,7 @@ describe("Bets", () => {
     console.log('Signer:', signer.publicKey.toBase58());
 
     // Create a new bet
-    const vtx = await createBet(program, signer, amount, lowerBoundPrice, upperBoundPrice, poolKey, competitionPubkey);
+    const vtx = await createBet(program, signer.publicKey, amount, lowerBoundPrice, upperBoundPrice, poolKey, competitionPubkey);
     vtx.sign([signer]);
     const signature = await program.provider.connection.sendTransaction(vtx);
     await program.provider.connection.confirmTransaction(signature, 'confirmed');
@@ -166,7 +166,7 @@ describe("Bets", () => {
     console.log('Found bet to cancel:', bet);
     expect(bet).toBeDefined();
 
-    const cancelBetTx = await cancelBet(program, signer, poolKey, signature.signature);
+    const cancelBetTx = await cancelBet(program, signer.publicKey, poolKey, signature.signature);
     await program.provider.connection.confirmTransaction(cancelBetTx, 'confirmed');
 
 
@@ -192,7 +192,7 @@ describe("Bets", () => {
     const poolKey = poolKeys[0];
 
     try {
-      await createBet(program, signer, amount, lowerBoundPrice, upperBoundPrice, poolKey, competitionPubkey);
+      await createBet(program, signer.publicKey, amount, lowerBoundPrice, upperBoundPrice, poolKey, competitionPubkey);
     } catch (error) {
       expect(error.message).toContain("CompetitionEnded");
     }
@@ -205,7 +205,7 @@ describe("Bets", () => {
     const poolKey = poolKeys[0];
 
     try {
-      await createBet(program, signer, amount, lowerBoundPrice, upperBoundPrice, poolKey, competitionPubkey);
+      await createBet(program, signer.publicKey, amount, lowerBoundPrice, upperBoundPrice, poolKey, competitionPubkey);
     } catch (error) {
       expect(error.message).toContain("PoolEnded");
     }
