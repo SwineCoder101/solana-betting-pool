@@ -1,7 +1,7 @@
+import { usePrivy, useSolanaWallets } from '@privy-io/react-auth';
+import { Keypair, PublicKey } from '@solana/web3.js';
 import { useMutation } from '@tanstack/react-query';
 import { createCompetitionWithPools } from '../../anchor/sdk/src/instructions/admin/create-competition-with-pools';
-import { UnsignedTransactionRequest, usePrivy, useSolanaWallets } from '@privy-io/react-auth';
-import { Keypair, PublicKey, Transaction, VersionedTransaction } from '@solana/web3.js';
 import { useAnchorProgram } from './use-anchor-program';
 
 interface CreateCompetitionParams {
@@ -17,7 +17,7 @@ interface CreateCompetitionParams {
 }
 //TODO: fix the form with privy wallet signing
 export function useCreateCompetition() {
-  const { user, sendTransaction, signTransaction } = usePrivy();
+  const { user } = usePrivy();
   const { wallets } = useSolanaWallets();
   const program = useAnchorProgram();
   const wallet = wallets[0];
@@ -33,7 +33,7 @@ export function useCreateCompetition() {
       const competitionHash = Keypair.generate().publicKey;
 
       // Get all instructions
-      const { competitionTx, poolTxs, poolKeys } = await createCompetitionWithPools(
+      const { competitionTx, poolKeys } = await createCompetitionWithPools(
         program,
         new PublicKey(user.wallet.address),
         competitionHash,
