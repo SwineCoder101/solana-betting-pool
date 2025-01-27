@@ -307,83 +307,6 @@ export type HorseRace = {
       ]
     },
     {
-      "name": "runCreatePoolOracleTransformer",
-      "docs": [
-        "Create a Pool Oracle Transformer"
-      ],
-      "discriminator": [
-        200,
-        65,
-        121,
-        126,
-        37,
-        233,
-        200,
-        41
-      ],
-      "accounts": [
-        {
-          "name": "authority",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "poolOracle",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  112,
-                  111,
-                  111,
-                  108,
-                  95,
-                  111,
-                  114,
-                  97,
-                  99,
-                  108,
-                  101
-                ]
-              },
-              {
-                "kind": "arg",
-                "path": "pool"
-              },
-              {
-                "kind": "arg",
-                "path": "priceFeed"
-              }
-            ]
-          }
-        },
-        {
-          "name": "systemProgram",
-          "address": "11111111111111111111111111111111"
-        }
-      ],
-      "args": [
-        {
-          "name": "pool",
-          "type": "pubkey"
-        },
-        {
-          "name": "priceFeed",
-          "type": "string"
-        },
-        {
-          "name": "startTime",
-          "type": "u64"
-        },
-        {
-          "name": "endTime",
-          "type": "u64"
-        }
-      ]
-    },
-    {
       "name": "runSettlePool",
       "docs": [
         "Settle a Pool"
@@ -464,67 +387,6 @@ export type HorseRace = {
           "type": "u64"
         }
       ]
-    },
-    {
-      "name": "runUpdatePoolPriceFeed",
-      "docs": [
-        "Update a Pool Price Feed"
-      ],
-      "discriminator": [
-        231,
-        14,
-        29,
-        101,
-        113,
-        15,
-        145,
-        140
-      ],
-      "accounts": [
-        {
-          "name": "authority",
-          "writable": true,
-          "signer": true
-        },
-        {
-          "name": "poolOracle",
-          "writable": true,
-          "pda": {
-            "seeds": [
-              {
-                "kind": "const",
-                "value": [
-                  112,
-                  111,
-                  111,
-                  108,
-                  95,
-                  111,
-                  114,
-                  97,
-                  99,
-                  108,
-                  101
-                ]
-              },
-              {
-                "kind": "account",
-                "path": "pool_oracle.pool",
-                "account": "poolOracleTransformer"
-              },
-              {
-                "kind": "account",
-                "path": "pool_oracle.price_feed",
-                "account": "poolOracleTransformer"
-              }
-            ]
-          }
-        },
-        {
-          "name": "priceUpdate"
-        }
-      ],
-      "args": []
     }
   ],
   "accounts": [
@@ -566,39 +428,28 @@ export type HorseRace = {
         109,
         188
       ]
-    },
-    {
-      "name": "poolOracleTransformer",
-      "discriminator": [
-        165,
-        246,
-        143,
-        134,
-        31,
-        187,
-        230,
-        30
-      ]
-    },
-    {
-      "name": "priceUpdateV2",
-      "discriminator": [
-        34,
-        241,
-        35,
-        99,
-        157,
-        126,
-        244,
-        205
-      ]
     }
   ],
   "errors": [
     {
       "code": 6000,
-      "name": "unauthorized",
-      "msg": "Unauthorized: Not a whitelisted admin or deployer."
+      "name": "invalidTimeRange",
+      "msg": "Invalid time range."
+    },
+    {
+      "code": 6001,
+      "name": "invalidOracleId",
+      "msg": "Invalid oracle id provided, please check the latest oracle id"
+    },
+    {
+      "code": 6002,
+      "name": "oracleInactive",
+      "msg": "Oracle is inactive."
+    },
+    {
+      "code": 6003,
+      "name": "outsideOracleTimeRange",
+      "msg": "Oracle is outside the time range."
     }
   ],
   "types": [
@@ -725,187 +576,6 @@ export type HorseRace = {
           {
             "name": "treasury",
             "type": "pubkey"
-          }
-        ]
-      }
-    },
-    {
-      "name": "poolOracleTransformer",
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "pool",
-            "type": "pubkey"
-          },
-          {
-            "name": "maxPrice",
-            "type": "u64"
-          },
-          {
-            "name": "minPrice",
-            "type": "u64"
-          },
-          {
-            "name": "priceFeed",
-            "type": "string"
-          },
-          {
-            "name": "active",
-            "type": "bool"
-          },
-          {
-            "name": "startTime",
-            "type": "u64"
-          },
-          {
-            "name": "endTime",
-            "type": "u64"
-          },
-          {
-            "name": "bump",
-            "type": "u8"
-          }
-        ]
-      }
-    },
-    {
-      "name": "priceFeedMessage",
-      "repr": {
-        "kind": "c"
-      },
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "feedId",
-            "docs": [
-              "`FeedId` but avoid the type alias because of compatibility issues with Anchor's `idl-build` feature."
-            ],
-            "type": {
-              "array": [
-                "u8",
-                32
-              ]
-            }
-          },
-          {
-            "name": "price",
-            "type": "i64"
-          },
-          {
-            "name": "conf",
-            "type": "u64"
-          },
-          {
-            "name": "exponent",
-            "type": "i32"
-          },
-          {
-            "name": "publishTime",
-            "docs": [
-              "The timestamp of this price update in seconds"
-            ],
-            "type": "i64"
-          },
-          {
-            "name": "prevPublishTime",
-            "docs": [
-              "The timestamp of the previous price update. This field is intended to allow users to",
-              "identify the single unique price update for any moment in time:",
-              "for any time t, the unique update is the one such that prev_publish_time < t <= publish_time.",
-              "",
-              "Note that there may not be such an update while we are migrating to the new message-sending logic,",
-              "as some price updates on pythnet may not be sent to other chains (because the message-sending",
-              "logic may not have triggered). We can solve this problem by making the message-sending mandatory",
-              "(which we can do once publishers have migrated over).",
-              "",
-              "Additionally, this field may be equal to publish_time if the message is sent on a slot where",
-              "where the aggregation was unsuccesful. This problem will go away once all publishers have",
-              "migrated over to a recent version of pyth-agent."
-            ],
-            "type": "i64"
-          },
-          {
-            "name": "emaPrice",
-            "type": "i64"
-          },
-          {
-            "name": "emaConf",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "priceUpdateV2",
-      "docs": [
-        "A price update account. This account is used by the Pyth Receiver program to store a verified price update from a Pyth price feed.",
-        "It contains:",
-        "- `write_authority`: The write authority for this account. This authority can close this account to reclaim rent or update the account to contain a different price update.",
-        "- `verification_level`: The [`VerificationLevel`] of this price update. This represents how many Wormhole guardian signatures have been verified for this price update.",
-        "- `price_message`: The actual price update.",
-        "- `posted_slot`: The slot at which this price update was posted."
-      ],
-      "type": {
-        "kind": "struct",
-        "fields": [
-          {
-            "name": "writeAuthority",
-            "type": "pubkey"
-          },
-          {
-            "name": "verificationLevel",
-            "type": {
-              "defined": {
-                "name": "verificationLevel"
-              }
-            }
-          },
-          {
-            "name": "priceMessage",
-            "type": {
-              "defined": {
-                "name": "priceFeedMessage"
-              }
-            }
-          },
-          {
-            "name": "postedSlot",
-            "type": "u64"
-          }
-        ]
-      }
-    },
-    {
-      "name": "verificationLevel",
-      "docs": [
-        "Pyth price updates are bridged to all blockchains via Wormhole.",
-        "Using the price updates on another chain requires verifying the signatures of the Wormhole guardians.",
-        "The usual process is to check the signatures for two thirds of the total number of guardians, but this can be cumbersome on Solana because of the transaction size limits,",
-        "so we also allow for partial verification.",
-        "",
-        "This enum represents how much a price update has been verified:",
-        "- If `Full`, we have verified the signatures for two thirds of the current guardians.",
-        "- If `Partial`, only `num_signatures` guardian signatures have been checked.",
-        "",
-        "# Warning",
-        "Using partially verified price updates is dangerous, as it lowers the threshold of guardians that need to collude to produce a malicious price update."
-      ],
-      "type": {
-        "kind": "enum",
-        "variants": [
-          {
-            "name": "partial",
-            "fields": [
-              {
-                "name": "numSignatures",
-                "type": "u8"
-              }
-            ]
-          },
-          {
-            "name": "full"
           }
         ]
       }
