@@ -1,5 +1,5 @@
 import { usePrivy, useSolanaWallets } from '@privy-io/react-auth';
-import { Keypair, PublicKey } from '@solana/web3.js';
+import { PublicKey } from '@solana/web3.js';
 import { useMutation } from '@tanstack/react-query';
 import { createBet } from '../../anchor/sdk/src/instructions/user/create-bet';
 import { useAnchorProgram } from './use-anchor-program';
@@ -27,7 +27,7 @@ export function useCreateBet() {
 
       const vtx = await createBet(
         program,
-        Keypair.generate(),
+        new PublicKey(wallet.address),
         params.amount,
         params.lowerBoundPrice,
         params.upperBoundPrice,
