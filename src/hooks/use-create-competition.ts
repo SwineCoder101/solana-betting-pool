@@ -1,11 +1,10 @@
 import { useMutation } from '@tanstack/react-query';
 import { createCompetitionWithPools } from '../../anchor/sdk/src/instructions/admin/create-competition-with-pools';
-import { usePrivy, useSolanaWallets } from '@privy-io/react-auth';
-import { PublicKey, Transaction, VersionedTransaction } from '@solana/web3.js';
+import { UnsignedTransactionRequest, usePrivy, useSolanaWallets } from '@privy-io/react-auth';
+import { Keypair, PublicKey, Transaction, VersionedTransaction } from '@solana/web3.js';
 import { useAnchorProgram } from './use-anchor-program';
 
 interface CreateCompetitionParams {
-  competitionHash: string;
   tokenA: string;
   priceFeedId: string;
   adminKeys: string[];
@@ -16,9 +15,9 @@ interface CreateCompetitionParams {
   endTime: number;
   treasury: string;
 }
-
+//TODO: fix the form with privy wallet signing
 export function useCreateCompetition() {
-  const { user } = usePrivy();
+  const { user, sendTransaction, signTransaction } = usePrivy();
   const { wallets } = useSolanaWallets();
   const program = useAnchorProgram();
   const wallet = wallets[0];
@@ -29,11 +28,15 @@ export function useCreateCompetition() {
         throw new Error('Wallet not connected');
       }
 
+      console.log(params);
+
+      const competitionHash = Keypair.generate().publicKey;
+
       // Get all instructions
-      const { instructions, poolKeys } = await createCompetitionWithPools(
+      const { competitionTx, poolTxs, poolKeys } = await createCompetitionWithPools(
         program,
         new PublicKey(user.wallet.address),
-        new PublicKey(params.competitionHash),
+        competitionHash,
         new PublicKey(params.tokenA),
         params.priceFeedId,
         params.adminKeys.map(key => new PublicKey(key)),
@@ -45,24 +48,30 @@ export function useCreateCompetition() {
         new PublicKey(params.treasury)
       );
 
-      // Create a new transaction and add all instructions
-      const tx = new Transaction();
-      instructions.forEach(ix => tx.add(ix));
+      const signature = await wallet.signTransaction(competitionTx);
+      console.log(signature); 
 
-      // Get latest blockhash
-      const latestBlockhash = await program.provider.connection.getLatestBlockhash();
-      tx.recentBlockhash = latestBlockhash.blockhash;
-      tx.feePayer = new PublicKey(user.wallet.address);
+      const tx = await wallet.sendTransaction(competitionTx, program.provider.connection);
+      console.log(tx);
 
-      // Convert to versioned transaction
-      const versionedTx = new VersionedTransaction(tx.compileMessage());
+      // // Create a new transaction and add all instructions
+      // const tx = new Transaction();
+      // instructions.forEach(ix => tx.add(ix));
 
-      // Sign with wallet
-      const signedTx = await wallet.signTransaction(versionedTx);
+      // // Get latest blockhash
+      // const latestBlockhash = await program.provider.connection.getLatestBlockhash();
+      // tx.recentBlockhash = latestBlockhash.blockhash;
+      // tx.feePayer = new PublicKey(user.wallet.address);
 
-      // Send and confirm
-      const signature = await program.provider.connection.sendTransaction(signedTx);
-      await program.provider.connection.confirmTransaction(signature, 'confirmed');
+      // // Convert to versioned transaction
+      // const versionedTx = new VersionedTransaction(tx.compileMessage());
+
+      // // Sign with wallet
+      // const signedTx = await wallet.signTransaction(versionedTx);
+
+      // // Send and confirm
+      // const signature = await program.provider.connection.sendTransaction(signedTx);
+      // await program.provider.connection.confirmTransaction(signature, 'confirmed');
 
       return {
         signature,

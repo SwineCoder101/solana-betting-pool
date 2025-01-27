@@ -17,6 +17,11 @@ const CompetitionForm: React.FC = () => {
     pool_count: 1,
     pool_interval: intervals[0].value,
     admin_keys: [""],
+    start_date: "",
+    start_time: "",
+    end_date: "",
+    end_time: "",
+    treasury: "",
   });
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
@@ -29,11 +34,17 @@ const CompetitionForm: React.FC = () => {
     setFormState({ ...formState, admin_keys: keys });
   };
 
+  const convertToEpoch = (date: string, time: string): number => {
+    const datetime = new Date(`${date}T${time}`);
+    return Math.floor(datetime.getTime() / 1000);
+  };
+
   const handleSubmit = async (action: "create" | "update") => {
     if (action === "create" && user?.wallet?.address) {
       try {
         const competitionHash = Keypair.generate().publicKey.toString();
-        const now = Math.floor(Date.now() / 1000);
+        const startTime = convertToEpoch(formState.start_date, formState.start_time);
+        const endTime = convertToEpoch(formState.end_date, formState.end_time);
         
         await createCompetitionMutation.mutateAsync({
           competitionHash,
@@ -43,9 +54,9 @@ const CompetitionForm: React.FC = () => {
           houseCutFactor: formState.house_cut_factor,
           minPayoutRatio: formState.min_payout_ratio,
           interval: Number(formState.interval),
-          startTime: now,
-          endTime: now + Number(formState.interval),
-          treasury: user.wallet.address,
+          startTime,
+          endTime,
+          treasury: formState.treasury || user.wallet.address,
         });
       } catch (error) {
         console.error('Error creating competition:', error);
@@ -118,6 +129,61 @@ const CompetitionForm: React.FC = () => {
             ))}
           </select>
         </div>
+        <div className="grid grid-cols-2 gap-4 mb-2">
+          <div>
+            <label className="block mb-1">Start Date</label>
+            <input
+              type="date"
+              name="start_date"
+              value={formState.start_date}
+              onChange={handleInputChange}
+              className="input input-bordered w-full bg-gray-200"
+            />
+          </div>
+          <div>
+            <label className="block mb-1">Start Time</label>
+            <input
+              type="time"
+              name="start_time"
+              value={formState.start_time}
+              onChange={handleInputChange}
+              className="input input-bordered w-full bg-gray-200"
+            />
+          </div>
+        </div>
+        <div className="grid grid-cols-2 gap-4 mb-2">
+          <div>
+            <label className="block mb-1">End Date</label>
+            <input
+              type="date"
+              name="end_date"
+              value={formState.end_date}
+              onChange={handleInputChange}
+              className="input input-bordered w-full bg-gray-200"
+            />
+          </div>
+          <div>
+            <label className="block mb-1">End Time</label>
+            <input
+              type="time"
+              name="end_time"
+              value={formState.end_time}
+              onChange={handleInputChange}
+              className="input input-bordered w-full bg-gray-200"
+            />
+          </div>
+        </div>
+        <div className="mb-2">
+          <label className="block mb-1">Treasury Address (optional)</label>
+          <input
+            type="text"
+            name="treasury"
+            value={formState.treasury}
+            onChange={handleInputChange}
+            placeholder="Leave empty to use your wallet address"
+            className="input input-bordered w-full bg-gray-200"
+          />
+        </div>
         <div className="mb-2">
           <label className="block mb-1">Admin Public Keys (one per line)</label>
           <textarea
@@ -127,32 +193,6 @@ const CompetitionForm: React.FC = () => {
             className="input input-bordered w-full bg-gray-200 h-24"
             placeholder="Enter admin public keys"
           />
-        </div>
-        <div className="mb-2">
-          <label className="block mb-1">Number of Pools</label>
-          <input
-            type="number"
-            name="pool_count"
-            value={formState.pool_count}
-            min="1"
-            onChange={handleInputChange}
-            className="input input-bordered w-full bg-gray-200"
-          />
-        </div>
-        <div className="mb-2">
-          <label className="block mb-1">Pool Interval</label>
-          <select
-            name="pool_interval"
-            value={formState.pool_interval}
-            onChange={handleInputChange}
-            className="input input-bordered w-full bg-gray-200"
-          >
-            {intervals.map((interval) => (
-              <option key={interval.id} value={interval.value}>
-                {interval.label}
-              </option>
-            ))}
-          </select>
         </div>
         <div className="flex gap-2 mt-4">
           <button

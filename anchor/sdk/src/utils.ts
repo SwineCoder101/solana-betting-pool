@@ -57,7 +57,7 @@ export async function getVersionTxFromInstructions(
   feePayer?: PublicKey,
   addressLookupTableAccounts?: web3.AddressLookupTableAccount[] // Optional ALT support
 ): Promise<VersionedTransaction> {
-  
+
   if (instructions.length === 0) {
     throw new Error('At least one instruction is required');
   }
