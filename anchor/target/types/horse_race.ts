@@ -433,33 +433,23 @@ export type HorseRace = {
   "errors": [
     {
       "code": 6000,
-      "name": "notEligible",
-      "msg": "User is not eligible to create a bet."
+      "name": "invalidTimeRange",
+      "msg": "Invalid time range."
     },
     {
       "code": 6001,
-      "name": "betOwnershipMismatch",
-      "msg": "User does not own this bet."
+      "name": "invalidOracleId",
+      "msg": "Invalid oracle id provided, please check the latest oracle id"
     },
     {
       "code": 6002,
-      "name": "unauthorized",
-      "msg": "Unauthorized: Not the competition owner."
+      "name": "oracleInactive",
+      "msg": "Oracle is inactive."
     },
     {
       "code": 6003,
-      "name": "poolNotEnded",
-      "msg": "Pool not finished yet."
-    },
-    {
-      "code": 6004,
-      "name": "competitionEnded",
-      "msg": "Competition has ended"
-    },
-    {
-      "code": 6005,
-      "name": "poolEnded",
-      "msg": "Pool has ended"
+      "name": "outsideOracleTimeRange",
+      "msg": "Oracle is outside the time range."
     }
   ],
   "types": [

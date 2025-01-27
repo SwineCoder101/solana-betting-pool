@@ -171,7 +171,7 @@ const CompetitionForm: React.FC = () => {
           </button>
         </div>
       </form>
-      {createCompetitionMutation.isLoading && <div>Creating competition...</div>}
+      {createCompetitionMutation.isPending && <div>Creating competition...</div>}
       {createCompetitionMutation.isError && (
         <div className="text-red-500">
           Error creating competition: {createCompetitionMutation.error?.message}
@@ -180,8 +180,8 @@ const CompetitionForm: React.FC = () => {
       {createCompetitionMutation.isSuccess && (
         <div className="text-green-500">
           Competition created successfully!
-          Competition signature: {createCompetitionMutation.data?.competitionSignature}
-          Pool signatures: {createCompetitionMutation.data?.poolSignatures.join(', ')}
+          Competition signature: {createCompetitionMutation.data?.signature}
+          Pool signatures: {createCompetitionMutation.data?.signature}
         </div>
       )}
     </div>

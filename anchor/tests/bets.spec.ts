@@ -1,13 +1,11 @@
 // bets.spec.ts
 
-import { setupCompetitionWithPools, SetupDTO } from "./common-setup";
-import { Keypair, LAMPORTS_PER_SOL, PublicKey, Transaction } from "@solana/web3.js";
+import { Keypair, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { BetStatus, getBetAccountsForPool, getBetAccountsForUser, getBetData } from "../sdk/src";
-import { createUserWithFunds } from "./test-utils";
-import { createBet } from "../sdk/src/instructions/user/create-bet";
 import { cancelBet } from "../sdk/src/instructions/user/cancel-bet";
-import { web3 } from '@coral-xyz/anchor';
-import { getVersionTxFromInstructions } from '../sdk/src/utils';
+import { createBet } from "../sdk/src/instructions/user/create-bet";
+import { setupCompetitionWithPools, SetupDTO } from "./common-setup";
+import { createUserWithFunds } from "./test-utils";
 
 describe("Bets", () => {
   let setupDto: SetupDTO;
@@ -48,10 +46,9 @@ describe("Bets", () => {
     const initialBetCount = (await getBetAccountsForPool(program, poolKey)).length;
     console.log('Initial bet count:', initialBetCount);
 
-    const tx = await createBet(program, signer, amount, lowerBoundPrice, upperBoundPrice, poolKey, competitionPubkey);
-    const versionedTx = await getVersionTxFromInstructions(program.provider.connection, [tx]);
-    versionedTx.sign([signer]);
-    const signature = await program.provider.connection.sendTransaction(versionedTx);
+    const vtx = await createBet(program, signer, amount, lowerBoundPrice, upperBoundPrice, poolKey, competitionPubkey);
+    vtx.sign([signer]);
+    const signature = await program.provider.connection.sendTransaction(vtx);
     await program.provider.connection.confirmTransaction(signature, 'confirmed');
     
     if (signature.err) {
@@ -91,10 +88,9 @@ describe("Bets", () => {
     const numBets = 3;
 
     for (let i = 0; i < numBets; i++) {
-      const tx = await createBet(program, signer, amount, lowerBoundPrice, upperBoundPrice, poolKey, competitionPubkey);
-      const versionedTx = await getVersionTxFromInstructions(program.provider.connection, [tx]);
-      versionedTx.sign([signer]);
-      const signature = await program.provider.connection.sendTransaction(versionedTx);
+      const vtx = await createBet(program, signer, amount, lowerBoundPrice, upperBoundPrice, poolKey, competitionPubkey);
+      vtx.sign([signer]);
+      const signature = await program.provider.connection.sendTransaction(vtx);
       await program.provider.connection.confirmTransaction(signature, 'confirmed');
     }
 
@@ -118,10 +114,9 @@ describe("Bets", () => {
 
     for (const poolKey of poolKeys) {
       for (let i = 0; i < numBetsPerPool; i++) {
-        const tx = await createBet(program, signer, amount, lowerBoundPrice, upperBoundPrice, poolKey, competitionPubkey);
-        const versionedTx = await getVersionTxFromInstructions(program.provider.connection, [tx]);
-        versionedTx.sign([signer]);
-        const signature = await program.provider.connection.sendTransaction(versionedTx);
+        const vtx = await createBet(program, signer, amount, lowerBoundPrice, upperBoundPrice, poolKey, competitionPubkey);
+        vtx.sign([signer]);
+        const signature = await program.provider.connection.sendTransaction(vtx);
         await program.provider.connection.confirmTransaction(signature, 'confirmed');
       }
     }
@@ -148,10 +143,9 @@ describe("Bets", () => {
     console.log('Signer:', signer.publicKey.toBase58());
 
     // Create a new bet
-    const tx = await createBet(program, signer, amount, lowerBoundPrice, upperBoundPrice, poolKey, competitionPubkey);
-    const versionedTx = await getVersionTxFromInstructions(program.provider.connection, [tx]);
-    versionedTx.sign([signer]);
-    const signature = await program.provider.connection.sendTransaction(versionedTx);
+    const vtx = await createBet(program, signer, amount, lowerBoundPrice, upperBoundPrice, poolKey, competitionPubkey);
+    vtx.sign([signer]);
+    const signature = await program.provider.connection.sendTransaction(vtx);
     await program.provider.connection.confirmTransaction(signature, 'confirmed');
     
     if (signature.err) {

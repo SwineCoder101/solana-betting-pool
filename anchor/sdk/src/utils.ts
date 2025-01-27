@@ -1,5 +1,5 @@
 // Here we export some useful types and functions for interacting with the Anchor program.
-import { AnchorProvider, Program } from '@coral-xyz/anchor'
+import { AnchorProvider, Program, web3 } from '@coral-xyz/anchor'
 import { Cluster, Connection, PublicKey, Transaction, TransactionInstruction, VersionedTransaction } from '@solana/web3.js'
 import HorseRaceIDL from '../../target/idl/horse_race.json'
 import type {HorseRace} from '../../target/types/horse_race'
@@ -53,13 +53,29 @@ export async function combineAndConvertTxs(connection: Connection, txs: Transact
 
 export async function getVersionTxFromInstructions(
   connection: Connection,
-  instructions: TransactionInstruction[]
+  instructions: TransactionInstruction[],
+  feePayer?: PublicKey,
+  addressLookupTableAccounts?: web3.AddressLookupTableAccount[] // Optional ALT support
 ): Promise<VersionedTransaction> {
-  const tx = new Transaction();
-  instructions.forEach(ix => tx.add(ix));
   
-  const latestBlockhash = await connection.getLatestBlockhash();
-  tx.recentBlockhash = latestBlockhash.blockhash;
-  
-  return new VersionedTransaction(tx.compileMessage());
+  if (instructions.length === 0) {
+    throw new Error('At least one instruction is required');
+  }
+
+  const payer = feePayer || instructions[0].keys.find(k => k.isSigner)?.pubkey;
+  if (!payer) {
+    throw new Error('Could not determine fee payer. Please specify explicitly.');
+  }
+
+  const { blockhash } = await connection.getLatestBlockhash();
+
+  const message = new web3.TransactionMessage({
+    payerKey: payer,
+    recentBlockhash: blockhash,
+    instructions,
+  }).compileToV0Message(addressLookupTableAccounts);
+
+  const versionedTx = new VersionedTransaction(message);
+
+  return versionedTx;
 }

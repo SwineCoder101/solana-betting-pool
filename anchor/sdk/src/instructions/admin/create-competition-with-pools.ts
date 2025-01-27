@@ -8,7 +8,8 @@ import { createPool } from './create-pool';
 
 export type CompetitionPoolResponse = {
   poolKeys: web3.PublicKey[],
-  tx: web3.VersionedTransaction,
+  competitionTx: web3.VersionedTransaction,
+  poolTxs: web3.VersionedTransaction[]
 }
 
 export async function createCompetitionWithPools(
@@ -25,65 +26,74 @@ export async function createCompetitionWithPools(
   endTime: number,
   treasury: PublicKey,
 ): Promise<CompetitionPoolResponse> {
-
-
+  
   const [competitionPda] = await web3.PublicKey.findProgramAddressSync(
     [Buffer.from(COMPETITION_SEED), competitionHash.toBuffer()],
     program.programId
   );
 
-
-  // Get competition creation instruction
-  const competitionIx = await createCompetition(
-    program,
-    admin,
-    competitionHash,
-    competitionPda,
-    tokenA,
-    priceFeedId,
-    adminKeys,
-    houseCutFactor,
-    minPayoutRatio,
-    interval,
-    startTime,
-    endTime
+  const competitionTx = await getVersionTxFromInstructions(
+    program.provider.connection,
+    [await createCompetition(
+      program,
+      admin,
+      competitionHash,
+      competitionPda,
+      tokenA,
+      priceFeedId,
+      adminKeys,
+      houseCutFactor,
+      minPayoutRatio,
+      interval,
+      startTime,
+      endTime
+    )],
+    admin
   );
 
-  // Calculate pool intervals
-  const poolCount = Math.floor(interval / 60); // One pool per minute
-  const poolInterval = interval / poolCount;
+  const poolCount = Math.floor((endTime - startTime) / interval); // Correct calculation
+  const poolInterval = interval;
+
+  console.log('poolCount:', poolCount);
   
-  // Generate pool hashes and time ranges
   const poolConfigs = Array.from({ length: poolCount }, (_, i) => ({
     poolHash: web3.Keypair.generate().publicKey,
     startTime: startTime + (i * poolInterval),
     endTime: startTime + ((i + 1) * poolInterval)
   }));
 
-  // Create pool instructions in parallel
-  const poolCreations = poolConfigs.map(({ poolHash, startTime: poolStartTime, endTime: poolEndTime }) => 
-    createPool(
-      program,
-      admin,
-      competitionHash,
-      poolStartTime,
-      poolEndTime,
-      treasury,
-      poolHash
-    )
+  console.log('competitionPda:', competitionPda.toBase58());
+
+  // Create pool transactions
+  const poolTxResponses = await Promise.all(
+    poolConfigs.map(async (config) => {
+      const { ix, poolKey } = await createPool(
+        program,
+        admin,
+        competitionPda, // Use actual competition PDA
+        config.startTime,
+        config.endTime,
+        treasury,
+        config.poolHash
+      );
+      
+      return {
+        tx: await getVersionTxFromInstructions(
+          program.provider.connection,
+          [ix],
+          admin
+        ),
+        poolKey
+      };
+    })
   );
 
-  const poolResponses = await Promise.all(poolCreations);
-  const poolInstructions = poolResponses.map(response => response.ix);
-
-  const poolKeys = poolConfigs.map(config => config.poolHash);
-
-  const allInstructions = [competitionIx, ...poolInstructions];
-
-  const tx = await getVersionTxFromInstructions(program.provider.connection, allInstructions);
+  const poolKeys = poolTxResponses.map(c => c.poolKey);
+  const poolTxs = poolTxResponses.map(c => c.tx);
 
   return {
-    tx,
-    poolKeys
+    competitionTx, // Return first transaction with competition creation
+    poolKeys,
+    poolTxs
   };
 }

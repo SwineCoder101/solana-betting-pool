@@ -1,6 +1,6 @@
-import { Program, BN, web3 } from '@coral-xyz/anchor';
+import { BN, Program, web3 } from '@coral-xyz/anchor';
+import { TransactionInstruction } from '@solana/web3.js';
 import { HorseRace } from '../../../../target/types/horse_race';
-import { Transaction, TransactionInstruction } from '@solana/web3.js';
 
 export async function createCompetition(
   program: Program<HorseRace>,
