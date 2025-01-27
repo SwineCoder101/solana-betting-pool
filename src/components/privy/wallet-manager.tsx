@@ -3,6 +3,7 @@ import { useEffect, useState } from "react";
 import { Connection, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { LoginWalletButton } from "./login-wallet-button";
 import { transferSolBetweenWallets } from "@/util/solana";
+import { DelegateActionButton } from "./delegate-action-button";
 
 interface WalletBalance {
     address: string;
@@ -121,6 +122,7 @@ export function WalletManager() {
 
             {authenticated && (
                 <>
+                    <DelegateActionButton />
                     <button
                         onClick={handleCreateWallet}
                         disabled={loading}
