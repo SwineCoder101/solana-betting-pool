@@ -1,7 +1,8 @@
 import * as anchor from '@coral-xyz/anchor';
 import { Program, web3 } from '@coral-xyz/anchor';
+import { Keypair, PublicKey, VersionedTransaction } from '@solana/web3.js';
 import { HorseRace } from '../../../../target/types/horse_race';
-import { Keypair, PublicKey } from '@solana/web3.js';
+import { getVersionTxFromInstructions } from '../../utils';
 
 export async function createBet(
   program: Program<HorseRace>,
@@ -11,16 +12,9 @@ export async function createBet(
   upperBoundPrice: number,
   poolKey: PublicKey,
   competitionKey: PublicKey,
-): Promise<{ tx: web3.TransactionSignature, betHash: PublicKey }> {
+): Promise<VersionedTransaction> {
+  
   const betHash = Keypair.generate().publicKey;
-
-  console.log('Creating bet with amount:', amount);
-  console.log('Lower bound price:', lowerBoundPrice);
-  console.log('Upper bound price:', upperBoundPrice);
-  console.log('Pool:', poolKey.toBase58());
-  console.log('Competition:', competitionKey.toBase58());
-  console.log('User:', signer.publicKey.toBase58());
-  console.log('Bet hash:', betHash.toBase58());
 
   const [betPDA] = PublicKey.findProgramAddressSync(
     [
@@ -46,9 +40,10 @@ export async function createBet(
       pool: poolKey,
       betHashAcc: betHash,
       systemProgram: web3.SystemProgram.programId,
-    })
-    .signers([signer])
-    .rpc();
+    }).instruction();
 
-  return { tx, betHash };
+
+    const vtx = await getVersionTxFromInstructions(program.provider.connection, [tx]);
+
+  return vtx;
 }

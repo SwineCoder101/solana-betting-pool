@@ -1,49 +1,44 @@
-import * as anchor from '@coral-xyz/anchor';
-import { Program, web3 } from '@coral-xyz/anchor';
+import { BN, Program, web3 } from '@coral-xyz/anchor';
+import { PublicKey, TransactionInstruction } from '@solana/web3.js';
 import { HorseRace } from '../../../../target/types/horse_race';
+import { POOL_SEED } from '../../constants';
 
 export type CreatePoolResponse = {
-  poolKey: web3.PublicKey,
-  poolHash: web3.PublicKey,
-  tx: web3.TransactionSignature,
+  poolKey: PublicKey;
+  ix: TransactionInstruction;
 }
-
 
 export async function createPool(
   program: Program<HorseRace>,
-  authority: web3.Keypair,
-  competitionAddr: web3.PublicKey,
+  admin: PublicKey,
+  competitionKey: PublicKey,
   startTime: number,
   endTime: number,
-  treasury: web3.PublicKey,
-  poolHash: web3.PublicKey
+  treasury: PublicKey,
+  poolHash: PublicKey,
 ): Promise<CreatePoolResponse> {
-
-  console.log('Creating pool with hash:', poolHash.toBase58());
-  console.log('Competition:', competitionAddr.toBase58());
-
-  const [poolPda] = await web3.PublicKey.findProgramAddressSync(
-    [Buffer.from('pool'), competitionAddr.toBuffer(), poolHash.toBuffer()],
+  const [poolPda] = web3.PublicKey.findProgramAddressSync(
+    [Buffer.from(POOL_SEED), competitionKey.toBuffer(), poolHash.toBuffer()],
     program.programId
   );
 
-  console.log('Pool PDA:', poolPda.toBase58());
-
-  const tx = await program.methods
-    .runCreatePool(new anchor.BN(startTime), new anchor.BN(endTime), treasury)
+  const ix = await program.methods
+    .runCreatePool(
+      new BN(startTime),
+      new BN(endTime),
+      treasury
+    )
     .accountsStrict({
-      authority: authority.publicKey,
+      authority: admin,
       pool: poolPda,
-      systemProgram: web3.SystemProgram.programId,
+      competitionAcc: competitionKey,
       poolHashAcc: poolHash,
-      competitionAcc: competitionAddr,
+      systemProgram: web3.SystemProgram.programId,
     })
-    .signers([authority])
-    .rpc();
+    .instruction();
 
   return {
     poolKey: poolPda,
-    poolHash,
-    tx,
+    ix
   };
 }

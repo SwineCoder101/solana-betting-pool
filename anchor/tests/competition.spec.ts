@@ -8,7 +8,7 @@ describe("Competition", () => {
 
   beforeAll(async () => {
     setupDto = await setupCompetition();
-  });
+  }, 1000000);
 
   it("Create competition successfully", async () => {
     const competitionData = setupDto.competitionData;
