@@ -12,6 +12,7 @@ interface WalletBalance {
 }
 
 export function WalletManager() {
+    // const { fundWallet, withdrawFunds } = useFundWallet();
     const { authenticated, ready, user } = usePrivy();
     const { wallets, createWallet } = useSolanaWallets();
     const [balances, setBalances] = useState<WalletBalance[]>([]);
@@ -80,6 +81,19 @@ export function WalletManager() {
             alert(`Please enter a valid amount, amount appears to be ${amount}`);
             return;
         }
+
+
+        // NativeFundingConfig = {
+        //     chain?: ChainLikeWithId;
+        //     amount?: string;
+        //     defaultFundingMethod?: DefaultFundingMethod;
+        //     card?: {
+        //         /** The preferred card onramp for funding */
+        //         preferredProvider?: PreferredCardProvider;
+        //     };
+        // }
+        
+        // fundWallet(toAddress, { amount: amount });
 
         const sourceWallet = wallets?.find(w => w.address === fromAddress);
         const sourceBalance = balances.find(b => b.address === fromAddress)?.balance || 0;

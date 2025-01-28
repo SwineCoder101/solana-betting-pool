@@ -1,9 +1,11 @@
 import { intervals } from "@/data/data-constants";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useCreateBet } from '@/hooks/use-create-bet';
+import { usePrivy } from "@privy-io/react-auth";
 
 const BetForm: React.FC = () => {
   const createBetMutation = useCreateBet();
+  const { user } = usePrivy();
   const [formState, setFormState] = useState({
     amount: 0,
     lower_bound_price: 0,
@@ -12,6 +14,13 @@ const BetForm: React.FC = () => {
     poolKey: '',
     competition: '',
   });
+
+  useEffect(() => {
+    // Check for required dependencies
+    if (!user?.wallet?.address) {
+      console.warn('Wallet not connected');
+    }
+  }, [user]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -22,6 +31,19 @@ const BetForm: React.FC = () => {
     e.preventDefault();
     
     try {
+      if (!user?.wallet?.address) {
+        throw new Error('Please connect your wallet first');
+      }
+
+      // Validate form data
+      if (!formState.amount || formState.amount <= 0) {
+        throw new Error('Please enter a valid amount');
+      }
+      if (!formState.poolKey) {
+        throw new Error('Please enter a pool key');
+      }
+      // Add other validations as needed
+
       await createBetMutation.mutateAsync({
         amount: Number(formState.amount),
         lowerBoundPrice: Number(formState.lower_bound_price),
@@ -31,6 +53,7 @@ const BetForm: React.FC = () => {
       });
     } catch (error) {
       console.error('Error creating bet:', error);
+      throw error; // Let error boundary handle it
     }
   };
 

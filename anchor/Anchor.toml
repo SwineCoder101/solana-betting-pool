@@ -13,7 +13,7 @@ horserace = "3U8ZsW8cd3GNcu69AhksaNEoeBCh8sHywvCHbm7mxaHz"
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "Localnet"
+cluster = "Devnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]

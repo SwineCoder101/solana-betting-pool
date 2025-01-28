@@ -1,5 +1,5 @@
 import { tokens, intervals } from "@/data/data-constants";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useCreateCompetition } from '@/hooks/use-create-competition';
 import { Keypair } from '@solana/web3.js';
 import { usePrivy } from '@privy-io/react-auth';
@@ -24,6 +24,13 @@ const CompetitionForm: React.FC = () => {
     treasury: "",
   });
 
+  useEffect(() => {
+    // Check for required dependencies
+    if (!user?.wallet?.address) {
+      console.warn('Wallet not connected');
+    }
+  }, [user]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormState({ ...formState, [name]: value });
@@ -40,8 +47,21 @@ const CompetitionForm: React.FC = () => {
   };
 
   const handleSubmit = async (action: "create" | "update") => {
-    if (action === "create" && user?.wallet?.address) {
+    if (action === "create") {
       try {
+        if (!user?.wallet?.address) {
+          throw new Error('Please connect your wallet first');
+        }
+
+        // Validate form data
+        if (!formState.token_a) {
+          throw new Error('Please select a token');
+        }
+        if (!formState.price_feed_id) {
+          throw new Error('Please enter a price feed ID');
+        }
+        // Add other validations as needed
+
         const competitionHash = Keypair.generate().publicKey;
         const startTime = convertToEpoch(formState.start_date, formState.start_time);
         const endTime = convertToEpoch(formState.end_date, formState.end_time);
@@ -60,6 +80,7 @@ const CompetitionForm: React.FC = () => {
         });
       } catch (error) {
         console.error('Error creating competition:', error);
+        throw error; // Let error boundary handle it
       }
     }
   };
