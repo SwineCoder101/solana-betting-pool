@@ -4,16 +4,17 @@ import { useCreateBet } from '@/hooks/use-create-bet';
 import { usePrivy } from "@privy-io/react-auth";
 
 const BetForm: React.FC = () => {
-  const createBetMutation = useCreateBet();
+  // const createBetMutation = useCreateBet();
   const { user } = usePrivy();
   const [formState, setFormState] = useState({
-    amount: 0,
-    lower_bound_price: 0,
-    upper_bound_price: 0,
-    interval: 0,
+    amount: "",
+    lower_bound_price: "",
+    upper_bound_price: "",
+    interval: intervals[0].value,
     poolKey: '',
     competition: '',
   });
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     // Check for required dependencies
@@ -29,37 +30,43 @@ const BetForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     
     try {
       if (!user?.wallet?.address) {
-        throw new Error('Please connect your wallet first');
+        setError('Please connect your wallet first');
+        return;
       }
 
       // Validate form data
-      if (!formState.amount || formState.amount <= 0) {
-        throw new Error('Please enter a valid amount');
+      if (!formState.amount || Number(formState.amount) <= 0) {
+        setError('Please enter a valid amount');
+        return;
       }
       if (!formState.poolKey) {
-        throw new Error('Please enter a pool key');
+        setError('Please enter a pool key');
+        return;
       }
       // Add other validations as needed
 
-      await createBetMutation.mutateAsync({
-        amount: Number(formState.amount),
-        lowerBoundPrice: Number(formState.lower_bound_price),
-        upperBoundPrice: Number(formState.upper_bound_price),
-        poolKey: formState.poolKey,
-        competition: formState.competition,
-      });
+      // await createBetMutation.mutateAsync({
+      //   amount: Number(formState.amount),
+      //   lowerBoundPrice: Number(formState.lower_bound_price),
+      //   upperBoundPrice: Number(formState.upper_bound_price),
+      //   poolKey: formState.poolKey,
+      //   competition: formState.competition,
+      // });
     } catch (error) {
-      console.error('Error creating bet:', error);
-      throw error; // Let error boundary handle it
+      setError(error instanceof Error ? error.message : 'Failed to create bet');
     }
   };
 
   return (
     <div>
       <h2 className="text-xl font-semibold mb-2">Betting Form</h2>
+      {error && (
+        <div className="text-red-500 mb-4">{error}</div>
+      )}
       <form>
         <div className="mb-2">
           <label className="block mb-1">Amount</label>
@@ -134,7 +141,7 @@ const BetForm: React.FC = () => {
           Submit Bet
         </button>
       </form>
-      {createBetMutation.isPending && <div>Creating bet...</div>}
+      {/* {createBetMutation.isPending && <div>Creating bet...</div>}
       {createBetMutation.isError && (
         <div className="text-red-500">
           Error creating bet: {createBetMutation.error?.message}
@@ -142,7 +149,7 @@ const BetForm: React.FC = () => {
       )}
       {createBetMutation.isSuccess && (
         <div className="text-green-500">Bet created successfully!</div>
-      )}
+      )} */}
     </div>
   );
 };

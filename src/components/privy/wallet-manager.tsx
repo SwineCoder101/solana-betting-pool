@@ -147,9 +147,9 @@ export function WalletManager() {
 
                     <div className="space-y-4">
                         <h3 className="text-lg font-semibold">Your Wallets</h3>
-                        {balances.map((walletBalance) => (
+                        {balances.map((walletBalance, index) => (
                             <div
-                                key={walletBalance.address}
+                                key={`${walletBalance.address}-${index}`}
                                 className="p-4 border rounded-lg space-y-2"
                             >
                                 <div className="flex justify-between items-center">

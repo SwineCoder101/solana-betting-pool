@@ -1,27 +1,29 @@
 import { tokens, intervals } from "@/data/data-constants";
 import React, { useState, useEffect } from "react";
-import { useCreateCompetition } from '@/hooks/use-create-competition';
+import { useCreateCompetitionBackend } from '@/hooks/use-create-competition-backend';
 import { Keypair } from '@solana/web3.js';
 import { usePrivy } from '@privy-io/react-auth';
 
 const CompetitionForm: React.FC = () => {
-  const createCompetitionMutation = useCreateCompetition();
+  const { createCompetition, updateCompetition } = useCreateCompetitionBackend();
   const { user } = usePrivy();
+  const [error, setError] = useState<string | null>(null);
 
   const [formState, setFormState] = useState({
-    token_a: "",
+    token_a: tokens[0].symbol,
     price_feed_id: "",
-    house_cut_factor: 0,
-    min_payout_ratio: 0,
-    interval: intervals[0].value,
-    pool_count: 1,
-    pool_interval: intervals[0].value,
+    house_cut_factor: "",
+    min_payout_ratio: "",
+    interval: intervals[0].value.toString(),
+    pool_count: "1",
+    pool_interval: intervals[0].value.toString(),
     admin_keys: [""],
     start_date: "",
     start_time: "",
     end_date: "",
     end_time: "",
     treasury: "",
+    competition_key: "",
   });
 
   useEffect(() => {
@@ -47,48 +49,98 @@ const CompetitionForm: React.FC = () => {
   };
 
   const handleSubmit = async (action: "create" | "update") => {
-    if (action === "create") {
-      try {
-        if (!user?.wallet?.address) {
-          throw new Error('Please connect your wallet first');
-        }
+    setError(null);
 
-        // Validate form data
-        if (!formState.token_a) {
-          throw new Error('Please select a token');
-        }
-        if (!formState.price_feed_id) {
-          throw new Error('Please enter a price feed ID');
-        }
-        // Add other validations as needed
+    try {
+      if (!user?.wallet?.address) {
+        throw new Error('Please connect your wallet first');
+      }
 
-        const competitionHash = Keypair.generate().publicKey;
-        const startTime = convertToEpoch(formState.start_date, formState.start_time);
-        const endTime = convertToEpoch(formState.end_date, formState.end_time);
-        
-        await createCompetitionMutation.mutateAsync({
+      // Common validations
+      if (!formState.token_a) {
+        throw new Error('Please select a token');
+      }
+      if (!formState.price_feed_id) {
+        throw new Error('Please enter a price feed ID');
+      }
+      if (!formState.house_cut_factor || Number(formState.house_cut_factor) <= 0) {
+        throw new Error('Please enter a valid house cut factor');
+      }
+      if (!formState.min_payout_ratio || Number(formState.min_payout_ratio) <= 0) {
+        throw new Error('Please enter a valid minimum payout ratio');
+      }
+
+      const startTime = convertToEpoch(formState.start_date, formState.start_time);
+      const endTime = convertToEpoch(formState.end_date, formState.end_time);
+
+      if (action === "create") {
+        const competitionHash = Keypair.generate().publicKey.toBase58();
+        await createCompetition.mutateAsync({
           competitionHash,
           tokenA: formState.token_a,
           priceFeedId: formState.price_feed_id,
           adminKeys: [user.wallet.address, ...formState.admin_keys],
-          houseCutFactor: formState.house_cut_factor,
-          minPayoutRatio: formState.min_payout_ratio,
+          houseCutFactor: Number(formState.house_cut_factor),
+          minPayoutRatio: Number(formState.min_payout_ratio),
           interval: Number(formState.interval),
           startTime,
           endTime,
           treasury: formState.treasury || user.wallet.address,
         });
-      } catch (error) {
-        console.error('Error creating competition:', error);
-        throw error; // Let error boundary handle it
+
+        // Reset form after successful creation
+        setFormState({
+          ...formState,
+          price_feed_id: "",
+          house_cut_factor: "",
+          min_payout_ratio: "",
+          admin_keys: [""],
+          start_date: "",
+          start_time: "",
+          end_date: "",
+          end_time: "",
+          treasury: "",
+        });
+      } else {
+        if (!formState.competition_key) {
+          throw new Error('Competition key is required for updates');
+        }
+
+        await updateCompetition.mutateAsync({
+          competitionKey: formState.competition_key,
+          tokenA: formState.token_a,
+          priceFeedId: formState.price_feed_id,
+          adminKeys: formState.admin_keys,
+          houseCutFactor: Number(formState.house_cut_factor),
+          minPayoutRatio: Number(formState.min_payout_ratio),
+          interval: Number(formState.interval),
+          startTime,
+          endTime,
+        });
       }
+    } catch (error) {
+      setError(error instanceof Error ? error.message : 'An unknown error occurred');
+      console.error('Error:', error);
     }
   };
 
   return (
     <div>
       <h2 className="text-xl font-semibold mb-2">Competition Setup</h2>
-      <form>
+      
+      {error && (
+        <div className="mb-4 p-3 bg-red-100 border border-red-400 text-red-700 rounded">
+          {error}
+        </div>
+      )}
+
+      {(createCompetition.isSuccess || updateCompetition.isSuccess) && (
+        <div className="mb-4 p-3 bg-green-100 border border-green-400 text-green-700 rounded">
+          Competition {createCompetition.isSuccess ? 'created' : 'updated'} successfully!
+        </div>
+      )}
+
+      <form className="space-y-4">
         <div className="mb-2">
           <label className="block mb-1">Token</label>
           <select
@@ -215,36 +267,36 @@ const CompetitionForm: React.FC = () => {
             placeholder="Enter admin public keys"
           />
         </div>
+        <div className="mb-2">
+          <label className="block mb-1">Competition Key (for updates)</label>
+          <input
+            type="text"
+            name="competition_key"
+            value={formState.competition_key}
+            onChange={handleInputChange}
+            className="input input-bordered w-full bg-gray-200"
+            placeholder="Enter competition key to update"
+          />
+        </div>
         <div className="flex gap-2 mt-4">
           <button
             type="button"
             onClick={() => handleSubmit("create")}
-            className="btn bg-yellow-600 text-white hover:bg-yellow-500"
+            disabled={createCompetition.isPending}
+            className="btn bg-yellow-600 text-white hover:bg-yellow-500 disabled:bg-gray-400"
           >
-            Create
+            {createCompetition.isPending ? "Creating..." : "Create"}
           </button>
           <button
             type="button"
             onClick={() => handleSubmit("update")}
-            className="btn bg-yellow-600 text-white hover:bg-yellow-500"
+            disabled={updateCompetition.isPending}
+            className="btn bg-yellow-600 text-white hover:bg-yellow-500 disabled:bg-gray-400"
           >
-            Update
+            {updateCompetition.isPending ? "Updating..." : "Update"}
           </button>
         </div>
       </form>
-      {createCompetitionMutation.isPending && <div>Creating competition...</div>}
-      {createCompetitionMutation.isError && (
-        <div className="text-red-500">
-          Error creating competition: {createCompetitionMutation.error?.message}
-        </div>
-      )}
-      {createCompetitionMutation.isSuccess && (
-        <div className="text-green-500">
-          Competition created successfully!
-          Competition signature: {''}
-          Pool signatures: {''}
-        </div>
-      )}
     </div>
   );
 };
