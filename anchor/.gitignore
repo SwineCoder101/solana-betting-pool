@@ -2,7 +2,7 @@ coverage
 .anchor
 .DS_Store
 target/debug
-target/deploy
+
 target/release
 target/sbf-solana-solana
 target/test-ledger
