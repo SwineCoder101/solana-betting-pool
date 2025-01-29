@@ -46,7 +46,7 @@ describe("Bets", () => {
     const initialBetCount = (await getBetAccountsForPool(program, poolKey)).length;
     console.log('Initial bet count:', initialBetCount);
 
-    const vtx = await createBet(program, signer, amount, lowerBoundPrice, upperBoundPrice, poolKey, competitionPubkey);
+    const vtx = await createBet(program, signer.publicKey, amount, lowerBoundPrice, upperBoundPrice, poolKey, competitionPubkey);
     vtx.sign([signer]);
     const signature = await program.provider.connection.sendTransaction(vtx);
     await program.provider.connection.confirmTransaction(signature, 'confirmed');

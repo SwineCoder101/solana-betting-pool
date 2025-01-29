@@ -1,5 +1,5 @@
 {
-  "name": "sdk",
+  "name": "solana-horse-race-sdk",
   "version": "1.0.0",
   "description": "",
   "main": "lib/index.js",
