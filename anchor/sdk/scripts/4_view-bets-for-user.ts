@@ -47,37 +47,13 @@ anchor.setProvider(provider);
 const program = anchor.workspace.HorseRace as anchor.Program<HorseRace>;
 
 
-const createBetParams : CreateBetParams = {
-    user: user.publicKey,
-    amount: 1,
-    lowerBoundPrice: 100,
-    upperBoundPrice: 200,
-    startTime: 1769931882,
-    endTime: 1769931912,
-    competitionKey: new PublicKey('ApiSSrYLUTvhTzLNudofmRhSChx4uobviTKJtkncvxZL'),
-    poolKey: new PublicKey('6hnTNibVauiQRJASs45BqHk6JWqsp6UwV4ebap3eaYi1'),
-}
-
-
 async function main() {
   try {
 
-    if (!createBetParams.poolKey) {
-        throw new Error('Pool key is required');
-    }
+    const bets = await program.account.bet.all();
+
+    console.log(bets);
     
-  const betTx = await createBetEntry(program, createBetParams);
-
-  const poolBalanceBefore = await program.provider.connection.getBalance(new PublicKey(createBetParams.poolKey));
-
-  const betSig = await signAndSendVTx(betTx, payer, program.provider.connection);
-  await confirmTransaction(betSig, program);
-
-  const poolBalanceAfter = await program.provider.connection.getBalance(new PublicKey(createBetParams.poolKey));
-
-  console.log('Pool Balance Before:', poolBalanceBefore);
-  console.log('Pool Balance After:', poolBalanceAfter);
-
   } catch (error) {
     console.error('Error creating competition:', error);
     throw error;
