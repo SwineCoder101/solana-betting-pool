@@ -10,6 +10,10 @@ export async function addOneHour(nowTimeStamp: number) {
     return nowTimeStamp + 3600;
 }
 
+export async function addOneYear(nowTimeStamp: number) {
+    return nowTimeStamp + 31536000;
+}
+
 export function convertBlockTime(timestamp: number): string {
     const date = new Date(timestamp * 1000); // Convert Unix timestamp to milliseconds
     return date.toLocaleString('en-US', {

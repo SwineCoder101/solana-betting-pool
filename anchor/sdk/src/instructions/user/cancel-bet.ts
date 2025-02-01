@@ -3,6 +3,18 @@ import { PublicKey, SystemProgram, VersionedTransaction } from '@solana/web3.js'
 import { HorseRace } from '../../../../target/types/horse_race';
 import { getVersionTxFromInstructions } from '../../utils';
 
+export type CancelBetParams = {
+  user: PublicKey,
+  poolKey: PublicKey,
+  betHash: PublicKey,
+}
+
+export async function cancelBetEntry(program: Program<HorseRace>, params: CancelBetParams): Promise<VersionedTransaction> {
+  const { user, poolKey, betHash } = params;
+  return cancelBet(program, user, poolKey, betHash);
+}
+
+
 export async function cancelBet(
   program: Program<HorseRace>,
   user: PublicKey,

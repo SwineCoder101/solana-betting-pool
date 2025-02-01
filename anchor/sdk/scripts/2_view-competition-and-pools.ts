@@ -1,10 +1,12 @@
 import * as anchor from '@coral-xyz/anchor';
 import NodeWallet from '@coral-xyz/anchor/dist/cjs/nodewallet';
-import { Connection, Keypair } from '@solana/web3.js';
+import { Connection, Keypair, PublicKey } from '@solana/web3.js';
 import dotenv from 'dotenv';
 import fs from 'fs';
-import {  HorseRace } from "../src";
+import { HorseRace } from "../src";
 import { CompetitionProgramData, CompetitionData } from '../src/states/competition-account';
+import { Program, ProgramAccount } from '@coral-xyz/anchor';
+import { convertBlockTime, setupEnvironment } from './utils';
 
 dotenv.config();
 
@@ -42,31 +44,75 @@ const provider = new anchor.AnchorProvider(connection, user, {
 
 anchor.setProvider(provider);
 
-function convertProgramToCompetitionData(programData : CompetitionProgramData) : CompetitionData {
-  console.log(typeof programData.minPayoutRatio);
+export function convertProgramToCompetitionData(programData : ProgramAccount<CompetitionProgramData>) : CompetitionData {
+  console.log(typeof programData.account.minPayoutRatio);
   
   return {
-    tokenA : programData.tokenA.toString(),
-    priceFeedId: programData.priceFeedId,
-    admin: programData.admin.map(a=> a.toString()),
-    houseCutFactor: typeof programData.houseCutFactor === 'number' ? programData.houseCutFactor : programData.houseCutFactor.toNumber(),
-    minPayoutRatio: typeof programData.minPayoutRatio === 'number' ? programData.minPayoutRatio : programData.minPayoutRatio.toNumber(),
-    interval: typeof programData.interval === 'number' ? programData.interval : programData.interval.toNumber(),
-    startTime: typeof programData.startTime === 'number' ? programData.startTime : programData.startTime.toNumber(),
-    endTime: typeof programData.endTime === 'number' ? programData.endTime : programData.endTime.toNumber()
+    competitionKey: programData.publicKey.toBase58(),
+    tokenA : programData.account.tokenA.toString(),
+    priceFeedId: programData.account.priceFeedId,
+    admin: programData.account.admin.map(a=> a.toString()),
+    houseCutFactor: typeof programData.account.houseCutFactor === 'number' ? programData.account.houseCutFactor : programData.account.houseCutFactor.toNumber(),
+    minPayoutRatio: typeof programData.account.minPayoutRatio === 'number' ? programData.account.minPayoutRatio : programData.account.minPayoutRatio.toNumber(),
+    interval: typeof programData.account.interval === 'number' ? programData.account.interval : programData.account.interval.toNumber(),
+    startTime: typeof programData.account.startTime === 'number' ? programData.account.startTime : programData.account.startTime.toNumber(),
+    endTime: typeof programData.account.endTime === 'number' ? programData.account.endTime : programData.account.endTime.toNumber()
    }
 }
 
-async function main () {
-    const retrieved = anchor.getProvider();
-    console.log(retrieved);
-    const program = anchor.workspace.HorseRace as anchor.Program<HorseRace>;
-
-    const competitions = await program.account.competition.all()
-
-    const competitionData = competitions.map((comp) => convertProgramToCompetitionData(comp.account))
- 
-    console.log(competitionData);
+export async function getPoolAccountsFromCompetition(program: Program<HorseRace>, competitionKey: PublicKey) {
+  const pools = await program.account.pool.all();
+  return pools.filter(pool => pool.account.competitionKey === competitionKey);
 }
 
-main();
+async function main() {
+  const { program } = await setupEnvironment();
+
+  // Fetch competitions and pools
+  const competitions = await program.account.competition.all();
+  const pools = await program.account.pool.all();
+
+  // Create a Map to store pools grouped by competition
+  const poolCompetitionMapping = new Map<string, Map<number, PublicKey>>();
+
+  // Process each pool and group by competition
+  pools.forEach(pool => {
+    const competitionKey = pool.account.competitionKey.toBase58();
+    const startTime = pool.account.startTime.toNumber();
+    
+    // Get or create the pools map for this competition
+    if (!poolCompetitionMapping.has(competitionKey)) {
+      poolCompetitionMapping.set(competitionKey, new Map<number, PublicKey>());
+    }
+    
+    // Add pool to the competition's pool map
+    const competitionPools = poolCompetitionMapping.get(competitionKey)!;
+    competitionPools.set(startTime, pool.publicKey);
+  });
+
+  // Print competitions with their pools
+  competitions.forEach(comp => {
+    const competitionKey = comp.publicKey.toBase58();
+    const pools = poolCompetitionMapping.get(competitionKey);
+    console.log('\nCompetition:', competitionKey);
+    console.log('Start Time:', convertBlockTime(comp.account.startTime) , comp.account.startTime.toNumber());
+    console.log('End Time:', convertBlockTime(comp.account.endTime), comp.account.endTime.toNumber());
+    console.log('Pools:');
+    if (pools && pools.size > 0) {
+      Array.from(pools.entries())
+        .sort(([timeA], [timeB]) => timeA - timeB)
+        .forEach(([startTime, poolPubkey]) => {
+          console.log(`  - ${poolPubkey.toBase58()} (starts: ${convertBlockTime(startTime)}, ${startTime})`);
+        });
+    } else {
+      console.log('  No pools');
+    }
+  });
+}
+
+main()
+  .then(() => process.exit(0))
+  .catch((error) => {
+    console.error(error);
+    process.exit(1);
+  });

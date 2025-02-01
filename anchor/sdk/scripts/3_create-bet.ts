@@ -4,12 +4,10 @@ import { Connection, Keypair, PublicKey } from '@solana/web3.js';
 import dotenv from 'dotenv';
 import fs from 'fs';
 import { HorseRace } from '../src';
-import { CompetitionPoolParams, createCompetitionWithPoolsEntry } from '../src/instructions/admin/create-competition-with-pools';
+import { createBetEntry, CreateBetParams } from '../src/instructions/user/create-bet';
 import {
-  addOneYear,
-  confirmTransaction,
-  now,
-  signAndSendVTx
+    confirmTransaction,
+    signAndSendVTx
 } from './utils';
 
 dotenv.config();
@@ -49,46 +47,37 @@ anchor.setProvider(provider);
 const program = anchor.workspace.HorseRace as anchor.Program<HorseRace>;
 
 
-
-const params : CompetitionPoolParams = {
-  admin: payer.publicKey,
-  tokenA: new PublicKey('7yfCkYodjoferYftgGT91H8nPpnspRAv8uv1HzEfhdhm'),
-  priceFeedId: '12345',
-  adminKeys: [payer.publicKey],
-  houseCutFactor: 5,
-  minPayoutRatio: 80,
-  interval: 30000,
-  startTime: 1767225720,
-  endTime: 1767225720,
-  treasury: payer.publicKey,
+const createBetParams : CreateBetParams = {
+    user: user.publicKey,
+    amount: 1,
+    lowerBoundPrice: 100,
+    upperBoundPrice: 200,
+    startTime: 1769931882,
+    endTime: 1769931912,
+    competitionKey: new PublicKey('ApiSSrYLUTvhTzLNudofmRhSChx4uobviTKJtkncvxZL'),
+    poolKey: new PublicKey('6hnTNibVauiQRJASs45BqHk6JWqsp6UwV4ebap3eaYi1'),
 }
 
-console.log('admin payer: ', payer.publicKey.toBase58());
 
 async function main() {
   try {
-    const startTime = await addOneYear(await now(connection));
-    const endTime = startTime + 60;
-    const interval = 30;
 
-    params.startTime = startTime;
-    params.endTime = endTime;
-    params.interval = interval;
+    if (!createBetParams.poolKey) {
+        throw new Error('Pool key is required');
+    }
     
-  const { competitionTx, poolTxs, poolKeys } = await createCompetitionWithPoolsEntry(program, params);
+  const betTx = await createBetEntry(program, createBetParams);
 
-  const compSig = await signAndSendVTx(competitionTx, payer, program.provider.connection);
-  await confirmTransaction(compSig, program);
+  const poolBalanceBefore = await program.provider.connection.getBalance(new PublicKey(createBetParams.poolKey));
 
-    // Send and confirm pool transactions
-    const poolSigs = await Promise.all(
-      poolTxs.map(tx => signAndSendVTx(tx, payer, connection))
-    );
-    await Promise.all(
-      poolSigs.map(sig => confirmTransaction(sig, program))
-    );
+  const betSig = await signAndSendVTx(betTx, payer, program.provider.connection);
+  await confirmTransaction(betSig, program);
 
-    console.log('Pool Keys:', poolKeys);
+  const poolBalanceAfter = await program.provider.connection.getBalance(new PublicKey(createBetParams.poolKey));
+
+  console.log('Pool Balance Before:', poolBalanceBefore);
+  console.log('Pool Balance After:', poolBalanceAfter);
+
   } catch (error) {
     console.error('Error creating competition:', error);
     throw error;
