@@ -80,7 +80,7 @@ export async function signAndSendVTx(
 
   const message = vTx.message;
   const newMessage = new web3.TransactionMessage({
-    payerKey: message.staticAccountKeys[0], // First account is always fee payer
+    payerKey: message.staticAccountKeys[0],
     instructions: message.compiledInstructions.map(ix => ({
       programId: message.staticAccountKeys[ix.programIdIndex],
       keys: ix.accountKeyIndexes.map(accountIndex => ({

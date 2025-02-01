@@ -2,7 +2,6 @@ coverage
 .anchor
 .DS_Store
 target/debug
-
 target/release
 target/sbf-solana-solana
 target/test-ledger
@@ -13,3 +12,5 @@ test-ledger
 .yarn
 coverage
 sdk/lib
+sdk/target
+sdk/scripts/.deleteme
