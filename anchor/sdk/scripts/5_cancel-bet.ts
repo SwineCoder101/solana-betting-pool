@@ -4,12 +4,11 @@ import { Connection, Keypair, PublicKey } from '@solana/web3.js';
 import dotenv from 'dotenv';
 import fs from 'fs';
 import { HorseRace } from '../src';
-import { createBetEntry, CreateBetParams } from '../src/instructions/user/create-bet';
-import {
-    confirmTransaction,
-    signAndSendVTx
-} from './utils';
 import { cancelBetEntry, CancelBetParams } from '../src/instructions/user/cancel-bet';
+import {
+  confirmTransaction,
+  signAndSendVTx
+} from './utils';
 
 dotenv.config();
 
