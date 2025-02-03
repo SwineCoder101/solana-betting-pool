@@ -115,6 +115,8 @@ export function WalletManager() {
                     <div className="space-x-2 text-sm">
                         <span>Status: {authenticated ? "Authenticated" : "Not Authenticated"}</span>
                         <span>Ready: {ready ? "Yes" : "No"}</span>
+                        <span>User: {user?.wallet?.address}</span>
+                        <span>Privy User: {user?.id}</span>
                     </div>
                     <LoginWalletButton connectedAddress={connectedAddress} />
                 </div>
