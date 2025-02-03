@@ -12,7 +12,6 @@ interface WalletBalance {
 }
 
 export function WalletManager() {
-    // const { fundWallet, withdrawFunds } = useFundWallet();
     const { authenticated, ready, user } = usePrivy();
     const { wallets, createWallet } = useSolanaWallets();
     const [balances, setBalances] = useState<WalletBalance[]>([]);
@@ -82,19 +81,6 @@ export function WalletManager() {
             return;
         }
 
-
-        // NativeFundingConfig = {
-        //     chain?: ChainLikeWithId;
-        //     amount?: string;
-        //     defaultFundingMethod?: DefaultFundingMethod;
-        //     card?: {
-        //         /** The preferred card onramp for funding */
-        //         preferredProvider?: PreferredCardProvider;
-        //     };
-        // }
-        
-        // fundWallet(toAddress, { amount: amount });
-
         const sourceWallet = wallets?.find(w => w.address === fromAddress);
         const sourceBalance = balances.find(b => b.address === fromAddress)?.balance || 0;
 
@@ -129,6 +115,8 @@ export function WalletManager() {
                     <div className="space-x-2 text-sm">
                         <span>Status: {authenticated ? "Authenticated" : "Not Authenticated"}</span>
                         <span>Ready: {ready ? "Yes" : "No"}</span>
+                        <span>User: {user?.wallet?.address}</span>
+                        <span>Privy User: {user?.id}</span>
                     </div>
                     <LoginWalletButton connectedAddress={connectedAddress} />
                 </div>
@@ -147,9 +135,9 @@ export function WalletManager() {
 
                     <div className="space-y-4">
                         <h3 className="text-lg font-semibold">Your Wallets</h3>
-                        {balances.map((walletBalance, index) => (
+                        {balances.map((walletBalance) => (
                             <div
-                                key={`${walletBalance.address}-${index}`}
+                                key={walletBalance.address}
                                 className="p-4 border rounded-lg space-y-2"
                             >
                                 <div className="flex justify-between items-center">

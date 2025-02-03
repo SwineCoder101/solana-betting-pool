@@ -1,7 +1,6 @@
 import { intervals } from "@/data/data-constants";
-import React, { useState, useEffect } from "react";
-import { useCreateBet } from '@/hooks/use-create-bet';
 import { usePrivy } from "@privy-io/react-auth";
+import React, { useEffect, useState } from "react";
 
 const BetForm: React.FC = () => {
   // const createBetMutation = useCreateBet();
