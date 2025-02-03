@@ -145,7 +145,7 @@ export const setupCompetition = async function (): Promise<SetupDTO> {
   };
 };
 
-const confirmTransaction = async function (signature: string, program: anchor.Program<HorseRace>) {
+export const confirmTransaction = async function (signature: string, program: anchor.Program<HorseRace>) {
   const latestBlockhash = await program.provider.connection.getLatestBlockhash();
 
   const confirmation = await program.provider.connection.confirmTransaction({

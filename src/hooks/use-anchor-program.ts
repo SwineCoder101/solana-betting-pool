@@ -13,7 +13,6 @@ interface ProgramResult {
 }
 
 // Move IDL and programId outside component to prevent recreation
-const PROGRAM_ID = new PublicKey("YOUR_PROGRAM_ID_HERE"); // Replace with your actual program ID
 const programIdl = IDL as any;
 
 export function useAnchorProgram(): ProgramResult {
@@ -54,7 +53,7 @@ export function useAnchorProgram(): ProgramResult {
     try {
       return new Program(
         programIdl,
-        PROGRAM_ID,
+        // PROGRAM_ID,
         provider
       );
     } catch (error) {

@@ -3,6 +3,32 @@ import { Program, web3 } from '@coral-xyz/anchor';
 import { Keypair, PublicKey, VersionedTransaction } from '@solana/web3.js';
 import { HorseRace } from '../../../../target/types/horse_race';
 import { getVersionTxFromInstructions } from '../../utils';
+import { findPoolKeyFromStartEndTime } from '../../states';
+
+
+export type CreateBetParams = {
+  user: PublicKey,
+  amount: number,
+  lowerBoundPrice: number,
+  upperBoundPrice: number,
+  startTime?: number,
+  endTime?: number,
+  competitionKey: PublicKey,
+  poolKey?: PublicKey,
+}
+
+export async function createBetEntry(program: Program<HorseRace>, params: CreateBetParams): Promise<VersionedTransaction> {
+  const { user, amount, lowerBoundPrice, upperBoundPrice, startTime, endTime, competitionKey } = params;
+
+  if (!startTime || !endTime) {
+    throw new Error('startTime and endTime are required');
+  }
+
+  if (!params.poolKey) {
+    params.poolKey = await findPoolKeyFromStartEndTime(program, competitionKey, startTime, endTime);
+  }
+  return createBet(program, user, amount, lowerBoundPrice, upperBoundPrice, params.poolKey, competitionKey);
+}
 
 export async function createBet(
   program: Program<HorseRace>,

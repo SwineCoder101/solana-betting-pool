@@ -1,5 +1,5 @@
 import { Program, web3 } from '@coral-xyz/anchor';
-import { PublicKey } from '@solana/web3.js';
+import { Keypair, PublicKey } from '@solana/web3.js';
 import { HorseRace } from '../../../../target/types/horse_race';
 import { COMPETITION_SEED } from '../../constants';
 import { getVersionTxFromInstructions } from '../../utils';
@@ -10,6 +10,50 @@ export type CompetitionPoolResponse = {
   poolKeys: web3.PublicKey[],
   competitionTx: web3.VersionedTransaction,
   poolTxs: web3.VersionedTransaction[]
+}
+
+export type CompetitionPoolParams = {
+  admin: PublicKey,
+  tokenA: PublicKey,
+  priceFeedId: string,
+  adminKeys: PublicKey[],
+  houseCutFactor: number,
+  minPayoutRatio: number,
+  interval: number,
+  startTime: number,
+  endTime: number,
+  treasury: PublicKey,
+}
+
+
+export async function createCompetitionWithPoolsEntry(program: Program<HorseRace>, params: CompetitionPoolParams){
+
+  const competitionHash = Keypair.generate().publicKey;
+
+  const {
+    competitionTx, // Return first transaction with competition creation
+    poolKeys,
+    poolTxs
+  } =  await createCompetitionWithPools(
+    program,
+    params.admin,
+    competitionHash,
+    params.tokenA,
+    params.priceFeedId,
+    params.adminKeys,
+    params.houseCutFactor,
+    params.minPayoutRatio,
+    params.interval,
+    params.startTime,
+    params.endTime,
+    params.treasury
+  );
+
+  return {
+    competitionTx, // Return first transaction with competition creation
+    poolKeys,
+    poolTxs
+  }
 }
 
 export async function createCompetitionWithPools(
