@@ -81,6 +81,11 @@ export async function getPoolBalance(poolPubkey: PublicKey, program: Program<Hor
   return program.provider.connection.getBalance(poolPubkey);
 }
 
+export async function getAllPools(program: Program<HorseRace>) {
+  const pools = await program.account.pool.all();
+  return pools.map((pool) => convertProgramToPoolData(pool));
+}
+
 export async function getPoolAccountsFromCompetition(program: Program<HorseRace>, competitionKey: PublicKey) {
   const pools = await program.account.pool.all();
   return pools.filter(pool => pool.account.competitionKey === competitionKey);

@@ -6,6 +6,7 @@ import BetForm from "./bet-form";
 import BetDisplay from "./bet-display";
 import PriceFeedDisplay from "./price-feed-display";
 import { ErrorBoundary } from "../common/error-boundary";
+import PoolDisplay from "./pool-display";
 
 const AdminFeatures: React.FC = () => {
   return (
@@ -40,6 +41,12 @@ const AdminFeatures: React.FC = () => {
         <ErrorBoundary>
           <div className="border p-4 bg-gray-50">
             <BetDisplay />
+          </div>
+        </ErrorBoundary>
+
+        <ErrorBoundary>
+          <div className="border p-4 bg-gray-50">
+            <PoolDisplay />
           </div>
         </ErrorBoundary>
       </div>
