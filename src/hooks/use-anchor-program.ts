@@ -12,11 +12,15 @@ interface ProgramResult {
   signer: AnchorWallet | null;
 }
 
+// Create a serializable version of the IDL
+const PROGRAM_IDL = JSON.parse(JSON.stringify(IDL));
+
 export function useAnchorProgram(): ProgramResult {
   const { wallets } = useSolanaWallets();
 
   const wallet = wallets.filter(wallet => wallet.type === "solana")[0];
   console.log("using wallet: ", wallet);
+  
   const connection = useMemo(() => new Connection(
     process.env.VITE_SOLANA_RPC_URL || 'https://api.devnet.solana.com'
   ), []);
@@ -28,7 +32,7 @@ export function useAnchorProgram(): ProgramResult {
     }
     
     return {
-      publicKey: new PublicKey(wallets[0].address),
+      publicKey: new PublicKey(wallet.address),
       signTransaction: async (tx: VersionedTransaction) => {
         return await wallet.signTransaction(tx);
       },
@@ -36,7 +40,7 @@ export function useAnchorProgram(): ProgramResult {
         return await Promise.all(txs.map(tx => wallet.signTransaction(tx)));
       }
     } as AnchorWallet;
-  }, [wallet, wallets]);
+  }, [wallet]);
 
   const provider = useMemo(() => {
     console.log("creating provider with signer: ", signer);
@@ -59,7 +63,7 @@ export function useAnchorProgram(): ProgramResult {
     }
     try {
       const prog = new Program<HorseRace>(
-        IDL,
+        PROGRAM_IDL,
         provider
       );
       console.log("Program created successfully");
