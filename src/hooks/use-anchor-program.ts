@@ -12,19 +12,20 @@ interface ProgramResult {
   signer: AnchorWallet | null;
 }
 
-// Move IDL and programId outside component to prevent recreation
-const programIdl = IDL as any;
-
 export function useAnchorProgram(): ProgramResult {
   const { wallets } = useSolanaWallets();
-  const wallet = wallets[0];
-  
+
+  const wallet = wallets.filter(wallet => wallet.type === "solana")[0];
+  console.log("using wallet: ", wallet);
   const connection = useMemo(() => new Connection(
     process.env.VITE_SOLANA_RPC_URL || 'https://api.devnet.solana.com'
   ), []);
 
   const signer = useMemo(() => {
-    if (!wallets[0]?.address) return null;
+    if (!wallet?.address) {
+      console.log("No wallet connected");
+      return null;
+    }
     
     return {
       publicKey: new PublicKey(wallets[0].address),
@@ -37,9 +38,12 @@ export function useAnchorProgram(): ProgramResult {
     } as AnchorWallet;
   }, [wallet, wallets]);
 
-  // Create memoized provider
   const provider = useMemo(() => {
-    if (!signer) return null;
+    console.log("creating provider with signer: ", signer);
+    if (!signer) {
+      console.log("No signer available");
+      return null;
+    }
     return new AnchorProvider(
       connection,
       signer,
@@ -47,15 +51,19 @@ export function useAnchorProgram(): ProgramResult {
     );
   }, [connection, signer]);
 
-  // Create memoized program instance
   const program = useMemo(() => {
-    if (!provider) return null;
+    console.log("creating program with provider: ", provider);
+    if (!provider) {
+      console.log("No provider available");
+      return null;
+    }
     try {
-      return new Program(
-        programIdl,
-        // PROGRAM_ID,
+      const prog = new Program<HorseRace>(
+        IDL,
         provider
       );
+      console.log("Program created successfully");
+      return prog;
     } catch (error) {
       console.error('Error creating program:', error);
       return null;

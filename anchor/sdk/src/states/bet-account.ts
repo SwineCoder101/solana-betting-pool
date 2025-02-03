@@ -122,6 +122,12 @@ export async function getBetAccountsForUser(
   }));
 }
 
+export async function getAllBetAccounts(program: Program<HorseRace>): Promise<BetData[]> {
+  console.log("Getting all bet accounts");
+  const accounts = await program.account.bet.all();
+  return accounts.map(account => convertProgramToBetData(account.account));
+}
+
 export async function getBetAccountsForPool(
   program: Program<HorseRace>,
   poolPubkey: PublicKey
