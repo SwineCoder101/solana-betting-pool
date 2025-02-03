@@ -26,7 +26,7 @@ const BetDisplay: React.FC = () => {
             <div className="flex justify-between items-center">
               <span>User: {shortenAddress(bet.user.toString())}</span>
               <span>Competition: {bet.competition.toString()}</span>
-              <span>Amount: {(bet.amount/LAMPORTS_PER_SOL).toString()}</span>
+              <span>Amount: {(bet.amount/LAMPORTS_PER_SOL).toString()} SOL</span>
             </div>
           </div>
         ))}
