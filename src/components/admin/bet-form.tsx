@@ -6,12 +6,13 @@ import { useCompetitionPools } from "@/hooks/queries/use-pool-queries";
 import { PublicKey } from "@solana/web3.js";
 import { useBackend } from "@/hooks/use-backend";
 import { tokens } from "@/data/data-constants";
-
+import { useAllBets } from "@/hooks/queries/use-bet-queries";
 const BetForm: React.FC = () => {
   const { user } = usePrivy();
   const { createBet } = useCreateBetBackend();
   const { data: activeCompetitions } = useActiveCompetitionsWithPools();
   const { isLive: isBackendLive } = useBackend();
+  const { refetch: refetchBets } = useAllBets();
   
   const [formState, setFormState] = useState({
     amount: "",
@@ -102,6 +103,10 @@ const BetForm: React.FC = () => {
         competition: "",
         poolKey: "",
       });
+
+      // Optionally force a refetch
+      await refetchBets();
+
     } catch (error) {
       console.error('Bet submission error:', error);
       setError(error instanceof Error ? error.message : 'Failed to create bet');

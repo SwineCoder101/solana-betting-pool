@@ -49,8 +49,16 @@ export function useCreateBetBackend() {
       return response.json();
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['allBets'] });
-      queryClient.invalidateQueries({ queryKey: ['userBets'] });
+      queryClient.invalidateQueries({ 
+        queryKey: ['allBets'],
+        exact: true,
+        refetchType: 'active'
+      });
+      
+      queryClient.refetchQueries({ 
+        queryKey: ['allBets'],
+        exact: true
+      });
     },
     onError: (error) => {
       console.error('Failed to create bet:', error);
