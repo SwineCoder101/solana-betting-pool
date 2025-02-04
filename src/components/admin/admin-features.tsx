@@ -1,12 +1,11 @@
 // src/components/admin/AdminFeatures.tsx
 import React from "react";
-import CompetitionForm from "./competition-form";
-import CompetitionDisplay from "./competition-display";
-import BetForm from "./bet-form";
-import BetDisplay from "./bet-display";
-import PriceFeedDisplay from "./price-feed-display";
 import { ErrorBoundary } from "../common/error-boundary";
+import BetDisplay from "./bet-display";
+import BetForm from "./bet-form";
+import CompetitionDisplay from "./competition-display";
 import PoolDisplay from "./pool-display";
+import PriceFeedDisplay from "./price-feed-display";
 
 const AdminFeatures: React.FC = () => {
   return (
