@@ -596,18 +596,8 @@
     },
     {
       "code": 6001,
-      "name": "InvalidOracleId",
-      "msg": "Invalid oracle id provided, please check the latest oracle id"
-    },
-    {
-      "code": 6002,
-      "name": "OracleInactive",
-      "msg": "Oracle is inactive."
-    },
-    {
-      "code": 6003,
-      "name": "OutsideOracleTimeRange",
-      "msg": "Oracle is outside the time range."
+      "name": "InvalidCompetitionId",
+      "msg": "Invalid competition id provided, please check the latest competition id"
     }
   ],
   "types": [

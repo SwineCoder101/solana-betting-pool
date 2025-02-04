@@ -602,18 +602,8 @@ export type HorseRace = {
     },
     {
       "code": 6001,
-      "name": "invalidOracleId",
-      "msg": "Invalid oracle id provided, please check the latest oracle id"
-    },
-    {
-      "code": 6002,
-      "name": "oracleInactive",
-      "msg": "Oracle is inactive."
-    },
-    {
-      "code": 6003,
-      "name": "outsideOracleTimeRange",
-      "msg": "Oracle is outside the time range."
+      "name": "invalidCompetitionId",
+      "msg": "Invalid competition id provided, please check the latest competition id"
     }
   ],
   "types": [
