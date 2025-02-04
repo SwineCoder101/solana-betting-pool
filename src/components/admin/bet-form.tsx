@@ -5,7 +5,7 @@ import { useActiveCompetitionsWithPools } from "@/hooks/queries";
 import { useCompetitionPools } from "@/hooks/queries/use-pool-queries";
 import { PublicKey } from "@solana/web3.js";
 import { useBackend } from "@/hooks/use-backend";
-import { tokens } from "@/data/data-constants";
+import { tokens, BONK_PRICE_RANGES } from "@/data/data-constants";
 import { useAllBets } from "@/hooks/queries/use-bet-queries";
 const BetForm: React.FC = () => {
   const { user } = usePrivy();
@@ -18,6 +18,7 @@ const BetForm: React.FC = () => {
     amount: "",
     competition: "",
     poolKey: "",
+    priceRangeId: "",
   });
   
   // Get pools for selected competition
@@ -74,6 +75,19 @@ const BetForm: React.FC = () => {
         setError('Please select a pool interval');
         return;
       }
+      if (!formState.priceRangeId) {
+        setError('Please select a price range');
+        return;
+      }
+
+      const selectedRange = BONK_PRICE_RANGES.find(
+        range => range.id === Number(formState.priceRangeId)
+      );
+
+      if (!selectedRange) {
+        setError('Invalid price range selected');
+        return;
+      }
 
       // Get selected pool data for price bounds
       const selectedPool = competitionPools?.find(pool => pool.poolKey === formState.poolKey);
@@ -87,14 +101,16 @@ const BetForm: React.FC = () => {
         amount: Number(formState.amount),
         poolKey: formState.poolKey,
         competitionKey: formState.competition,
+        lowerBoundPrice: selectedRange.lower,
+        upperBoundPrice: selectedRange.upper,
       });
 
       await createBet.mutateAsync({
         amount: Number(formState.amount),
         poolKey: formState.poolKey,
         competitionKey: formState.competition,
-        lowerBoundPrice: 0, // These will be calculated by backend
-        upperBoundPrice: 0,
+        lowerBoundPrice: selectedRange.lower,
+        upperBoundPrice: selectedRange.upper,
       });
 
       // Reset form on success
@@ -102,6 +118,7 @@ const BetForm: React.FC = () => {
         amount: "",
         competition: "",
         poolKey: "",
+        priceRangeId: "",
       });
 
       // Optionally force a refetch
@@ -117,6 +134,14 @@ const BetForm: React.FC = () => {
     console.log('Token A:', tokenA); 
     return tokens.find(token => token.tokenAddress === tokenA)?.symbol;
   }
+
+  // Get the token symbol for the selected competition
+  const selectedCompetition = activeCompetitions?.find(
+    comp => comp.competitionKey === formState.competition
+  );
+  const selectedTokenSymbol = selectedCompetition 
+    ? getSymbolFromTokenA(selectedCompetition.tokenA)
+    : null;
 
   return (
     <div>
@@ -177,6 +202,26 @@ const BetForm: React.FC = () => {
                 </button>
               ))}
             </div>
+          </div>
+        )}
+
+        {formState.competition && selectedTokenSymbol === 'BONK' && (
+          <div className="mb-2">
+            <label className="block mb-1">Price Range</label>
+            <select
+              name="priceRangeId"
+              value={formState.priceRangeId}
+              onChange={handleInputChange}
+              className="input input-bordered w-full bg-gray-200"
+              required
+            >
+              <option value="">Select Price Range</option>
+              {BONK_PRICE_RANGES.map((range) => (
+                <option key={range.id} value={range.id}>
+                  {range.label}
+                </option>
+              ))}
+            </select>
           </div>
         )}
 

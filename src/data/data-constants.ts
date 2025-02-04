@@ -30,3 +30,27 @@ export const tokens = [
     { id: 5, value: 300, label: "5 minutes" },
     { id: 6, value: 600, label: "10 minutes" },
   ];
+
+export interface PriceRange {
+  id: number;
+  lower: number;
+  upper: number;
+  label: string;
+}
+
+const BONK_CURRENT_PRICE = 0.000019;
+const BONK_INCREMENT = 0.000001;
+
+export const BONK_PRICE_RANGES: PriceRange[] = Array.from({ length: 10 }, (_, i) => {
+  const midPoint = 4; // Index of middle range
+  const offset = i - midPoint;
+  const lower = BONK_CURRENT_PRICE + (offset * BONK_INCREMENT);
+  const upper = lower + BONK_INCREMENT;
+  
+  return {
+    id: i,
+    lower,
+    upper,
+    label: `${lower.toFixed(6)} - ${upper.toFixed(6)} USD`
+  };
+});
