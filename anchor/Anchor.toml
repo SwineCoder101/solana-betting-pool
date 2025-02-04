@@ -6,11 +6,11 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-solanabettingapplication = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
+# solanabettingapplication = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
 horserace = "3U8ZsW8cd3GNcu69AhksaNEoeBCh8sHywvCHbm7mxaHz"
 
 [programs.devnet]
-solanabettingapplication = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
+# solanabettingapplication = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
 horserace = "3U8ZsW8cd3GNcu69AhksaNEoeBCh8sHywvCHbm7mxaHz"
 
 [registry]
