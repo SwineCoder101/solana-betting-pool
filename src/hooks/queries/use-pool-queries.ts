@@ -1,14 +1,11 @@
 import { useQuery } from '@tanstack/react-query';
 import { PublicKey } from '@solana/web3.js';
 import { useAnchorProgram } from '../use-anchor-program';
-import { 
-  getPoolData, 
-  getAllPoolDataByCompetition,
-  PoolData 
-} from '../../../anchor/sdk/src';
+import { getAllCompetitions, getAllPoolDataByCompetition, getAllPools, getPoolData, PoolData } from '../../../anchor/sdk/src';
+
 
 export function usePoolData(poolPubkey: PublicKey | null) {
-  const program = useAnchorProgram();
+  const { program } = useAnchorProgram();
 
   return useQuery({
     queryKey: ['pool', poolPubkey?.toString()],
@@ -21,20 +18,20 @@ export function usePoolData(poolPubkey: PublicKey | null) {
 }
 
 export function useCompetitionPools(competitionPubkey: PublicKey | null) {
-  const program = useAnchorProgram();
+  const {program} = useAnchorProgram();
 
   return useQuery({
     queryKey: ['competitionPools', competitionPubkey?.toString()],
     queryFn: async (): Promise<PoolData[]> => {
       if (!program || !competitionPubkey) return [];
-      return getAllPoolDataByCompetition(program, competitionPubkey);
+      return getAllPoolDataByCompetition(program ,competitionPubkey);
     },
     enabled: !!program && !!competitionPubkey,
   });
 }
 
 export function useActivePools() {
-  const program = useAnchorProgram();
+  const {program} = useAnchorProgram();
   
   return useQuery({
     queryKey: ['activePools'],
@@ -43,12 +40,12 @@ export function useActivePools() {
       const now = Math.floor(Date.now() / 1000);
       
       // Get all competitions first
-      const competitions = await program.account.competition.all();
+      const competitions = await getAllCompetitions(program);
       
       // Get pools for each competition
       const allPools = await Promise.all(
         competitions.map(comp => 
-          getAllPoolDataByCompetition(program, comp.publicKey)
+          getAllPoolDataByCompetition(program, new PublicKey(comp.competitionKey))
         )
       );
       
@@ -58,5 +55,27 @@ export function useActivePools() {
         .filter(pool => pool.startTime <= now && pool.endTime >= now);
     },
     enabled: !!program,
+  });
+}
+
+export function useAllPools() {
+  const { program } = useAnchorProgram();
+  
+  console.log("useAllPools hook called, program state:", !!program);
+  
+  return useQuery({
+    queryKey: ['allPools'],
+    queryFn: async (): Promise<PoolData[]> => {
+      if (!program) {
+        console.log("Program not available in queryFn");
+        throw new Error("Program not initialized");
+      }
+      console.log("Fetching pool accounts...");
+      const results = await getAllPools(program);
+      console.log("Pool accounts fetched:", results.length);
+      return results;
+    },
+    enabled: !!program,
+    retry: false,
   });
 } 

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import AdminFeatures from '../admin/admin-features';
 import { LoginWalletButton } from "../privy/login-wallet-button";
 import { WalletManager } from "../privy/wallet-manager";
+import { useBackend } from "@/hooks/use-backend";
 
 interface WalletInfo {
     address: string;
@@ -16,6 +17,7 @@ export function VanillaLayout() {
     const [walletInfo, setWalletInfo] = useState<WalletInfo[]>([]);
     const { authenticated, user } = usePrivy();
     const { wallets } = useSolanaWallets();
+    const { isLive, isLoading } = useBackend();
 
     const connection = new Connection(
         process.env.NEXT_PUBLIC_SOLANA_RPC_URL || "https://api.devnet.solana.com"
@@ -63,7 +65,7 @@ export function VanillaLayout() {
     };
 
     return (
-        <div className="min-h-screen bg-gray-100">
+        <div className={"min-h-screen bg-gray-100"}>
             {/* Header */}
             <header className="bg-white shadow-md">
                 <div className="max-w-7xl mx-auto px-4 py-4">
@@ -88,11 +90,25 @@ export function VanillaLayout() {
                             ))}
                         </div>
 
-                        {/* Login Button */}
-                        <LoginWalletButton 
-                            connectedAddress={user?.wallet?.address}
-                            className="ml-4"
-                        />
+                        <div className="flex flex-col items-end space-y-2">
+                            {/* Login Button */}
+                            <LoginWalletButton 
+                                connectedAddress={user?.wallet?.address}
+                                className="ml-4"
+                            />
+                            
+                            {/* Backend Status Indicator */}
+                            <div className="flex items-center gap-2 text-sm">
+                                <span>Backend:</span>
+                                {isLoading ? (
+                                    <div className="w-3 h-3 bg-yellow-400 rounded-full animate-pulse" />
+                                ) : isLive ? (
+                                    <div className="w-3 h-3 bg-green-500 rounded-full" title="Backend Connected" />
+                                ) : (
+                                    <div className="w-3 h-3 bg-red-500 rounded-full" title="Backend Offline" />
+                                )}
+                            </div>
+                        </div>
                     </div>
 
                     {/* Tabs */}

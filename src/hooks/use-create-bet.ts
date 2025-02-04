@@ -15,46 +15,49 @@ interface CreateBetParams {
 export function useCreateBet() {
   const { user } = usePrivy();
   const { wallets } = useSolanaWallets();
-  const program = useAnchorProgram();
-
-  const wallet = wallets[0];  
+  const { program, connection } = useAnchorProgram();
+  const wallet = wallets[0];
 
   return useMutation({
+    mutationKey: ['createBet'],
     mutationFn: async (params: CreateBetParams) => {
-      if (!user?.wallet?.address || !program) {
+      if (!user?.wallet?.address || !wallet) {
         throw new Error('Wallet not connected');
       }
+      if (!program) {
+        throw new Error('Program not initialized');
+      }
 
-      const vtx = await createBet(
-        program,
-        new PublicKey(wallet.address),
-        params.amount,
-        params.lowerBoundPrice,
-        params.upperBoundPrice,
-        new PublicKey(params.poolKey),
-        new PublicKey(params.competition)
-      );
+      try {
+        const vtx = await createBet(
+          program,
+          new PublicKey(user.wallet.address),
+          params.amount,
+          params.lowerBoundPrice,
+          params.upperBoundPrice,
+          new PublicKey(params.poolKey),
+          new PublicKey(params.competition)
+        );
 
-      // Convert to versioned transaction
-      // const versionedTx = await convertToVersionedTransaction(
-      //   program.provider.connection,
-      //   tx
-      // );
+        const signedTx = await wallet.signTransaction(vtx);
+        const signature = await connection.sendTransaction(signedTx);
+        await connection.confirmTransaction(signature);
 
-      // Sign the versioned transaction
-      const signedTx = await wallet.signTransaction(vtx);
-
-      // Send and confirm
-      const signature = await program.provider.connection.sendTransaction(signedTx);
-      await program.provider.connection.confirmTransaction(signature);
-
-      return signature;
+        return {
+          signature,
+          params
+        };
+      } catch (error) {
+        const message = error instanceof Error ? error.message : 'Failed to create bet';
+        console.error('Error in createBet:', error);
+        throw new Error(message);
+      }
     },
-    onError: (error) => {
-      console.error('Failed to create bet:', error);
+    onError: (error: Error) => {
+      console.error('Failed to create bet:', error.message);
     },
-    onSuccess: (signature) => {
-      console.log('Bet created successfully:', signature);
+    onSuccess: (data) => {
+      console.log('Bet created successfully:', data.signature);
     },
   });
 } 

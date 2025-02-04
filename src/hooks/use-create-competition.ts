@@ -1,89 +1,107 @@
-import { usePrivy, useSolanaWallets } from '@privy-io/react-auth';
-import { Keypair, PublicKey } from '@solana/web3.js';
-import { useMutation } from '@tanstack/react-query';
-import { createCompetitionWithPools } from '../../anchor/sdk/src/instructions/admin/create-competition-with-pools';
+import { tokens } from '@/data/data-constants';
+import { usePrivy } from '@privy-io/react-auth';
+import { PublicKey } from '@solana/web3.js';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAnchorProgram } from './use-anchor-program';
+import { CompetitionPoolParams, createCompetitionWithPoolsEntry } from '../../anchor/sdk/src/instructions/admin/create-competition-with-pools';
+import { useSolanaPrivyWallet } from './use-solana-privy-wallet';
 
-interface CreateCompetitionParams {
-  competitionHash: PublicKey;
-  tokenA: string;
-  priceFeedId: string;
-  adminKeys: string[];
+export type CreateCompetitionParams = {
+  tokenSymbol: string;
   houseCutFactor: number;
   minPayoutRatio: number;
   interval: number;
   startTime: number;
   endTime: number;
-  treasury: string;
-}
-//TODO: fix the form with privy wallet signing
+  adminKeys?: string[];
+  treasury?: string;
+};
+
 export function useCreateCompetition() {
+  const { program } = useAnchorProgram();
+  const queryClient = useQueryClient();
   const { user } = usePrivy();
-  const { wallets } = useSolanaWallets();
-  const program = useAnchorProgram();
-  const wallet = wallets[0];
+  const { embeddedWallet} = useSolanaPrivyWallet();
 
   return useMutation({
     mutationFn: async (params: CreateCompetitionParams) => {
-      if (!user?.wallet?.address || !program || !wallet) {
-        throw new Error('Wallet not connected');
+      if (!program || !user?.wallet?.address) {
+        throw new Error('Program or wallet not initialized');
       }
 
-      console.log(params);
+      // Find token data from constants
+      const tokenData = tokens.find(t => t.symbol === params.tokenSymbol);
+      if (!tokenData) {
+        throw new Error('Invalid token symbol');
+      }
 
-      const competitionHash = Keypair.generate().publicKey;
+      // Convert admin keys to PublicKeys if provided
+      const adminKeys = params.adminKeys 
+        ? params.adminKeys.map(key => new PublicKey(key))
+        : [];
 
-      // Get all instructions
-      const { competitionTx, poolKeys } = await createCompetitionWithPools(
-        program,
-        new PublicKey(user.wallet.address),
-        competitionHash,
-        new PublicKey(params.tokenA),
-        params.priceFeedId,
-        params.adminKeys.map(key => new PublicKey(key)),
-        params.houseCutFactor,
-        params.minPayoutRatio,
-        params.interval,
-        params.startTime,
-        params.endTime,
-        new PublicKey(params.treasury)
-      );
-
-      const signature = await wallet.signTransaction(competitionTx);
-      console.log(signature); 
-
-      const tx = await wallet.sendTransaction(competitionTx, program.provider.connection);
-      console.log(tx);
-
-      // // Create a new transaction and add all instructions
-      // const tx = new Transaction();
-      // instructions.forEach(ix => tx.add(ix));
-
-      // // Get latest blockhash
-      // const latestBlockhash = await program.provider.connection.getLatestBlockhash();
-      // tx.recentBlockhash = latestBlockhash.blockhash;
-      // tx.feePayer = new PublicKey(user.wallet.address);
-
-      // // Convert to versioned transaction
-      // const versionedTx = new VersionedTransaction(tx.compileMessage());
-
-      // // Sign with wallet
-      // const signedTx = await wallet.signTransaction(versionedTx);
-
-      // // Send and confirm
-      // const signature = await program.provider.connection.sendTransaction(signedTx);
-      // await program.provider.connection.confirmTransaction(signature, 'confirmed');
-
-      return {
-        signature,
-        poolKeys: poolKeys.map(key => key.toString())
+      // Create competition params
+      const competitionParams: CompetitionPoolParams = {
+        admin: new PublicKey(user.wallet.address),
+        tokenA: new PublicKey(tokenData.tokenAddress),
+        priceFeedId: tokenData.priceFeedId,
+        adminKeys,
+        houseCutFactor: params.houseCutFactor,
+        minPayoutRatio: params.minPayoutRatio,
+        interval: params.interval,
+        startTime: params.startTime,
+        endTime: params.endTime,
+        treasury: params.treasury 
+          ? new PublicKey(params.treasury)
+          : new PublicKey(user.wallet.address),
       };
+      const { competitionTx, poolTxs } = await createCompetitionWithPoolsEntry(program, competitionParams);
+
+      const signedCompetitionTx = await embeddedWallet?.signTransaction(competitionTx);
+      const signedPoolTxs = await Promise.all(poolTxs.map(tx => embeddedWallet?.signTransaction(tx)));
+      
+      const compTx = await program.provider.connection.sendRawTransaction(signedCompetitionTx?.serialize() as Uint8Array);
+      await program.provider.connection.confirmTransaction({
+        signature: compTx,
+        ...(await program.provider.connection.getLatestBlockhash()),
+      });
+      for (const signedPoolTx of signedPoolTxs) {
+        if (!signedPoolTx) continue;
+        const rawPoolTx = await program.provider.connection.sendRawTransaction(signedPoolTx.serialize() as Uint8Array);
+        await program.provider.connection.confirmTransaction({
+          signature: rawPoolTx,
+          ...(await program.provider.connection.getLatestBlockhash()),
+        });
+      }
+
+      return compTx;
+    },
+    onSuccess: () => {
+      // Invalidate and refetch all relevant queries
+      queryClient.invalidateQueries({ 
+        queryKey: ['allCompetitions'],
+        refetchType: 'active',
+        exact: true 
+      });
+      queryClient.invalidateQueries({ 
+        queryKey: ['activeCompetitions'],
+        refetchType: 'active',
+        exact: true 
+      });
+      queryClient.invalidateQueries({ 
+        queryKey: ['allPools'],
+        refetchType: 'active',
+        exact: true 
+      });
+
+      // Optional: Force an immediate refetch
+      queryClient.refetchQueries({ 
+        queryKey: ['allCompetitions'],
+        exact: true 
+      });
     },
     onError: (error) => {
       console.error('Failed to create competition:', error);
-    },
-    onSuccess: (result) => {
-      console.log('Competition and pools created successfully:', result);
-    },
+    }
   });
-} 
+}

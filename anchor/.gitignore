@@ -12,5 +12,5 @@ test-ledger
 .yarn
 coverage
 sdk/lib
-sdk/target
 sdk/scripts/.deleteme
+sdk/target
