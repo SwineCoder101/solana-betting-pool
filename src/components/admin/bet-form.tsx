@@ -1,10 +1,11 @@
 import { intervals } from "@/data/data-constants";
 import { usePrivy } from "@privy-io/react-auth";
 import React, { useEffect, useState } from "react";
+import { useCreateBetBackend } from '@/hooks/use-create-bet-backend';
 
 const BetForm: React.FC = () => {
-  // const createBetMutation = useCreateBet();
   const { user } = usePrivy();
+  const { createBet } = useCreateBetBackend();
   const [formState, setFormState] = useState({
     amount: "",
     lower_bound_price: "",
@@ -48,13 +49,13 @@ const BetForm: React.FC = () => {
       }
       // Add other validations as needed
 
-      // await createBetMutation.mutateAsync({
-      //   amount: Number(formState.amount),
-      //   lowerBoundPrice: Number(formState.lower_bound_price),
-      //   upperBoundPrice: Number(formState.upper_bound_price),
-      //   poolKey: formState.poolKey,
-      //   competition: formState.competition,
-      // });
+      await createBet.mutateAsync({
+        amount: Number(formState.amount),
+        lowerBoundPrice: Number(formState.lower_bound_price),
+        upperBoundPrice: Number(formState.upper_bound_price),
+        poolKey: formState.poolKey,
+        competitionKey: formState.competition,
+      });
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Failed to create bet');
     }
@@ -140,15 +141,6 @@ const BetForm: React.FC = () => {
           Submit Bet
         </button>
       </form>
-      {/* {createBetMutation.isPending && <div>Creating bet...</div>}
-      {createBetMutation.isError && (
-        <div className="text-red-500">
-          Error creating bet: {createBetMutation.error?.message}
-        </div>
-      )}
-      {createBetMutation.isSuccess && (
-        <div className="text-green-500">Bet created successfully!</div>
-      )} */}
     </div>
   );
 };

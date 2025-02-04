@@ -3,9 +3,9 @@ import { shortenAddress } from "@/lib/utils";
 import React from "react";
 
 const CompetitionDisplay: React.FC = () => {
-  const { data: competitions, isLoading, error } = useAllCompetitions();
+  const { data: competitions, isLoading, error, isFetching } = useAllCompetitions();
 
-  if (isLoading) {
+  if (isLoading || isFetching) {
     return <div>Loading competitions...</div>;
   }
   
