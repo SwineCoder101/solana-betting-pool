@@ -2,7 +2,8 @@ export const tokens = [
     {
       symbol: "BONK",
       priceFeedId: "0x72b021217ca3fe68922a19aaf990109cb9d84e9ad004b4d2025ad6f529314419",
-      tokenAddress: "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
+      tokenAddress: "7yfCkYodjoferYftgGT91H8nPpnspRAv8uv1HzEfhdhm",
+      mainTokenAddress: "DezXAZ8z7PnrnRJjz3wXBoRgixCa6xjnB7YaB1pPB263",
       devnet: "bonk-devnet",
       localnet: "bonk-localnet",
       testnet: "bonk-testnet",

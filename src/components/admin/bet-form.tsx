@@ -4,16 +4,19 @@ import { useCreateBetBackend } from '@/hooks/use-create-bet-backend';
 import { useActiveCompetitionsWithPools } from "@/hooks/queries";
 import { useCompetitionPools } from "@/hooks/queries/use-pool-queries";
 import { PublicKey } from "@solana/web3.js";
+import { useBackend } from "@/hooks/use-backend";
+import { tokens } from "@/data/data-constants";
 
 const BetForm: React.FC = () => {
   const { user } = usePrivy();
   const { createBet } = useCreateBetBackend();
   const { data: activeCompetitions } = useActiveCompetitionsWithPools();
+  const { isLive: isBackendLive } = useBackend();
   
   const [formState, setFormState] = useState({
     amount: "",
     competition: "",
-    poolKey: "", // This will be set automatically based on selected interval
+    poolKey: "",
   });
   
   // Get pools for selected competition
@@ -24,7 +27,6 @@ const BetForm: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // Check for required dependencies
     if (!user?.wallet?.address) {
       console.warn('Wallet not connected');
     }
@@ -49,8 +51,13 @@ const BetForm: React.FC = () => {
     setError(null);
     
     try {
-      if (!user?.wallet?.address) {
+      if (!user?.id || !user?.wallet?.address) {
         setError('Please connect your wallet first');
+        return;
+      }
+
+      if (!isBackendLive) {
+        setError('Backend is not available. Please try again later.');
         return;
       }
 
@@ -67,12 +74,25 @@ const BetForm: React.FC = () => {
         return;
       }
 
+      // Get selected pool data for price bounds
+      const selectedPool = competitionPools?.find(pool => pool.poolKey === formState.poolKey);
+      if (!selectedPool) {
+        setError('Selected pool not found');
+        return;
+      }
+
+      console.log('Submitting bet:', {
+        userId: user.id,
+        amount: Number(formState.amount),
+        poolKey: formState.poolKey,
+        competitionKey: formState.competition,
+      });
+
       await createBet.mutateAsync({
         amount: Number(formState.amount),
         poolKey: formState.poolKey,
         competitionKey: formState.competition,
-        // These will be handled by backend
-        lowerBoundPrice: 0,
+        lowerBoundPrice: 0, // These will be calculated by backend
         upperBoundPrice: 0,
       });
 
@@ -83,9 +103,15 @@ const BetForm: React.FC = () => {
         poolKey: "",
       });
     } catch (error) {
+      console.error('Bet submission error:', error);
       setError(error instanceof Error ? error.message : 'Failed to create bet');
     }
   };
+
+  const getSymbolFromTokenA = (tokenA: string) => {
+    console.log('Token A:', tokenA); 
+    return tokens.find(token => token.tokenAddress === tokenA)?.symbol;
+  }
 
   return (
     <div>
@@ -103,6 +129,8 @@ const BetForm: React.FC = () => {
             onChange={handleInputChange}
             className="input input-bordered w-full bg-gray-200"
             required
+            min="0"
+            step="0.000000001"
           />
         </div>
         
@@ -118,7 +146,7 @@ const BetForm: React.FC = () => {
             <option value="">Select Competition</option>
             {activeCompetitions?.map((competition) => (
               <option key={competition.competitionKey} value={competition.competitionKey}>
-                {new Date(competition.endTime * 1000).toLocaleString()} - {competition.interval}s
+                {getSymbolFromTokenA(competition.tokenA)} - { new Date(competition.endTime * 1000).toLocaleString()} - {competition.interval}s
               </option>
             ))}
           </select>
@@ -149,11 +177,17 @@ const BetForm: React.FC = () => {
 
         <button
           type="submit"
-          disabled={createBet.isPending}
-          className="btn bg-yellow-600 text-white hover:bg-yellow-500 mt-4"
+          disabled={createBet.isPending || !isBackendLive}
+          className="btn bg-yellow-600 text-white hover:bg-yellow-500 mt-4 w-full"
         >
           {createBet.isPending ? "Submitting..." : "Submit Bet"}
         </button>
+
+        {!isBackendLive && (
+          <div className="text-red-500 text-sm mt-2">
+            Backend is offline. Betting is temporarily disabled.
+          </div>
+        )}
       </form>
     </div>
   );
