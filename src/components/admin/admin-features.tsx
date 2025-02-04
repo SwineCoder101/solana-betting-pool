@@ -20,11 +20,12 @@ const AdminFeatures: React.FC = () => {
           </div>
         </ErrorBoundary>
 
-        <ErrorBoundary>
+        {/* TODO: Decide if we want to allow admins to create competitions from the admin panel */}
+        {/* <ErrorBoundary>
           <div className="border p-4 bg-gray-50">
             <CompetitionForm />
           </div>
-        </ErrorBoundary>
+        </ErrorBoundary> */}
 
         <ErrorBoundary>
           <div className="border p-4 bg-gray-50">
