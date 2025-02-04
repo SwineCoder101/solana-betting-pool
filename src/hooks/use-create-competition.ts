@@ -60,20 +60,21 @@ export function useCreateCompetition() {
       const signedCompetitionTx = await embeddedWallet?.signTransaction(competitionTx);
       const signedPoolTxs = await Promise.all(poolTxs.map(tx => embeddedWallet?.signTransaction(tx)));
       
-      const compTx = await program.provider.connection.sendRawTransaction(signedCompetitionTx?.serialize());
+      const compTx = await program.provider.connection.sendRawTransaction(signedCompetitionTx?.serialize() as Uint8Array);
       await program.provider.connection.confirmTransaction({
         signature: compTx,
         ...(await program.provider.connection.getLatestBlockhash()),
       });
+      for (const signedPoolTx of signedPoolTxs) {
+        if (!signedPoolTx) continue;
+        const rawPoolTx = await program.provider.connection.sendRawTransaction(signedPoolTx.serialize() as Uint8Array);
+        await program.provider.connection.confirmTransaction({
+          signature: rawPoolTx,
+          ...(await program.provider.connection.getLatestBlockhash()),
+        });
+      }
 
-
-      const rawPoolTxs = await program.provider.connection.sendRawTransaction(signedPoolTxs?.serialize());
-      await program.provider.connection.confirmTransaction({
-        signature: rawPoolTxs,
-        ...(await program.provider.connection.getLatestBlockhash()),
-      });
-
-      return tx;
+      return compTx;
     },
     onSuccess: () => {
       // Invalidate and refetch all relevant queries
