@@ -1,5 +1,6 @@
 import { usePrivy } from '@privy-io/react-auth';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useBackend } from './use-backend';
 
 interface CreateBetParams {
   amount: number;
@@ -14,11 +15,10 @@ interface CancelBetParams {
   betHash: string;
 }
 
-const API_URL = process.env.VITE_BACKEND_URL || 'http://localhost:3001';
-
 export function useCreateBetBackend() {
   const { user } = usePrivy();
   const queryClient = useQueryClient();
+  const { baseUrl } = useBackend();
 
   const createBetMutation = useMutation({
     mutationFn: async (params: CreateBetParams) => {
@@ -26,7 +26,7 @@ export function useCreateBetBackend() {
         throw new Error('User not authenticated');
       }
 
-      const response = await fetch(`${API_URL}/order/create-bet`, {
+      const response = await fetch(`${baseUrl}/order/create-bet`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -49,7 +49,6 @@ export function useCreateBetBackend() {
       return response.json();
     },
     onSuccess: () => {
-      // Invalidate relevant queries
       queryClient.invalidateQueries({ queryKey: ['allBets'] });
       queryClient.invalidateQueries({ queryKey: ['userBets'] });
     },
@@ -64,7 +63,7 @@ export function useCreateBetBackend() {
         throw new Error('User not authenticated');
       }
 
-      const response = await fetch(`${API_URL}/order/cancel-bet`, {
+      const response = await fetch(`${baseUrl}/order/cancel-bet`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -84,7 +83,6 @@ export function useCreateBetBackend() {
       return response.json();
     },
     onSuccess: () => {
-      // Invalidate relevant queries
       queryClient.invalidateQueries({ queryKey: ['allBets'] });
       queryClient.invalidateQueries({ queryKey: ['userBets'] });
     },

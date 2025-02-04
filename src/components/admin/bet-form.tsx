@@ -1,19 +1,26 @@
-import { intervals } from "@/data/data-constants";
 import { usePrivy } from "@privy-io/react-auth";
 import React, { useEffect, useState } from "react";
 import { useCreateBetBackend } from '@/hooks/use-create-bet-backend';
+import { useActiveCompetitionsWithPools } from "@/hooks/queries";
+import { useCompetitionPools } from "@/hooks/queries/use-pool-queries";
+import { PublicKey } from "@solana/web3.js";
 
 const BetForm: React.FC = () => {
   const { user } = usePrivy();
   const { createBet } = useCreateBetBackend();
+  const { data: activeCompetitions } = useActiveCompetitionsWithPools();
+  
   const [formState, setFormState] = useState({
     amount: "",
-    lower_bound_price: "",
-    upper_bound_price: "",
-    interval: intervals[0].value,
-    poolKey: '',
-    competition: '',
+    competition: "",
+    poolKey: "", // This will be set automatically based on selected interval
   });
+  
+  // Get pools for selected competition
+  const { data: competitionPools } = useCompetitionPools(
+    formState.competition ? new PublicKey(formState.competition) : null
+  );
+
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
@@ -23,9 +30,18 @@ const BetForm: React.FC = () => {
     }
   }, [user]);
 
+  // Reset pool when competition changes
+  useEffect(() => {
+    setFormState(prev => ({ ...prev, poolKey: "" }));
+  }, [formState.competition]);
+
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormState({ ...formState, [name]: value });
+  };
+
+  const handlePoolSelect = (poolKey: string) => {
+    setFormState(prev => ({ ...prev, poolKey }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -38,23 +54,33 @@ const BetForm: React.FC = () => {
         return;
       }
 
-      // Validate form data
       if (!formState.amount || Number(formState.amount) <= 0) {
         setError('Please enter a valid amount');
         return;
       }
-      if (!formState.poolKey) {
-        setError('Please enter a pool key');
+      if (!formState.competition) {
+        setError('Please select a competition');
         return;
       }
-      // Add other validations as needed
+      if (!formState.poolKey) {
+        setError('Please select a pool interval');
+        return;
+      }
 
       await createBet.mutateAsync({
         amount: Number(formState.amount),
-        lowerBoundPrice: Number(formState.lower_bound_price),
-        upperBoundPrice: Number(formState.upper_bound_price),
         poolKey: formState.poolKey,
         competitionKey: formState.competition,
+        // These will be handled by backend
+        lowerBoundPrice: 0,
+        upperBoundPrice: 0,
+      });
+
+      // Reset form on success
+      setFormState({
+        amount: "",
+        competition: "",
+        poolKey: "",
       });
     } catch (error) {
       setError(error instanceof Error ? error.message : 'Failed to create bet');
@@ -67,7 +93,7 @@ const BetForm: React.FC = () => {
       {error && (
         <div className="text-red-500 mb-4">{error}</div>
       )}
-      <form>
+      <form onSubmit={handleSubmit}>
         <div className="mb-2">
           <label className="block mb-1">Amount</label>
           <input
@@ -76,69 +102,57 @@ const BetForm: React.FC = () => {
             value={formState.amount}
             onChange={handleInputChange}
             className="input input-bordered w-full bg-gray-200"
+            required
           />
         </div>
-        <div className="mb-2">
-          <label className="block mb-1">Lower Bound Price</label>
-          <input
-            type="number"
-            name="lower_bound_price"
-            value={formState.lower_bound_price}
-            onChange={handleInputChange}
-            className="input input-bordered w-full bg-gray-200"
-          />
-        </div>
-        <div className="mb-2">
-          <label className="block mb-1">Upper Bound Price</label>
-          <input
-            type="number"
-            name="upper_bound_price"
-            value={formState.upper_bound_price}
-            onChange={handleInputChange}
-            className="input input-bordered w-full bg-gray-200"
-          />
-        </div>
-        <div className="mb-2">
-          <label className="block mb-1">Interval</label>
-          <select
-            name="interval"
-            value={formState.interval}
-            onChange={handleInputChange}
-            className="input input-bordered w-full bg-gray-200"
-          >
-            {intervals.map((interval) => (
-              <option key={interval.id} value={interval.value}>
-                {interval.label}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="mb-2">
-          <label className="block mb-1">Pool Key</label>
-          <input
-            type="text"
-            name="poolKey"
-            value={formState.poolKey}
-            onChange={handleInputChange}
-            className="input input-bordered w-full bg-gray-200"
-          />
-        </div>
+        
         <div className="mb-2">
           <label className="block mb-1">Competition</label>
-          <input
-            type="text"
+          <select
             name="competition"
             value={formState.competition}
             onChange={handleInputChange}
             className="input input-bordered w-full bg-gray-200"
-          />
+            required
+          >
+            <option value="">Select Competition</option>
+            {activeCompetitions?.map((competition) => (
+              <option key={competition.competitionKey} value={competition.competitionKey}>
+                {new Date(competition.endTime * 1000).toLocaleString()} - {competition.interval}s
+              </option>
+            ))}
+          </select>
         </div>
+
+        {formState.competition && (
+          <div className="mb-2">
+            <label className="block mb-1">Pool Interval</label>
+            <div className="grid grid-cols-2 gap-2">
+              {competitionPools?.map((pool) => (
+                <button
+                  key={pool.poolKey}
+                  type="button"
+                  onClick={() => handlePoolSelect(pool.poolKey)}
+                  className={`p-2 rounded ${
+                    formState.poolKey === pool.poolKey
+                      ? 'bg-yellow-600 text-white'
+                      : 'bg-gray-200 hover:bg-gray-300'
+                  }`}
+                >
+                  {new Date(pool.startTime * 1000).toLocaleTimeString()} - 
+                  {new Date(pool.endTime * 1000).toLocaleTimeString()}
+                </button>
+              ))}
+            </div>
+          </div>
+        )}
+
         <button
-          type="button"
-          onClick={handleSubmit}
+          type="submit"
+          disabled={createBet.isPending}
           className="btn bg-yellow-600 text-white hover:bg-yellow-500 mt-4"
         >
-          Submit Bet
+          {createBet.isPending ? "Submitting..." : "Submit Bet"}
         </button>
       </form>
     </div>

@@ -57,4 +57,13 @@ export function useActiveCompetitions() {
     },
     enabled: !!program,
   });
+}
+
+export function useActiveCompetitionsWithPools() {
+  const { data: competitions } = useAllCompetitions();
+  const now = Math.floor(Date.now() / 1000);
+  
+  return {
+    data: competitions?.filter(comp => comp.endTime > now) || [],
+  };
 } 
