@@ -44,3 +44,17 @@ pub enum OracleError {
     #[msg("Oracle is outside the time range.")]
     OutsideOracleTimeRange,
 }
+
+#[error_code]
+pub enum TreasuryError {
+    #[msg("Too many admins provided")]
+    TooManyAdmins,
+    #[msg("Invalid signature threshold")]
+    InvalidSignatureThreshold,
+    #[msg("Insufficient funds in treasury")]
+    InsufficientFunds,
+    #[msg("Arithmetic overflow")]
+    Overflow,
+    #[msg("Unauthorized")]
+    Unauthorized,
+}
