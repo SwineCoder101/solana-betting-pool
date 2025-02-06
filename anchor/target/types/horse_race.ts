@@ -308,9 +308,6 @@ export type HorseRace = {
     },
     {
       "name": "runCreatePoolOracleTransformer",
-      "docs": [
-        "Create a Pool Oracle Transformer"
-      ],
       "discriminator": [
         200,
         65,
@@ -398,11 +395,37 @@ export type HorseRace = {
         192,
         218
       ],
-      "accounts": [],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "pool",
+          "writable": true
+        },
+        {
+          "name": "treasury",
+          "writable": true
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
       "args": [
         {
           "name": "competitionKey",
           "type": "pubkey"
+        },
+        {
+          "name": "lowerBoundPrice",
+          "type": "u64"
+        },
+        {
+          "name": "upperBoundPrice",
+          "type": "u64"
         }
       ]
     },
@@ -597,13 +620,8 @@ export type HorseRace = {
   "errors": [
     {
       "code": 6000,
-      "name": "invalidTimeRange",
-      "msg": "Invalid time range."
-    },
-    {
-      "code": 6001,
-      "name": "invalidCompetitionId",
-      "msg": "Invalid competition id provided, please check the latest competition id"
+      "name": "unauthorized",
+      "msg": "Unauthorized: Not a whitelisted admin or deployer."
     }
   ],
   "types": [
