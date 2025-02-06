@@ -69,7 +69,7 @@ async function main() {
   try {
     const startTime = await addOneYear(await now(connection));
     const endTime = startTime + 60;
-    const interval = 30;
+    const interval = 20;
 
     params.startTime = startTime;
     params.endTime = endTime;

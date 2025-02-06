@@ -19,9 +19,6 @@ export function useBetData(betPubkey: PublicKey | null) {
 export function useAllBets() {
   const { program } = useAnchorProgram();
   
-  console.log("useAllBets hook called, program state:", !!program);
-  console.log("program", program);
-  
   return useQuery({
     queryKey: ['allBets'],
     queryFn: async (): Promise<BetData[]> => {
@@ -31,6 +28,8 @@ export function useAllBets() {
       }
       console.log("Fetching bet accounts...");
       const results = await getAllBetAccounts(program);
+
+      console.log("bet: ", results[0]);
       console.log("Bet accounts fetched:", results.length);
       return results;
     },

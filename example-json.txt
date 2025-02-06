@@ -1,0 +1,37 @@
+
+Pool
+{
+    "poolKey": "FSH6uUpsjR3AWsegtdda7tUnjkhpHb1JDHuWbwv5NMsV",
+    "poolHash": "11111111111111111111111111111111",
+    "competitionKey": "7mJUg9eWdp42MfJrS8cozFWLiv15YKGk4mFvY8KWfLji",
+    "startTime": 1770219115,
+    "endTime": 1770219145,
+    "treasury": "3Vm8KKkd1aaCL1nnVf4PSXMZySy7Cu2DrsNVQeGpN2An"
+}
+
+Bet
+{
+    "publicKey": "3Vm8KKkd1aaCL1nnVf4PSXMZySy7Cu2DrsNVQeGpN2An",
+    "user": "3Vm8KKkd1aaCL1nnVf4PSXMZySy7Cu2DrsNVQeGpN2An",
+    "amount": 1,
+    "lowerBoundPrice": 100,
+    "upperBoundPrice": 200,
+    "poolKey": "6hnTNibVauiQRJASs45BqHk6JWqsp6UwV4ebap3eaYi1",
+    "competition": "ApiSSrYLUTvhTzLNudofmRhSChx4uobviTKJtkncvxZL",
+    "status": 0
+}
+
+Competition
+{
+    "competitionKey": "9hoAzQ7ximVJGSBkrksCEmRi8DvzVS1T8PLgugxiNiws",
+    "tokenA": "7yfCkYodjoferYftgGT91H8nPpnspRAv8uv1HzEfhdhm",
+    "priceFeedId": "12345",
+    "admin": [
+        "3Vm8KKkd1aaCL1nnVf4PSXMZySy7Cu2DrsNVQeGpN2An"
+    ],
+    "houseCutFactor": 5,
+    "minPayoutRatio": 80,
+    "interval": 30000,
+    "startTime": 1767225600,
+    "endTime": 1767225720
+}

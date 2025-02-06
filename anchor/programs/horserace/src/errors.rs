@@ -15,6 +15,8 @@ pub enum BettingError {
     CompetitionEnded,
     #[msg("Pool has ended")]
     PoolEnded,
+    #[msg("Invalid user account")]
+    InvalidUserAccount,
 }
 
 #[error_code]
