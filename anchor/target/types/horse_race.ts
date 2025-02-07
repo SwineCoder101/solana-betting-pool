@@ -381,19 +381,19 @@ export type HorseRace = {
       ]
     },
     {
-      "name": "runSettlePool",
+      "name": "runSettlePoolByPrice",
       "docs": [
         "Settle a Pool"
       ],
       "discriminator": [
-        96,
-        137,
-        173,
-        253,
-        147,
-        165,
-        192,
-        218
+        171,
+        89,
+        52,
+        200,
+        177,
+        251,
+        136,
+        83
       ],
       "accounts": [
         {
@@ -620,8 +620,38 @@ export type HorseRace = {
   "errors": [
     {
       "code": 6000,
+      "name": "notEligible",
+      "msg": "User is not eligible to create a bet."
+    },
+    {
+      "code": 6001,
+      "name": "betOwnershipMismatch",
+      "msg": "User does not own this bet."
+    },
+    {
+      "code": 6002,
       "name": "unauthorized",
-      "msg": "Unauthorized: Not a whitelisted admin or deployer."
+      "msg": "Unauthorized: Not the competition owner."
+    },
+    {
+      "code": 6003,
+      "name": "poolNotEnded",
+      "msg": "Pool not finished yet."
+    },
+    {
+      "code": 6004,
+      "name": "competitionEnded",
+      "msg": "Competition has ended"
+    },
+    {
+      "code": 6005,
+      "name": "poolEnded",
+      "msg": "Pool has ended"
+    },
+    {
+      "code": 6006,
+      "name": "invalidUserAccount",
+      "msg": "Invalid user account"
     }
   ],
   "types": [

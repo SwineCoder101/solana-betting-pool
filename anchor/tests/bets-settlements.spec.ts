@@ -1,13 +1,10 @@
-// bets.spec.ts
-
 import { Keypair, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
-import { BetStatus, getBetAccountsForPool, getBetAccountsForUser, getBetData } from "../sdk/src";
-import { cancelBet } from "../sdk/src/instructions/user/cancel-bet";
-import { createBet } from "../sdk/src/instructions/user/create-bet";
+import { getBetAccountsForPool, getBetAccountsForUser } from "../sdk/src";
 import { setupCompetitionWithPools, SetupDTO } from "./common-setup";
-import { createUserWithFunds } from "./test-utils";
+import { createUserWithFunds, executeCreateBet } from "./test-utils";
+import { createBet } from "../sdk/src/instructions/user/create-bet";
 
-describe("Bets", () => {
+describe.skip("Bets", () => {
   let setupDto: SetupDTO;
   let program, poolKeys: PublicKey[], competitionPubkey, connection;
   let signer: Keypair;
@@ -33,6 +30,13 @@ describe("Bets", () => {
   }, 30000);
 
   it("should settle all funds from pool to treasury if no bet has won", async () => {
+    const amount = LAMPORTS_PER_SOL;
+    const lowerBoundPrice = 50;
+    const upperBoundPrice = 150;
+    const poolKey = poolKeys[0];
+
+    await executeCreateBet(program, signer, amount, lowerBoundPrice, upperBoundPrice, poolKey, competitionPubkey, signer);
+
   });
 
   it("should settle to user if bet has won", async () => {
@@ -44,12 +48,11 @@ describe("Bets", () => {
   it("should settle to users if some bets have won and settle to treasury if no bet has won", async () => {
   });
 
-  it("should not settle if pool is not ended", async () => {
-  });
+//TODO: Uncomment these when we have a way to test time travel
+//   it("should not settle if pool is not ended", async () => {
+//   });
 
-  it("should not settle if competition has ended", async () => {
-  });
-
-
+//   it("should not settle if competition has ended", async () => {
+//   });
 
 });

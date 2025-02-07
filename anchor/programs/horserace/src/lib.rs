@@ -105,7 +105,7 @@ pub mod horse_race {
     }
 
     /// Settle a Pool
-    pub fn run_settle_pool<'info>(
+    pub fn run_settle_pool_by_price<'info>(
         ctx: Context<'_, '_, 'info, 'info, SettlePool<'info>>,
         competition_key: Pubkey,
         lower_bound_price: u64,

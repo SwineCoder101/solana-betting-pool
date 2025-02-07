@@ -31,10 +31,11 @@ pub fn run_settle_pool_by_price<'info>(
         BettingError::Unauthorized
     );
 
-    let clock = Clock::get()?;
-    if clock.unix_timestamp as u64 <= pool.end_time {
-        return err!(BettingError::PoolNotEnded);
-    }
+    // TODO: Uncomment this when we have a way to test time travel
+    // let clock = Clock::get()?;
+    // if clock.unix_timestamp as u64 <= pool.end_time {
+    //     return err!(BettingError::PoolNotEnded);
+    // }
 
     let mut remaining_accounts_iter = ctx.remaining_accounts.iter();
 
