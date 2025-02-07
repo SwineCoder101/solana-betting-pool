@@ -15,6 +15,7 @@ export type SetupDTO = {
     fakeAdmin: Keypair;
     program: anchor.Program<HorseRace>;
     sdkConfig: SdkConfig;
+    treasury: PublicKey;
 }
 
 export type EnvironmentSetupDTO = {
@@ -29,7 +30,7 @@ export type EnvironmentSetupDTO = {
 
 export const setupEnvironment = async function (): Promise<EnvironmentSetupDTO> {
   const provider = anchor.AnchorProvider.env();
-  const treasury = provider.wallet.publicKey;
+  const treasury = Keypair.generate().publicKey;
   anchor.setProvider(provider);
   
   // @ts-expect-error-ignore
@@ -94,7 +95,7 @@ export const getCompetitionTestData = (program) => {
 }
 
 export const setupCompetition = async function (): Promise<SetupDTO> {
-  const {fakeAdmin, program, adminKp, sdkConfig, adminKeys} = await setupEnvironment();
+  const {fakeAdmin, program, adminKp, sdkConfig, adminKeys, treasury} = await setupEnvironment();
   const {tokenA, priceFeedId, houseCutFactor, minPayoutRatio, interval, startTime, endTime, competitionHash, competitionPubkey} = getCompetitionTestData(program);
 
   // Get competition creation instruction
@@ -139,6 +140,7 @@ export const setupCompetition = async function (): Promise<SetupDTO> {
     adminKp,
     competitionPubkey,
     competitionData,
+    treasury,
     fakeAdmin,
     program,
     sdkConfig,
@@ -157,7 +159,7 @@ export const confirmTransaction = async function (signature: string, program: an
 }
 
 export const setupCompetitionWithPools = async function (): Promise<SetupDTO> {
-  const {fakeAdmin, program, sdkConfig, adminKeys, treasury, adminKp} = await setupEnvironment();
+  const { fakeAdmin, program, sdkConfig, adminKeys, treasury, adminKp} = await setupEnvironment();
   const {tokenA, priceFeedId, houseCutFactor, minPayoutRatio, interval, startTime, endTime, competitionHash, competitionPubkey} = getCompetitionTestData(program);
 
   // Get versioned transaction and pool keys
@@ -189,6 +191,7 @@ export const setupCompetitionWithPools = async function (): Promise<SetupDTO> {
     adminKp,
     competitionPubkey,
     competitionData,
+    treasury,
     fakeAdmin,
     program,
     sdkConfig,

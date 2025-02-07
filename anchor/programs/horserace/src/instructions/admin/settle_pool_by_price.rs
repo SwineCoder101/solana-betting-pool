@@ -1,5 +1,7 @@
+use anchor_lang::solana_program::log;
 use anchor_lang::{prelude::*, solana_program::system_program};
-use crate::states::BetStatus;
+use crate::errors::SettlementError;
+use crate::states::{BetStatus, Competition};
 use crate::{states::{Pool, Bet}, errors::BettingError};
 
 #[derive(Accounts)]
@@ -10,6 +12,9 @@ pub struct SettlePool<'info> {
     #[account(mut)]
     pub pool: Account<'info, Pool>,
 
+    #[account(mut)]
+    pub competition: Account<'info, Competition>,
+
     #[account(mut, address = pool.treasury)]
     pub treasury: SystemAccount<'info>,
 
@@ -19,19 +24,26 @@ pub struct SettlePool<'info> {
 
 pub fn run_settle_pool_by_price<'info>(
     ctx: Context<'_, '_, 'info, 'info, SettlePool<'info>>,
-    competition_key: Pubkey,
     lower_bound_price: u64,
     upper_bound_price: u64,
 ) -> Result<()> {
+
     let pool = &mut ctx.accounts.pool;
 
+    let competition_admins = &ctx.accounts.competition.admin;
+    let competition_key = ctx.accounts.competition.key();
+
     require_keys_eq!(
-        ctx.accounts.authority.key(),
         competition_key,
-        BettingError::Unauthorized
+        pool.competition_key,
+        SettlementError::InvalidCompetitionAccount
     );
 
-    // TODO: Uncomment this when we have a way to test time travel
+    if !competition_admins.contains(&ctx.accounts.authority.key()) {
+        return err!(SettlementError::Unauthorized);
+    }
+
+    // TODO: Uncomment this when we have a way to test with time travel
     // let clock = Clock::get()?;
     // if clock.unix_timestamp as u64 <= pool.end_time {
     //     return err!(BettingError::PoolNotEnded);

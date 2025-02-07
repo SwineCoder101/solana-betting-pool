@@ -1,15 +1,19 @@
+import { BN } from '@coral-xyz/anchor';
+import { expect } from '@jest/globals';
 import { Keypair, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
-import { getBetAccountsForPool, getBetAccountsForUser } from "../sdk/src";
+import { getActiveBetAccountsForPool, getBetAccountsForPool, getBetAccountsForUser } from "../sdk/src";
+import { settlePoolByPrice } from "../sdk/src/instructions/admin/settle-pool-by-price";
 import { setupCompetitionWithPools, SetupDTO } from "./common-setup";
-import { createUserWithFunds, executeCreateBet } from "./test-utils";
-import { createBet } from "../sdk/src/instructions/user/create-bet";
+import { executeCreateBet, signAndSendVTx } from "./test-utils";
 
-describe.skip("Bets", () => {
+describe("settlements with bets", () => {
   let setupDto: SetupDTO;
   let program, poolKeys: PublicKey[], competitionPubkey, connection;
   let signer: Keypair;
+  let treasuryKey: PublicKey;
   const poolsToBetCountMap = new Map<PublicKey, number>();
-  let numberOfBetsForSigner: number; 
+  let numberOfBetsForSigner: number;
+
 
   beforeAll(async () => {
     setupDto = await setupCompetitionWithPools();
@@ -18,8 +22,9 @@ describe.skip("Bets", () => {
     competitionPubkey = setupDto.competitionPubkey;
     connection = setupDto.sdkConfig.connection;
     numberOfBetsForSigner = 0;
-
-    signer = await createUserWithFunds(connection);
+    treasuryKey = setupDto.treasury;
+    signer = setupDto.adminKp;
+    // signer = await createUserWithFunds(connection);
 
     // Initialize bet counts for each pool
     for (const poolKey of poolKeys) {
@@ -30,22 +35,100 @@ describe.skip("Bets", () => {
   }, 30000);
 
   it("should settle all funds from pool to treasury if no bet has won", async () => {
-    const amount = LAMPORTS_PER_SOL;
+    const amount = new BN(5 * LAMPORTS_PER_SOL);
+    const betLowerBoundPrice = 50;
+    const betUpperBoundPrice = 150;
+    const oracleLowerBoundPrice = 200; // Outside bet range
+    const oracleUpperBoundPrice = 250; // Outside bet range
+
+    const poolKey = poolKeys[0];
+    
+    // Get initial balances
+    const userBalanceBefore = await connection.getBalance(signer.publicKey);
+    const treasuryBalanceBefore = await connection.getBalance(treasuryKey);
+
+    console.log('treasuryKey', treasuryKey.toBase58());
+    console.log('signer', signer.publicKey.toBase58());
+
+    console.log('treasuryBalanceBefore', treasuryBalanceBefore/LAMPORTS_PER_SOL);
+    console.log('userBalanceBefore', userBalanceBefore/LAMPORTS_PER_SOL);
+
+    // Get pool balance before bet creation
+    const poolBalanceBefore = await connection.getBalance(poolKey);
+
+    // Create bet
+    await executeCreateBet(
+      program, 
+      signer, 
+      amount.toNumber(), 
+      betLowerBoundPrice, 
+      betUpperBoundPrice, 
+      poolKey, 
+      competitionPubkey, 
+      signer
+    );
+
+    // Check pool received bet amount
+    const poolBalanceAfterBet = await connection.getBalance(poolKey);
+    expect(poolBalanceAfterBet - poolBalanceBefore).toBe(amount.toNumber());
+
+    // Settle pool
+    const settleTx = await settlePoolByPrice(
+      program, 
+      signer.publicKey, 
+      poolKey, 
+      oracleLowerBoundPrice, 
+      oracleUpperBoundPrice
+    );
+    await signAndSendVTx(settleTx, signer, connection);
+
+    const userBalanceAfter = await connection.getBalance(signer.publicKey);
+    const treasuryBalanceAfter = await connection.getBalance(treasuryKey);
+    const poolBalanceAfter = await connection.getBalance(poolKey);
+
+    console.log('treasuryBalanceAfter', treasuryBalanceAfter/LAMPORTS_PER_SOL);
+    console.log('userBalanceAfter', userBalanceAfter/LAMPORTS_PER_SOL);
+    console.log('poolBalanceAfter', poolBalanceAfter/LAMPORTS_PER_SOL);
+
+    const betAccounts = await getActiveBetAccountsForPool(program, poolKey);
+    expect(betAccounts.length).toBeGreaterThan(0);
+
+    const userBalanceDiff = userBalanceBefore - userBalanceAfter;
+    expect(userBalanceDiff).toBeGreaterThanOrEqual(amount.toNumber());
+    expect(userBalanceDiff).toBeLessThan(amount.toNumber() + 0.1 * LAMPORTS_PER_SOL);
+
+    expect(treasuryBalanceAfter).toBeGreaterThan(treasuryBalanceBefore + amount.toNumber());
+
+    expect(poolBalanceAfter).toBe(0);
+  });
+
+  it.skip("should settle to user if bet has won", async () => {
+    const amount = new BN(1 * LAMPORTS_PER_SOL);
     const lowerBoundPrice = 50;
     const upperBoundPrice = 150;
     const poolKey = poolKeys[0];
 
-    await executeCreateBet(program, signer, amount, lowerBoundPrice, upperBoundPrice, poolKey, competitionPubkey, signer);
+    const userBalanceBefore = await connection.getBalance(signer.publicKey);
+    const treasuryBalanceBefore = await connection.getBalance(treasuryKey);
 
-  });
+    await executeCreateBet(program, signer, amount.toNumber(), lowerBoundPrice, upperBoundPrice, poolKey, competitionPubkey, signer);
 
-  it("should settle to user if bet has won", async () => {
-  });
+    //settle pool by price
+    const settleTx = await settlePoolByPrice(program, signer.publicKey, poolKey, lowerBoundPrice, upperBoundPrice);
+    await signAndSendVTx(settleTx, signer, connection);
 
-  it("should settle to all users if all bets have won", async () => {
-  });
+    //get bet accounts for pool
+    const betAccounts = await getActiveBetAccountsForPool(program, poolKey);
+    expect(betAccounts.length).toBeGreaterThan(0);
 
-  it("should settle to users if some bets have won and settle to treasury if no bet has won", async () => {
+    //check balance of treasury
+    const userBalanceAfter = await connection.getBalance(signer.publicKey);
+    const treasuryBalanceAfter = await connection.getBalance(treasuryKey);
+
+    expect(userBalanceBefore - userBalanceAfter).toBeGreaterThan(0);
+    expect(userBalanceBefore - userBalanceAfter).toBeLessThan(amount.toNumber());
+    expect(treasuryBalanceBefore - treasuryBalanceAfter).toBeGreaterThan(0);
+    expect(treasuryBalanceBefore - treasuryBalanceAfter).toBeLessThan(amount.toNumber());
   });
 
 //TODO: Uncomment these when we have a way to test time travel
@@ -55,4 +138,15 @@ describe.skip("Bets", () => {
 //   it("should not settle if competition has ended", async () => {
 //   });
 
+  it('should handle multiple winning bets correctly', async () => {
+    // Test with multiple winning bets and verify prize distribution
+  });
+
+  it('should handle zero bets in pool', async () => {
+    // Test settling an empty pool
+  });
+
+  it('should prevent double settlement', async () => {
+    // Test attempting to settle same pool twice
+  });
 });

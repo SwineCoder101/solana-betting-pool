@@ -107,11 +107,10 @@ pub mod horse_race {
     /// Settle a Pool
     pub fn run_settle_pool_by_price<'info>(
         ctx: Context<'_, '_, 'info, 'info, SettlePool<'info>>,
-        competition_key: Pubkey,
         lower_bound_price: u64,
         upper_bound_price: u64,
     ) -> Result<()> {
-        instructions::admin::settle_pool_by_price::run_settle_pool_by_price(ctx, competition_key, lower_bound_price, upper_bound_price)
+        instructions::admin::settle_pool_by_price::run_settle_pool_by_price(ctx, lower_bound_price, upper_bound_price)
     }
 
     /// Update a Pool Price Feed

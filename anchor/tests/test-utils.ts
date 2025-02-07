@@ -78,7 +78,7 @@ export async function signAndSendVTx(
   signer: Keypair,
   connection: Connection
 ): Promise<string> {
-  const { blockhash } = await connection.getLatestBlockhash();
+  const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
 
   const message = vTx.message;
   const newMessage = new web3.TransactionMessage({
@@ -109,7 +109,13 @@ export async function signAndSendVTx(
       throw new Error(`Simulation failed: ${errorLogs}`);
     }
 
-    return await connection.sendTransaction(newTx);
+    const signature = await connection.sendTransaction(newTx);
+    await connection.confirmTransaction({
+      signature,
+      blockhash,
+      lastValidBlockHeight
+    });
+    return signature;
   } catch (error) {
     console.error('Transaction failed:', error);
     throw new Error(`Submission failed: ${error.message}`);

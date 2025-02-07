@@ -20,6 +20,18 @@ pub enum BettingError {
 }
 
 #[error_code]
+pub enum SettlementError {
+    #[msg("Unauthorized: Not a competition admin.")]
+    Unauthorized,
+    #[msg("Pool has ended")]
+    PoolEnded,
+    #[msg("Pool has not ended yet")]
+    PoolNotEnded,
+    #[msg("Invalid competition account, cannot settle pool")]
+    InvalidCompetitionAccount,
+}
+
+#[error_code]
 pub enum PoolError {
     #[msg("invalid pool id provided, please check the latest pool id")]
     InvalidPoolId,
