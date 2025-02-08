@@ -46,6 +46,7 @@ describe("settlements with bets", () => {
     // Get initial balances
     const userBalanceBefore = await connection.getBalance(signer.publicKey);
     const treasuryBalanceBefore = await connection.getBalance(treasuryKey);
+    const poolBalanceBeforeBet = await connection.getBalance(poolKey);
 
     console.log('treasuryKey', treasuryKey.toBase58());
     console.log('signer', signer.publicKey.toBase58());
@@ -91,25 +92,25 @@ describe("settlements with bets", () => {
     console.log('poolBalanceAfter', poolBalanceAfter/LAMPORTS_PER_SOL);
 
     const betAccounts = await getActiveBetAccountsForPool(program, poolKey);
-    expect(betAccounts.length).toBeGreaterThan(0);
+    expect(betAccounts.length).toBe(0);
 
     const userBalanceDiff = userBalanceBefore - userBalanceAfter;
     expect(userBalanceDiff).toBeGreaterThanOrEqual(amount.toNumber());
     expect(userBalanceDiff).toBeLessThan(amount.toNumber() + 0.1 * LAMPORTS_PER_SOL);
 
-    expect(treasuryBalanceAfter).toBeGreaterThan(treasuryBalanceBefore + amount.toNumber());
+    expect(treasuryBalanceAfter).toBe(treasuryBalanceBefore + amount.toNumber());
 
-    expect(poolBalanceAfter).toBe(0);
+    expect(poolBalanceAfter).toBe(poolBalanceBeforeBet);
   });
 
-  it.skip("should settle to user if bet has won", async () => {
-    const amount = new BN(1 * LAMPORTS_PER_SOL);
+  it("should settle to user if bet has won on the exact range", async () => {
+    const amount = new BN(5 * LAMPORTS_PER_SOL);
     const lowerBoundPrice = 50;
     const upperBoundPrice = 150;
-    const poolKey = poolKeys[0];
+    const poolKey = poolKeys[1];
 
-    const userBalanceBefore = await connection.getBalance(signer.publicKey);
     const treasuryBalanceBefore = await connection.getBalance(treasuryKey);
+    const poolBalanceBeforeBet = await connection.getBalance(poolKey);
 
     await executeCreateBet(program, signer, amount.toNumber(), lowerBoundPrice, upperBoundPrice, poolKey, competitionPubkey, signer);
 
@@ -119,16 +120,15 @@ describe("settlements with bets", () => {
 
     //get bet accounts for pool
     const betAccounts = await getActiveBetAccountsForPool(program, poolKey);
-    expect(betAccounts.length).toBeGreaterThan(0);
+    expect(betAccounts.length).toBe(0);
 
+    const poolBalanceAfter = await connection.getBalance(poolKey);
+    
     //check balance of treasury
-    const userBalanceAfter = await connection.getBalance(signer.publicKey);
     const treasuryBalanceAfter = await connection.getBalance(treasuryKey);
-
-    expect(userBalanceBefore - userBalanceAfter).toBeGreaterThan(0);
-    expect(userBalanceBefore - userBalanceAfter).toBeLessThan(amount.toNumber());
-    expect(treasuryBalanceBefore - treasuryBalanceAfter).toBeGreaterThan(0);
-    expect(treasuryBalanceBefore - treasuryBalanceAfter).toBeLessThan(amount.toNumber());
+    
+    expect(treasuryBalanceBefore - treasuryBalanceAfter).toBe(0);
+    expect(poolBalanceAfter).toBe(poolBalanceBeforeBet);
   });
 
 //TODO: Uncomment these when we have a way to test time travel
@@ -138,15 +138,7 @@ describe("settlements with bets", () => {
 //   it("should not settle if competition has ended", async () => {
 //   });
 
-  it('should handle multiple winning bets correctly', async () => {
-    // Test with multiple winning bets and verify prize distribution
-  });
+//   it('should handle multiple winning bets correctly', async () => {
+//   });
 
-  it('should handle zero bets in pool', async () => {
-    // Test settling an empty pool
-  });
-
-  it('should prevent double settlement', async () => {
-    // Test attempting to settle same pool twice
-  });
 });

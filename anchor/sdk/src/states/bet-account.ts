@@ -158,7 +158,7 @@ export async function getBetAccountsForPool(
     publicKey: account.publicKey.toBase58()
   }));
 }
- 
+
 export async function getAllBetDataByUser(program: Program<HorseRace>, user: PublicKey): Promise<BetData[]> {
   const bets = await program.account.bet.all();
   return bets.filter((bet) => bet.account.user.toBase58() === user.toBase58()).map((bet) => convertProgramToBetData(bet.account));
