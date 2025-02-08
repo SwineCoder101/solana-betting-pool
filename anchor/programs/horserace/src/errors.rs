@@ -15,6 +15,20 @@ pub enum BettingError {
     CompetitionEnded,
     #[msg("Pool has ended")]
     PoolEnded,
+    #[msg("Invalid user account")]
+    InvalidUserAccount,
+}
+
+#[error_code]
+pub enum SettlementError {
+    #[msg("Unauthorized: Not a competition admin.")]
+    Unauthorized,
+    #[msg("Pool has ended")]
+    PoolEnded,
+    #[msg("Pool has not ended yet")]
+    PoolNotEnded,
+    #[msg("Invalid competition account, cannot settle pool")]
+    InvalidCompetitionAccount,
 }
 
 #[error_code]
@@ -43,4 +57,18 @@ pub enum OracleError {
     OracleInactive,
     #[msg("Oracle is outside the time range.")]
     OutsideOracleTimeRange,
+}
+
+#[error_code]
+pub enum TreasuryError {
+    #[msg("Too many admins provided")]
+    TooManyAdmins,
+    #[msg("Invalid signature threshold")]
+    InvalidSignatureThreshold,
+    #[msg("Insufficient funds in treasury")]
+    InsufficientFunds,
+    #[msg("Arithmetic overflow")]
+    Overflow,
+    #[msg("Unauthorized")]
+    Unauthorized,
 }

@@ -105,14 +105,10 @@ export async function getBetAccountsForUser(
   // Get all bet accounts
   const accounts = await program.account.bet.all();
   
-  console.log('Total bet accounts:', accounts.length);
-  console.log('Looking for user:', userPubkey.toBase58());
-
   // Filter accounts where user matches
   const betAccounts = accounts.filter((account) => {
     const accountUser = account.account.user.toBase58();
     const matches = accountUser === userPubkey.toBase58();
-    console.log('Comparing account user:', accountUser, 'with target:', userPubkey.toBase58(), 'matches:', matches);
     return matches;
   });
 
@@ -123,30 +119,32 @@ export async function getBetAccountsForUser(
 }
 
 export async function getAllBetAccounts(program: Program<HorseRace>): Promise<BetData[]> {
-  console.log("Getting all bet accounts");
   const accounts = await program.account.bet.all();
   return accounts.map(account => convertProgramToBetData(account.account));
 }
 
+export async function getActiveBetAccountsForPool(
+  program: Program<HorseRace>,
+  poolPubkey: PublicKey,
+): Promise<BetData[]> {
+  const accounts = await getBetAccountsForPool(program, poolPubkey);
+  return accounts.filter(account => account.status === BetStatus.Active);
+}
+
 export async function getBetAccountsForPool(
   program: Program<HorseRace>,
-  poolPubkey: PublicKey
+  poolPubkey: PublicKey,
 ): Promise<BetData[]> {
   // Get all bet accounts
   const accounts = await program.account.bet.all();
-  
-  console.log('Total bet accounts:', accounts.length);
-  console.log('Looking for pool:', poolPubkey.toBase58());
   
   // Filter accounts where poolKey matches
   const betAccounts = accounts.filter((account) => {
     const accountPoolKey = account.account.poolKey.toBase58();
     const matches = accountPoolKey === poolPubkey.toBase58();
-    console.log('Comparing account pool key:', accountPoolKey, 'with target:', poolPubkey.toBase58(), 'matches:', matches);
     return matches;
   });
 
-  console.log('Found bet accounts for pool:', betAccounts.length);
   betAccounts.forEach(acc => {
     console.log('Account:', {
       pubkey: acc.publicKey.toBase58(),
@@ -160,7 +158,7 @@ export async function getBetAccountsForPool(
     publicKey: account.publicKey.toBase58()
   }));
 }
- 
+
 export async function getAllBetDataByUser(program: Program<HorseRace>, user: PublicKey): Promise<BetData[]> {
   const bets = await program.account.bet.all();
   return bets.filter((bet) => bet.account.user.toBase58() === user.toBase58()).map((bet) => convertProgramToBetData(bet.account));

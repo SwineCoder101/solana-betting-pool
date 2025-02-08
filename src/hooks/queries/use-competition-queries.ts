@@ -35,6 +35,7 @@ export function useAllCompetitions() {
       console.log("Fetching competition accounts...");
       const results = await getAllCompetitions(program);
       console.log("Competition accounts fetched:", results.length);
+      console.log("competition: ", results[0]);
       return results;
     },
     enabled: !!program,
@@ -50,6 +51,7 @@ export function useActiveCompetitions() {
     queryFn: async (): Promise<CompetitionData[]> => {
       if (!program) return [];
       const competitions = await getAllCompetitions(program);
+      console.log("competition: ", competitions[0]);
       const now = Math.floor(Date.now() / 1000);
       return competitions.filter(comp => 
         comp.startTime <= now && comp.endTime >= now

@@ -19,7 +19,6 @@ export function useAnchorProgram(): ProgramResult {
   const { wallets } = useSolanaWallets();
 
   const wallet = wallets.filter(wallet => wallet.type === "solana")[0];
-  console.log("using wallet: ", wallet);
   
   const connection = useMemo(() => new Connection(
     process.env.VITE_SOLANA_RPC_URL || 'https://api.devnet.solana.com'
@@ -43,7 +42,6 @@ export function useAnchorProgram(): ProgramResult {
   }, [wallet]);
 
   const provider = useMemo(() => {
-    console.log("creating provider with signer: ", signer);
     if (!signer) {
       console.log("No signer available");
       return null;
@@ -56,7 +54,6 @@ export function useAnchorProgram(): ProgramResult {
   }, [connection, signer]);
 
   const program = useMemo(() => {
-    console.log("creating program with provider: ", provider);
     if (!provider) {
       console.log("No provider available");
       return null;
@@ -66,7 +63,6 @@ export function useAnchorProgram(): ProgramResult {
         PROGRAM_IDL,
         provider
       );
-      console.log("Program created successfully");
       return prog;
     } catch (error) {
       console.error('Error creating program:', error);

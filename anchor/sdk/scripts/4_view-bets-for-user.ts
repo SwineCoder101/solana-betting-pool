@@ -1,14 +1,9 @@
 import * as anchor from '@coral-xyz/anchor';
 import NodeWallet from '@coral-xyz/anchor/dist/cjs/nodewallet';
-import { Connection, Keypair, PublicKey } from '@solana/web3.js';
+import { Connection, Keypair } from '@solana/web3.js';
 import dotenv from 'dotenv';
 import fs from 'fs';
 import { HorseRace } from '../src';
-import { createBetEntry, CreateBetParams } from '../src/instructions/user/create-bet';
-import {
-    confirmTransaction,
-    signAndSendVTx
-} from './utils';
 
 dotenv.config();
 

@@ -72,6 +72,7 @@ export function useAllPools() {
       }
       console.log("Fetching pool accounts...");
       const results = await getAllPools(program);
+      console.log("pool: ", results[0]);
       console.log("Pool accounts fetched:", results.length);
       return results;
     },

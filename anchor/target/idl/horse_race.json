@@ -302,9 +302,6 @@
     },
     {
       "name": "run_create_pool_oracle_transformer",
-      "docs": [
-        "Create a Pool Oracle Transformer"
-      ],
       "discriminator": [
         200,
         65,
@@ -378,25 +375,51 @@
       ]
     },
     {
-      "name": "run_settle_pool",
+      "name": "run_settle_pool_by_price",
       "docs": [
         "Settle a Pool"
       ],
       "discriminator": [
-        96,
-        137,
-        173,
-        253,
-        147,
-        165,
-        192,
-        218
+        171,
+        89,
+        52,
+        200,
+        177,
+        251,
+        136,
+        83
       ],
-      "accounts": [],
+      "accounts": [
+        {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "pool",
+          "writable": true
+        },
+        {
+          "name": "competition",
+          "writable": true
+        },
+        {
+          "name": "treasury",
+          "writable": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
       "args": [
         {
-          "name": "competition_key",
-          "type": "pubkey"
+          "name": "lower_bound_price",
+          "type": "u64"
+        },
+        {
+          "name": "upper_bound_price",
+          "type": "u64"
         }
       ]
     },
@@ -591,13 +614,8 @@
   "errors": [
     {
       "code": 6000,
-      "name": "InvalidTimeRange",
-      "msg": "Invalid time range."
-    },
-    {
-      "code": 6001,
-      "name": "InvalidCompetitionId",
-      "msg": "Invalid competition id provided, please check the latest competition id"
+      "name": "Unauthorized",
+      "msg": "Unauthorized: Not a whitelisted admin or deployer."
     }
   ],
   "types": [

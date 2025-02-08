@@ -98,7 +98,6 @@ export async function createCompetitionWithPools(
   const poolCount = Math.floor((endTime - startTime) / interval); // Correct calculation
   const poolInterval = interval;
 
-  console.log('poolCount:', poolCount);
   
   const poolConfigs = Array.from({ length: poolCount }, (_, i) => ({
     poolHash: web3.Keypair.generate().publicKey,
@@ -106,7 +105,6 @@ export async function createCompetitionWithPools(
     endTime: startTime + ((i + 1) * poolInterval)
   }));
 
-  console.log('competitionPda:', competitionPda.toBase58());
 
   // Create pool transactions
   const poolTxResponses = await Promise.all(

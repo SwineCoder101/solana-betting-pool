@@ -1,5 +1,5 @@
 import * as anchor from "@coral-xyz/anchor";
-import { web3 } from "@coral-xyz/anchor";
+import { Program, web3 } from "@coral-xyz/anchor";
 import * as borsh from "@coral-xyz/borsh";
 import {
     Account,
@@ -15,6 +15,8 @@ import {
     Transaction,
     VersionedTransaction
 } from "@solana/web3.js";
+import { createBet } from "../sdk/src/instructions/user/create-bet";
+import { HorseRace } from "../sdk/src";
 
 export const loggingOn = true; //Enable / disable logging
 // const program = anchor.workspace.MemePrice as Program<MemePrice>;
@@ -76,7 +78,7 @@ export async function signAndSendVTx(
   signer: Keypair,
   connection: Connection
 ): Promise<string> {
-  const { blockhash } = await connection.getLatestBlockhash();
+  const { blockhash, lastValidBlockHeight } = await connection.getLatestBlockhash();
 
   const message = vTx.message;
   const newMessage = new web3.TransactionMessage({
@@ -107,7 +109,13 @@ export async function signAndSendVTx(
       throw new Error(`Simulation failed: ${errorLogs}`);
     }
 
-    return await connection.sendTransaction(newTx);
+    const signature = await connection.sendTransaction(newTx);
+    await connection.confirmTransaction({
+      signature,
+      blockhash,
+      lastValidBlockHeight
+    });
+    return signature;
   } catch (error) {
     console.error('Transaction failed:', error);
     throw new Error(`Submission failed: ${error.message}`);
@@ -155,5 +163,21 @@ export async function sendAndConfirmTx(
 ): Promise<string> {
   return await provider.sendAndConfirm(tx, signers);
 }
-  
+
+export async function executeCreateBet(
+  program: Program<HorseRace>,
+  user: Keypair,
+  amount: number,
+  lowerBoundPrice: number, 
+  upperBoundPrice: number, 
+  poolKey: PublicKey,
+  competitionPubkey: PublicKey,
+  signer: Signer) {
+    const vtx = await createBet(program, user.publicKey, amount, lowerBoundPrice, upperBoundPrice, poolKey, competitionPubkey);
+    vtx.sign([signer]);
+    const signature = await program.provider.connection.sendTransaction(vtx);
+    await program.provider.connection.confirmTransaction(signature, 'confirmed');
+  }
+
+
   
