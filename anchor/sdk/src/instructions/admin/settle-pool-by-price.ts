@@ -10,7 +10,6 @@ export async function settlePoolByPrice(
   poolKey: PublicKey,
   lowerBoundPrice: number,
   upperBoundPrice: number,
-
 ): Promise<VersionedTransaction> {
 
   const poolAccount = await program.account.pool.fetch(poolKey);

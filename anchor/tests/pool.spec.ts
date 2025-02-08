@@ -4,7 +4,7 @@ import { createPool } from '../sdk/src/instructions/admin/create-pool';
 import { setupEnvironment } from './common-setup';
 import { getVersionTxFromInstructions } from '../sdk/src/utils';
 
-describe.skip("Pool", () => {
+describe("Pool", () => {
 
   const competitionKey = Keypair.generate().publicKey;
   const treasury = Keypair.generate().publicKey;
