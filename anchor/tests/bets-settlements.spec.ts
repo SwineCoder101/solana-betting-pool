@@ -1,5 +1,4 @@
 import { BN } from '@coral-xyz/anchor';
-import { expect } from '@jest/globals';
 import { Keypair, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { getActiveBetAccountsForPool, getBetAccountsForPool, getBetAccountsForUser } from "../sdk/src";
 import { settlePoolByPrice } from "../sdk/src/instructions/admin/settle-pool-by-price";
