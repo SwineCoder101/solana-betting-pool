@@ -60,7 +60,7 @@ const params : CompetitionPoolParams = {
   interval: 30000,
   startTime: 1767225720,
   endTime: 1767225720,
-  treasury: payer.publicKey,
+  treasury: new PublicKey('ES28kowUxgJ9HiwENF2Jh8fJJZSdia1qwM4PS4TWMcEP'),
 }
 
 console.log('admin payer: ', payer.publicKey.toBase58());

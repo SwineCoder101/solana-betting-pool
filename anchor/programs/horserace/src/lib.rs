@@ -8,7 +8,7 @@ pub mod utils;
 
 use instructions::*;
 
-declare_id!("3U8ZsW8cd3GNcu69AhksaNEoeBCh8sHywvCHbm7mxaHz");
+declare_id!("BSKPMTGPrLXDdrHBQSBhH33dqPNDtyTcuMh8BG9Ce1aa");
 
 #[program]
 pub mod horse_race {

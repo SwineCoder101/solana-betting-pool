@@ -1,14 +1,17 @@
 import * as anchor from '@coral-xyz/anchor';
 import NodeWallet from '@coral-xyz/anchor/dist/cjs/nodewallet';
-import { Connection, Keypair, PublicKey } from '@solana/web3.js';
+import { Connection, Keypair, LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js';
 import dotenv from 'dotenv';
 import fs from 'fs';
-import { HorseRace } from '../src';
+import { getAllBetAccounts, getBetAccountsForPool, HorseRace } from '../src';
 import { settlePoolByPrice } from '../src/instructions/admin/settle-pool-by-price';
 import {
     confirmTransaction,
+    getCompetitionKey,
+    getFirstPoolFromCompetition,
     signAndSendVTx
 } from './utils';
+import { PRICE_RANGE_CONFIG } from './config';
 
 dotenv.config();
 
@@ -37,20 +40,34 @@ const program = anchor.workspace.HorseRace as anchor.Program<HorseRace>;
 // Configuration - Update these values according to your test scenario
 const SETTLE_CONFIG = {
   poolKey: new PublicKey('6hnTNibVauiQRJASs45BqHk6JWqsp6UwV4ebap3eaYi1'),
-  lowerBoundPrice: 0,
-  upperBoundPrice: 0
+  lowerBoundPrice: PRICE_RANGE_CONFIG.lowerBoundPrice,
+  upperBoundPrice: PRICE_RANGE_CONFIG.upperBoundPrice,
 };
 
 async function main() {
   try {
+
+    const competitionKey = await getCompetitionKey(program);
+    const poolKey = await getFirstPoolFromCompetition(program, competitionKey);
+
+    console.log('competitionKey', competitionKey);
+    console.log('poolKey', poolKey);
+
+    SETTLE_CONFIG.poolKey = poolKey;
+
     // Fetch pool state
     const poolAccount = await program.account.pool.fetch(SETTLE_CONFIG.poolKey);
+
+
+    const userBalanceBefore = await connection.getBalance(payer.publicKey);
+    const treasuryBalanceBefore = await connection.getBalance(poolAccount.treasury);
+    const poolBalanceBefore = await connection.getBalance(SETTLE_CONFIG.poolKey);
     
     // Settlement validation checks
     console.log('Pool State Before Settlement:');
     console.log('- Total Balance:', await connection.getBalance(SETTLE_CONFIG.poolKey));
-    console.log('- Competition:', poolAccount.competitionKey.toString());
-    console.log('- Treasury:', poolAccount.treasury.toString());
+    console.log('- Competition:', poolAccount.competitionKey.toBase58());
+    console.log('- Treasury:', poolAccount.treasury.toBase58());
 
     console.log('program', program.methods);
 
@@ -62,18 +79,45 @@ async function main() {
       SETTLE_CONFIG.lowerBoundPrice,
       SETTLE_CONFIG.upperBoundPrice
     );
+    
+
+    const userBalanceAfter = await connection.getBalance(payer.publicKey);
+    const poolBalanceAfter = await connection.getBalance(SETTLE_CONFIG.poolKey);
+    const treasuryBalanceAfter = await connection.getBalance(poolAccount.treasury);
+
+
+
 
     // Send and confirm transaction
     const settleSig = await signAndSendVTx(settleTx, payer, connection);
     await confirmTransaction(settleSig, program);
 
     // Post-settlement checks
-    console.log('\nPool State After Settlement:');
-    console.log('- Total Balance:', await connection.getBalance(SETTLE_CONFIG.poolKey));
     
+    console.log('- Total Balance:', await connection.getBalance(SETTLE_CONFIG.poolKey));
+
+    // Display all bets
+    const bets = await getAllBetAccounts(program);
+    console.log('Bets:', bets);
+
+    // Display balances before and after
+
+    console.log('-------BALANCES BEFORE--------');
+    
+    console.log('User Balance Before:', userBalanceBefore / LAMPORTS_PER_SOL);
+    console.log('Pool Balance Before:', poolBalanceBefore / LAMPORTS_PER_SOL);
+    console.log('Treasury Balance Before:', treasuryBalanceBefore / LAMPORTS_PER_SOL);
+
+    console.log('-------BALANCES AFTER--------');
+    
+    console.log('User Balance After:', userBalanceAfter / LAMPORTS_PER_SOL);
+    console.log('Pool Balance After:', poolBalanceAfter / LAMPORTS_PER_SOL);
+    console.log('Treasury Balance After:', treasuryBalanceAfter / LAMPORTS_PER_SOL);
+
     // Verify bet states
-    const updatedPool = await program.account.pool.fetch(SETTLE_CONFIG.poolKey);
-    // console.log('- Settled Bets Count:', updatedPool.settledBetsCount.toString());
+    const betAccounts = await getBetAccountsForPool(program, SETTLE_CONFIG.poolKey);
+
+    console.log('betAccounts', betAccounts);
 
   } catch (error) {
     console.error('Settlement Error:', error);

@@ -72,6 +72,15 @@ async function main() {
   const competitions = await program.account.competition.all();
   const pools = await program.account.pool.all();
 
+  if (competitions.length === 0) {
+    console.log('No competitions found');
+    return;
+  }
+
+  if (pools.length === 0) {
+    console.log('No pools found');
+    return;
+  }
   // Create a Map to store pools grouped by competition
   const poolCompetitionMapping = new Map<string, Map<number, PublicKey>>();
 

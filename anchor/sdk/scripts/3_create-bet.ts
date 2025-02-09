@@ -1,13 +1,16 @@
 import * as anchor from '@coral-xyz/anchor';
 import NodeWallet from '@coral-xyz/anchor/dist/cjs/nodewallet';
-import { Connection, Keypair, PublicKey } from '@solana/web3.js';
+import { Connection, Keypair, LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js';
 import dotenv from 'dotenv';
 import fs from 'fs';
 import { HorseRace } from '../src';
 import { createBetEntry, CreateBetParams } from '../src/instructions/user/create-bet';
+import { BET_AMOUNT_0_2, PRICE_RANGE_CONFIG } from './config';
 import {
-    confirmTransaction,
-    signAndSendVTx
+  confirmTransaction,
+  getCompetitionKey,
+  getFirstPoolFromCompetition,
+  signAndSendVTx
 } from './utils';
 
 dotenv.config();
@@ -46,16 +49,15 @@ anchor.setProvider(provider);
 
 const program = anchor.workspace.HorseRace as anchor.Program<HorseRace>;
 
-
 const createBetParams : CreateBetParams = {
     user: user.publicKey,
-    amount: 1,
-    lowerBoundPrice: 100,
-    upperBoundPrice: 200,
+    amount: BET_AMOUNT_0_2,
+    lowerBoundPrice: PRICE_RANGE_CONFIG.lowerBoundPrice,
+    upperBoundPrice: PRICE_RANGE_CONFIG.upperBoundPrice,
     startTime: 1769931882,
     endTime: 1769931912,
-    competitionKey: new PublicKey('ApiSSrYLUTvhTzLNudofmRhSChx4uobviTKJtkncvxZL'),
-    poolKey: new PublicKey('6hnTNibVauiQRJASs45BqHk6JWqsp6UwV4ebap3eaYi1'),
+    competitionKey: Keypair.generate().publicKey,
+    poolKey: Keypair.generate().publicKey,
 }
 
 
@@ -65,6 +67,19 @@ async function main() {
     if (!createBetParams.poolKey) {
         throw new Error('Pool key is required');
     }
+
+  const competitionKey = await getCompetitionKey(program);
+  const poolKey = await getFirstPoolFromCompetition(program, competitionKey);
+
+  console.log('competitionKey', competitionKey.toBase58());
+  console.log('poolKey', poolKey.toBase58());
+
+  createBetParams.competitionKey = competitionKey;
+  createBetParams.poolKey = poolKey;
+
+  if (!createBetParams.poolKey) {
+    throw new Error('Pool key is required');
+  }
     
   const betTx = await createBetEntry(program, createBetParams);
 
@@ -75,8 +90,8 @@ async function main() {
 
   const poolBalanceAfter = await program.provider.connection.getBalance(new PublicKey(createBetParams.poolKey));
 
-  console.log('Pool Balance Before:', poolBalanceBefore);
-  console.log('Pool Balance After:', poolBalanceAfter);
+  console.log('Pool Balance Before:', poolBalanceBefore / LAMPORTS_PER_SOL);
+  console.log('Pool Balance After:', poolBalanceAfter / LAMPORTS_PER_SOL);
 
   } catch (error) {
     console.error('Error creating competition:', error);

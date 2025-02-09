@@ -3,7 +3,7 @@ import NodeWallet from '@coral-xyz/anchor/dist/cjs/nodewallet';
 import { Connection, Keypair } from '@solana/web3.js';
 import dotenv from 'dotenv';
 import fs from 'fs';
-import { HorseRace } from '../src';
+import { getAllBetAccounts, HorseRace } from '../src';
 
 dotenv.config();
 
@@ -45,7 +45,9 @@ const program = anchor.workspace.HorseRace as anchor.Program<HorseRace>;
 async function main() {
   try {
 
-    const bets = await program.account.bet.all();
+    console.log('program', program.programId.toBase58());
+
+    const bets = await getAllBetAccounts(program);
 
     console.log(bets);
     

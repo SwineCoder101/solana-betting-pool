@@ -13,4 +13,5 @@ test-ledger
 coverage
 sdk/lib
 sdk/scripts/.deleteme
+sdk/scripts/.deleteTreasuryWallet
 sdk/target

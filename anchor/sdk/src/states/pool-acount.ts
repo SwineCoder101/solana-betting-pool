@@ -86,9 +86,14 @@ export async function getAllPools(program: Program<HorseRace>) {
   return pools.map((pool) => convertProgramToPoolData(pool));
 }
 
+export async function getFirstPool(program: Program<HorseRace>) {
+  const pools = await getAllPools(program);
+  return pools.sort((a, b) => a.startTime - b.startTime)[0];
+}
+
 export async function getPoolAccountsFromCompetition(program: Program<HorseRace>, competitionKey: PublicKey) {
   const pools = await program.account.pool.all();
-  return pools.filter(pool => pool.account.competitionKey === competitionKey);
+  return pools.filter(pool => pool.account.competitionKey.toBase58() === competitionKey.toBase58());
 }
 
 export async function getAllPoolDataByCompetition(program: Program<HorseRace>, competition: PublicKey): Promise<PoolData[]> {

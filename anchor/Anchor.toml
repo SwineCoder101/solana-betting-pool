@@ -7,17 +7,17 @@ skip-lint = false
 
 [programs.localnet]
 # solanabettingapplication = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
-horserace = "3U8ZsW8cd3GNcu69AhksaNEoeBCh8sHywvCHbm7mxaHz"
+horserace = "BSKPMTGPrLXDdrHBQSBhH33dqPNDtyTcuMh8BG9Ce1aa"
 
 [programs.devnet]
 # solanabettingapplication = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
-horserace = "3U8ZsW8cd3GNcu69AhksaNEoeBCh8sHywvCHbm7mxaHz"
+horserace = "BSKPMTGPrLXDdrHBQSBhH33dqPNDtyTcuMh8BG9Ce1aa"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "Localnet"
+cluster = "Devnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]

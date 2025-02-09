@@ -1,7 +1,7 @@
 import * as anchor from "@coral-xyz/anchor";
-import { web3 } from "@coral-xyz/anchor";
-import { Connection, Keypair, VersionedTransaction } from "@solana/web3.js";
-import { HorseRace } from "../src";
+import { Program, web3 } from "@coral-xyz/anchor";
+import { Connection, Keypair, PublicKey, VersionedTransaction } from "@solana/web3.js";
+import { getFirstPool, getPoolAccountsFromCompetition, HorseRace } from "../src";
 import dotenv from 'dotenv';
 import fs from 'fs';
 import NodeWallet from '@coral-xyz/anchor/dist/cjs/nodewallet';
@@ -25,6 +25,17 @@ export function convertBlockTime(timestamp: number): string {
         second: '2-digit',
         timeZoneName: 'short'
     });
+}
+
+export const getCompetitionKey = async (program: Program<HorseRace>) : Promise<PublicKey> => {
+  const competitions = await program.account.competition.all();
+  console.log('competitions', competitions);
+  return competitions[competitions.length - 1].publicKey;
+}
+
+export const getFirstPoolFromCompetition = async (program: Program<HorseRace>, competitionKey: PublicKey) : Promise<PublicKey> => {
+  const pools = await getPoolAccountsFromCompetition(program, competitionKey);
+  return pools[0].publicKey;
 }
 
 export async function now(connection: Connection): Promise<number> {
