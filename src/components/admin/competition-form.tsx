@@ -1,11 +1,11 @@
 import { tokens } from "@/data/data-constants";
 import React, { useState } from "react";
 import { usePrivy } from '@privy-io/react-auth';
-import { useCreateCompetition } from "@/hooks/use-create-competition";
+import { useCreateCompetitionBackend } from "@/hooks/use-create-competition-backend";
 
 const CompetitionForm: React.FC = () => {
   const { user } = usePrivy();
-  const createCompetitionMutation = useCreateCompetition();
+  const {createCompetition } = useCreateCompetitionBackend();
   const [error, setError] = useState<string | null>(null);
   
   const [startDate, setStartDate] = useState<string>("");
@@ -32,16 +32,18 @@ const CompetitionForm: React.FC = () => {
     const startTimestamp = Math.floor(new Date(`${startDate}T${startTime}`).getTime() / 1000);
     const endTimestamp = Math.floor(new Date(`${endDate}T${endTime}`).getTime() / 1000);
 
+    console.log("interval", interval);
+
     try {
-      await createCompetitionMutation.mutateAsync({
+      await createCompetition.mutateAsync({
         tokenSymbol,
         houseCutFactor: parseFloat(houseCutFactor),
         minPayoutRatio: parseFloat(minPayoutRatio),
         interval: parseInt(interval),
         startTime: startTimestamp,
         endTime: endTimestamp,
-        adminKeys: adminKeys ? adminKeys.split('\n').filter(k => k.trim()) : undefined,
-        treasury: treasury || undefined,
+        adminKeys: adminKeys ? adminKeys.split('\n').filter(k => k.trim()) : [],
+        treasury: treasury || user.wallet.address,
       });
 
       // Reset form
@@ -49,7 +51,7 @@ const CompetitionForm: React.FC = () => {
       setStartTime("");
       setEndDate("");
       setEndTime("");
-      setInterval("300");
+      setInterval("20");
       setHouseCutFactor("5");
       setMinPayoutRatio("1.5");
       setAdminKeys("");
@@ -176,10 +178,10 @@ const CompetitionForm: React.FC = () => {
         </div>
         <button
           type="submit"
-          disabled={createCompetitionMutation.isPending}
+          disabled={createCompetition.isPending}
           className="btn bg-yellow-600 text-white hover:bg-yellow-500 mt-4"
         >
-          {createCompetitionMutation.isPending ? "Creating..." : "Create Competition"}
+          {createCompetition.isPending ? "Creating..." : "Create Competition"}
         </button>
       </form>
     </div>

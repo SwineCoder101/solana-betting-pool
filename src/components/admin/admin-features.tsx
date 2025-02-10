@@ -6,6 +6,7 @@ import BetForm from "./bet-form";
 import CompetitionDisplay from "./competition-display";
 import PoolDisplay from "./pool-display";
 import PriceFeedDisplay from "./price-feed-display";
+import CompetitionForm from "./competition-form";
 
 const AdminFeatures: React.FC = () => {
   return (
@@ -19,12 +20,11 @@ const AdminFeatures: React.FC = () => {
           </div>
         </ErrorBoundary>
 
-        {/* TODO: Decide if we want to allow admins to create competitions from the admin panel */}
-        {/* <ErrorBoundary>
+        <ErrorBoundary>
           <div className="border p-4 bg-gray-50">
             <CompetitionForm />
           </div>
-        </ErrorBoundary> */}
+        </ErrorBoundary>
 
         <ErrorBoundary>
           <div className="border p-4 bg-gray-50">
