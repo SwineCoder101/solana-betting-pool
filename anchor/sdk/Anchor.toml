@@ -6,8 +6,8 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-solanabettingapplication = "coUnmi3oBUtwtd9fjeAvSsJssXh5A5xyPbhpewyzRVF"
-horserace = "3U8ZsW8cd3GNcu69AhksaNEoeBCh8sHywvCHbm7mxaHz"
+# solanabettingapplication = "coUnmi3oBUtwtd9fjeAvSsJssXh5A5xyPbhpewyzRVF"
+horserace = "BSKPMTGPrLXDdrHBQSBhH33dqPNDtyTcuMh8BG9Ce1aa"
 
 [registry]
 url = "https://api.apr.dev"

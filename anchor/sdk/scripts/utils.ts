@@ -1,10 +1,10 @@
 import * as anchor from "@coral-xyz/anchor";
 import { Program, web3 } from "@coral-xyz/anchor";
+import NodeWallet from '@coral-xyz/anchor/dist/cjs/nodewallet';
 import { Connection, Keypair, PublicKey, VersionedTransaction } from "@solana/web3.js";
-import { getFirstPool, getPoolAccountsFromCompetition, HorseRace } from "../src";
 import dotenv from 'dotenv';
 import fs from 'fs';
-import NodeWallet from '@coral-xyz/anchor/dist/cjs/nodewallet';
+import { getPoolAccountsFromCompetition, HorseRace } from "../src";
 
 export async function addOneHour(nowTimeStamp: number) {
     return nowTimeStamp + 3600;

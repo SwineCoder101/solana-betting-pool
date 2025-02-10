@@ -6,18 +6,16 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-# solanabettingapplication = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
 horserace = "BSKPMTGPrLXDdrHBQSBhH33dqPNDtyTcuMh8BG9Ce1aa"
 
 [programs.devnet]
-# solanabettingapplication = "Fg6PaFpoGXkYsidMpWTK6W2BeZ7FEfcYkg476zPFsLnS"
 horserace = "BSKPMTGPrLXDdrHBQSBhH33dqPNDtyTcuMh8BG9Ce1aa"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "Devnet"
+cluster = "Localnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
