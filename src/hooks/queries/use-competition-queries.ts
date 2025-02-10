@@ -24,6 +24,11 @@ export function useAllCompetitions() {
   const { program } = useAnchorProgram();
   
   console.log("useAllCompetitions hook called, program state:", !!program);
+
+  if (!program) {
+    console.log("Program not available in useAllCompetitions");
+    throw new Error("Program not initialized");
+  }
   
   return useQuery({
     queryKey: ['allCompetitions'],

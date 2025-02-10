@@ -17,7 +17,7 @@ const CompetitionDisplay: React.FC = () => {
   return (
     <div>
       <h2 className="text-xl font-semibold mb-2">Live Competitions</h2>
-      <div className="p-4 bg-gray-100">
+      <div className="p-4 bg-gray-100 max-h-[500px] overflow-y-auto">
         {competitions?.map((competition, index) => (
           <div 
             key={`${competition.competitionKey}-${index}`} 
