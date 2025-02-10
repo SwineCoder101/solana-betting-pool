@@ -7,6 +7,7 @@ import CompetitionDisplay from "./competition-display";
 import PoolDisplay from "./pool-display";
 import PriceFeedDisplay from "./price-feed-display";
 import CompetitionForm from "./competition-form";
+import SettlementForm from "./settlement-form";
 
 const AdminFeatures: React.FC = () => {
   return (
@@ -41,6 +42,12 @@ const AdminFeatures: React.FC = () => {
         <ErrorBoundary>
           <div className="border p-4 bg-gray-50">
             <BetDisplay />
+          </div>
+        </ErrorBoundary>
+
+        <ErrorBoundary>
+          <div className="border p-4 bg-gray-50">
+            <SettlementForm/>
           </div>
         </ErrorBoundary>
 

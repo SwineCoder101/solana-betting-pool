@@ -1,6 +1,7 @@
 import { useAllBets } from "@/hooks/queries";
 import { shortenAddress } from "@/lib/utils";
 import { LAMPORTS_PER_SOL } from "@solana/web3.js";
+import React from "react";
 
 const BetDisplay: React.FC = () => {
   const { data: bets, isLoading, error } = useAllBets();
@@ -17,7 +18,7 @@ const BetDisplay: React.FC = () => {
   return (
     <div>
       <h2 className="text-xl font-semibold mb-2">Live Bets</h2>
-      <div className="p-4 bg-gray-100">
+      <div className="p-4 bg-gray-100 max-h-[500px] overflow-y-auto">
         {bets?.map((bet, index) => (
           <div 
             key={`${bet.publicKey.toString()}-${index}`} 

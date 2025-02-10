@@ -17,7 +17,7 @@ const PoolDisplay: React.FC = () => {
   return (
     <div>
       <h2 className="text-xl font-semibold mb-2">Live Pools</h2>
-      <div className="p-4 bg-gray-100">
+      <div className="p-4 bg-gray-100 max-h-[500px] overflow-y-auto">
         {pools?.map((pool, index) => (
           <div 
             key={`${pool.poolKey}-${index}`} 
