@@ -52,14 +52,15 @@ const SettlementForm: React.FC = () => {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
+      <h2 className="text-xl font-semibold mb-2">Force Settlement</h2>
       <div>
-        <label className="block text-sm font-medium text-gray-700">
+        <label className="block mb-1">
           Select Pool
         </label>
         <select
           value={selectedPool}
           onChange={(e) => setSelectedPool(e.target.value)}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+          className="input input-bordered w-full bg-gray-200"
         >
           <option value="">Select a pool</option>
           {poolOptions.map((pool) => {
@@ -78,26 +79,26 @@ const SettlementForm: React.FC = () => {
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700">
+        <label className="block mb-1">
           Lower Bound Price
         </label>
         <input
           type="number"
           value={lowerBoundPrice}
           onChange={(e) => setLowerBoundPrice(e.target.value)}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+          className="input input-bordered w-full bg-gray-200"
         />
       </div>
 
       <div>
-        <label className="block text-sm font-medium text-gray-700">
+        <label className="block mb-1">
           Upper Bound Price
         </label>
         <input
           type="number"
           value={upperBoundPrice}
           onChange={(e) => setUpperBoundPrice(e.target.value)}
-          className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500"
+          className="input input-bordered w-full bg-gray-200"
         />
       </div>
 
