@@ -19,7 +19,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
         appId={privyAppId}
         clientId={privyClientId}
         config={{
-          loginMethods: ['wallet'],
+          loginMethods: ['wallet','telegram'],
           appearance: {
             theme: 'light',
             accentColor: '#676FFF',

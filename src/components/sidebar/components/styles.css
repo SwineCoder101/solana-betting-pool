@@ -1,0 +1,21 @@
+.gradient-text {
+  font-size: 20px;
+  background: linear-gradient(-35deg, #8c421d, #fbe67b, #fcfbe7, #f7d14e, #d4a041, #8c421d);
+  -webkit-text-fill-color: transparent;
+  -webkit-background-clip: text;
+  font-family: 'Poppins';
+  -webkit-text-stroke: 1.5px black;
+}
+
+.spinning-banner .scroll#scroll-two {
+  animation: bannermove 10s linear infinite;
+}
+
+@keyframes bannermove {
+  0% {
+    transform: translate(0, 0);
+  }
+  100% {
+    transform: translate(-50%, 0);
+  }
+}
