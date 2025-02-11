@@ -1,0 +1,108 @@
+.betting-cell path {
+  /* clip-path: url(#roundedCorner); */
+  stroke: #2c2c2c;
+  cursor: pointer;
+}
+
+.betting-cell--uncrossed {
+  fill: blue;
+}
+
+.betting-cell__label,
+.betting-cell__price {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  pointer-events: none;
+  -webkit-touch-callout: none;
+  cursor: pointer;
+}
+
+.betting-cell__label--default {
+  font-size: 20px;
+  fill: white;
+}
+.betting-cell__price--default {
+  fill: #a2a2a2;
+}
+
+.betting-cell__label--mobile-expanded {
+  font-size: 12px;
+}
+
+.betting-cell__price--mobile-expanded {
+  font-size: 12px;
+}
+
+.betting-cell__label--predicted,
+.betting-cell__price--predicted {
+  fill: #000000 !important;
+}
+
+.betting-cell__label--confirming {
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  pointer-events: none;
+  -webkit-touch-callout: none;
+  transform: translateY(12px);
+}
+
+.betting-cell__emoji {
+  font-size: 14px;
+  pointer-events: none;
+  user-select: none;
+}
+
+.betting-cell {
+  pointer-events: all;
+}
+
+.betting-cell--predicted {
+  pointer-events: all;
+}
+
+/* Add these new rules */
+.betting-cell__emoji {
+  pointer-events: none;
+}
+
+foreignObject {
+  pointer-events: none;
+}
+
+foreignObject * {
+  pointer-events: none;
+}
+
+/* Add styles for the banana image */
+.betting-cell image {
+  pointer-events: none;
+  user-select: none;
+}
+
+/* Add this to your existing styles */
+.turbo-border {
+  position: relative;
+  border: none;
+}
+
+.turbo-border::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  background: linear-gradient(to right, #ff0000, /* Red */ #ffa500, /* Orange */ #008000, /* Green */ #0000ff /* Blue */);
+  z-index: -1;
+  border-radius: 4px;
+}
+
+.betting-cell__label--won {
+  fill: white;
+  transform: translateY(20px);
+
+  @media screen and (max-width: 768px) {
+    font-size: 16px;
+  }
+}
