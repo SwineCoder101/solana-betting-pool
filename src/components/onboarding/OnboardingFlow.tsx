@@ -45,7 +45,6 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   const [step, setStep] = useState(0)
   const [isDesktop, setIsDesktop] = useState(window.innerWidth > 768)
   const { createWallet} = useSolanaPrivyWallet();
-  const [loading, setLoading] = useState(false);
 
   const { authenticated } = usePrivy();
   // const { login } = useLogin();
@@ -60,14 +59,11 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   }, [])
 
   const handleCreateWallet = async () => {
-    setLoading(true);
     try {
         await createWallet();
         setStep(2);
     } catch (error) {
         console.error("Error creating wallet:", error);
-    } finally {
-        setLoading(false);
     }
 };
 
