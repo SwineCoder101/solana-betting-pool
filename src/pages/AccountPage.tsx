@@ -1,4 +1,9 @@
-import { useState } from 'react'
+import { usePrivyWalletChecker } from '@/hooks/use-privy-wallet-checker'
+import { useEffect, useState } from 'react'
+import { useAllBets } from '@/hooks/queries'
+import { LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js'
+import { useSolanaPrivyWallet } from '@/hooks/use-solana-privy-wallet'
+import { useAnchorProgram } from '@/hooks/use-anchor-program'
 
 interface AccountStats {
   volume: number
@@ -11,6 +16,35 @@ export default function AccountPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedChain, setSelectedChain] = useState('All Chains')
   const [selectedCurrency, setSelectedCurrency] = useState('Current')
+  const { embeddedWallet } = usePrivyWalletChecker()
+  const { data: bets = [] } = useAllBets()
+  const [solBalance, setSolBalance] = useState(0)
+  const [usdBalance, setUsdBalance] = useState(0)
+  const { wallets, balances, loading } = useSolanaPrivyWallet()
+  const {program} = useAnchorProgram()
+  const SOL_PRICE_USD = 198.73
+
+  useEffect(() => {
+    const calculateStats = () => {
+      if (!embeddedWallet?.address) return
+      
+      // Calculate total bet volume
+      const totalBetVolume = bets.reduce((acc, bet) => acc + (bet.amount / LAMPORTS_PER_SOL), 0)
+      
+      // Get wallet balance from balances array
+      const walletBalance = balances.find(b => b.address === embeddedWallet.address)
+      if (walletBalance) {
+        setSolBalance(walletBalance.balanceSol)
+        setUsdBalance(walletBalance.balanceUsd)
+      }
+
+      // Update stats
+      stats.volume = totalBetVolume
+      stats.maxTradeSize = Math.max(...bets.map(bet => bet.amount / LAMPORTS_PER_SOL), 0)
+    }
+
+    calculateStats()
+  }, [embeddedWallet?.address, bets, balances])
 
   const stats: AccountStats = {
     volume: 0.0,
@@ -49,22 +83,23 @@ export default function AccountPage() {
           <div className="grid grid-cols-3 w-full max-w-2xl sm:hidden text-[#222222] mb-8">
             <div className="flex flex-col items-center">
               <span className="text-lg">Volume</span>
-              <span className="">${stats.volume.toFixed(2)}</span>
+              <span className="">${(stats.volume * SOL_PRICE_USD).toFixed(2)}</span>
             </div>
             <div className="flex flex-col items-center">
               <span className="text-lg">P&L</span>
-              <span className="">${stats.pnl.toFixed(2)}</span>
+              <span className="">${(stats.pnl * SOL_PRICE_USD).toFixed(2)}</span>
             </div>
             <div className="flex flex-col items-center">
               <span className="text-lg">Max Trade Size</span>
-              <span className="">${stats.maxTradeSize.toFixed(2)}</span>
+              <span className="">${(stats.maxTradeSize * SOL_PRICE_USD).toFixed(2)}</span>
             </div>
           </div>
 
-          <span className="text-7xl text-[#222222] mb-2">$0.00</span>
+          {/* Main Balance Display */}
+          <span className="text-7xl text-[#222222] mb-2">${usdBalance.toFixed(2)}</span>
           <span className="text-xl flex items-center gap-2 text-[#AAAAAA]">
             <img src="/assets/svg/arrow-bottom-right.svg" alt="Arrow bottom right" className="w-4 h-4" />
-            $0.00
+            {solBalance.toFixed(4)} SOL
           </span>
 
           <div className="flex gap-4 mt-8">
@@ -77,23 +112,24 @@ export default function AccountPage() {
             <button className="flex-1 bg-[#FFF369] text-[#222222] py-1 rounded-full border border-black font-medium">Buy</button>
           </div>
 
+          {/* Stats Grid */}
           <div className="grid grid-cols-3 gap-4 mt-8">
             <div className="border border-black p-4">
               <div className="text-lg">Volume</div>
-              <div className="text-lg">$0.00</div>
+              <div className="text-lg">${(stats.volume * SOL_PRICE_USD).toFixed(2)}</div>
             </div>
             <div className="border border-black p-4">
               <div className="text-lg">P&L</div>
-              <div className="text-lg">$0.00</div>
+              <div className="text-lg">${(stats.pnl * SOL_PRICE_USD).toFixed(2)}</div>
             </div>
             <div className="border border-black p-4">
               <div className="text-lg">Max Trade Size</div>
-              <div className="text-lg">$0.00</div>
+              <div className="text-lg">${(stats.maxTradeSize * SOL_PRICE_USD).toFixed(2)}</div>
             </div>
           </div>
         </div>
 
-        {/* Right Side */}
+        {/* Right Side - Activity Section */}
         <div className="sm:w-1/2">
           {/* Tab Navigation - Mobile only */}
           <div className="flex w-full sm:hidden">
@@ -140,18 +176,27 @@ export default function AccountPage() {
             </select>
           </div>
 
-          {/* Deposit Tokens Notice */}
-          <div className="bg-[#FDC214] border border-[#222222] p-4 rounded-lg m-4">
-            <div className="flex justify-between items-center">
-              <span className="text-[#222222] font-medium">Deposit Tokens</span>
-              <button className="text-[#222222]">×</button>
-            </div>
-            <p className="text-[#222222]">Let's get you trading! Send tokens on the blockchain or buy with cash.</p>
-          </div>
-
-          {/* Empty State */}
-          <div className="text-center text-gray-500 mt-16">
-            <p className="text-xl">No transactions yet</p>
+          {/* Activity List */}
+          <div className="p-4">
+            {bets.length > 0 ? (
+              <div className="space-y-4">
+                {bets.map((bet, index) => (
+                  <div key={index} className="border border-black p-4">
+                    <div className="flex justify-between">
+                      <span>Bet Amount: {(bet.amount / LAMPORTS_PER_SOL).toFixed(4)} SOL</span>
+                      <span>${((bet.amount / LAMPORTS_PER_SOL) * SOL_PRICE_USD).toFixed(2)}</span>
+                    </div>
+                    <div className="text-sm text-gray-600">
+                      Status: {bet.status}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center text-gray-500 mt-16">
+                <p className="text-xl">No transactions yet</p>
+              </div>
+            )}
           </div>
         </div>
       </div>
