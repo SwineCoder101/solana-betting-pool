@@ -131,6 +131,10 @@
         {
           "name": "competition",
           "type": "pubkey"
+        },
+        {
+          "name": "leverage_multiplier",
+          "type": "u64"
         }
       ]
     },
@@ -611,6 +615,73 @@
       ]
     }
   ],
+  "events": [
+    {
+      "name": "BetCancelled",
+      "discriminator": [
+        32,
+        179,
+        128,
+        184,
+        125,
+        193,
+        106,
+        104
+      ]
+    },
+    {
+      "name": "BetCreated",
+      "discriminator": [
+        32,
+        153,
+        105,
+        71,
+        188,
+        72,
+        107,
+        114
+      ]
+    },
+    {
+      "name": "BetSettled",
+      "discriminator": [
+        57,
+        145,
+        224,
+        160,
+        62,
+        119,
+        227,
+        206
+      ]
+    },
+    {
+      "name": "CompetitionCreated",
+      "discriminator": [
+        20,
+        172,
+        54,
+        140,
+        71,
+        253,
+        74,
+        235
+      ]
+    },
+    {
+      "name": "PoolSettled",
+      "discriminator": [
+        71,
+        220,
+        136,
+        147,
+        65,
+        185,
+        90,
+        47
+      ]
+    }
+  ],
   "errors": [
     {
       "code": 6000,
@@ -655,6 +726,130 @@
                 "name": "BetStatus"
               }
             }
+          },
+          {
+            "name": "leverage",
+            "type": "u64"
+          },
+          {
+            "name": "leverage_multiplier",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "BetCancelled",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bet_key",
+            "type": "pubkey"
+          },
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "lower_bound_price",
+            "type": "u64"
+          },
+          {
+            "name": "upper_bound_price",
+            "type": "u64"
+          },
+          {
+            "name": "pool_key",
+            "type": "pubkey"
+          },
+          {
+            "name": "competition",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "BetCreated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bet_key",
+            "type": "pubkey"
+          },
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "lower_bound_price",
+            "type": "u64"
+          },
+          {
+            "name": "upper_bound_price",
+            "type": "u64"
+          },
+          {
+            "name": "pool_key",
+            "type": "pubkey"
+          },
+          {
+            "name": "competition",
+            "type": "pubkey"
+          },
+          {
+            "name": "leverage_multiplier",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "BetSettled",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "bet_key",
+            "type": "pubkey"
+          },
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "i64"
+          },
+          {
+            "name": "lower_bound_price",
+            "type": "u64"
+          },
+          {
+            "name": "upper_bound_price",
+            "type": "u64"
+          },
+          {
+            "name": "has_winning_range",
+            "type": "bool"
+          },
+          {
+            "name": "winning_lower_bound_price",
+            "type": "u64"
+          },
+          {
+            "name": "winning_upper_bound_price",
+            "type": "u64"
           }
         ]
       }
@@ -702,6 +897,56 @@
             "type": {
               "vec": "pubkey"
             }
+          },
+          {
+            "name": "interval",
+            "type": "u64"
+          },
+          {
+            "name": "start_time",
+            "type": "u64"
+          },
+          {
+            "name": "end_time",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "CompetitionCreated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "competition_key",
+            "type": "pubkey"
+          },
+          {
+            "name": "token_a",
+            "type": "pubkey"
+          },
+          {
+            "name": "price_feed_id",
+            "type": "string"
+          },
+          {
+            "name": "admin",
+            "type": {
+              "vec": "pubkey"
+            }
+          },
+          {
+            "name": "house_cut_factor",
+            "type": "u8"
+          },
+          {
+            "name": "min_payout_ratio",
+            "type": "u8"
+          },
+          {
+            "name": "num_of_pools",
+            "type": "u8"
           },
           {
             "name": "interval",
@@ -781,6 +1026,58 @@
           },
           {
             "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PoolSettled",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool_key",
+            "type": "pubkey"
+          },
+          {
+            "name": "competition",
+            "type": "pubkey"
+          },
+          {
+            "name": "lower_bound_price",
+            "type": "u64"
+          },
+          {
+            "name": "upper_bound_price",
+            "type": "u64"
+          },
+          {
+            "name": "has_winning_range",
+            "type": "bool"
+          },
+          {
+            "name": "pool_balance_before",
+            "type": "u64"
+          },
+          {
+            "name": "winning_bets_balance",
+            "type": "u64"
+          },
+          {
+            "name": "losing_bets_balance",
+            "type": "u64"
+          },
+          {
+            "name": "number_of_bets",
+            "type": "u8"
+          },
+          {
+            "name": "number_of_winning_bets",
+            "type": "u8"
+          },
+          {
+            "name": "number_of_losing_bets",
             "type": "u8"
           }
         ]

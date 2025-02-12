@@ -40,5 +40,28 @@ pub fn run_cancel_bet(ctx: Context<CancelBet>) -> Result<()> {
 
     ctx.accounts.bet.status = BetStatus::Cancelled;
 
+    emit!(BetCancelled {
+        bet_key: ctx.accounts.bet.key(),
+        user: ctx.accounts.user.key(),
+        amount,
+        lower_bound_price: ctx.accounts.bet.lower_bound_price,
+        upper_bound_price: ctx.accounts.bet.upper_bound_price,
+        pool_key: ctx.accounts.pool.key(),
+        competition: ctx.accounts.bet.competition,
+    });
+
     Ok(())
 }
+
+
+#[event]
+pub struct BetCancelled {
+    pub bet_key: Pubkey,
+    pub user: Pubkey,
+    pub amount: u64,
+    pub lower_bound_price: u64,
+    pub upper_bound_price: u64,
+    pub pool_key: Pubkey,
+    pub competition: Pubkey,
+}
+

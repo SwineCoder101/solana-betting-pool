@@ -46,5 +46,34 @@ pub fn run_create_competition(
     competition.start_time = start_time;
     competition.end_time = end_time;
 
+    let num_of_pools = ((end_time - start_time) / interval) as u8;
+
+    emit!(CompetitionCreated {
+        competition_key: competition.key(),
+        token_a: competition.token_a,
+        price_feed_id: competition.price_feed_id.clone(),
+        admin: competition.admin.clone(),
+        house_cut_factor,
+        min_payout_ratio,
+        num_of_pools,
+        interval,
+        start_time,
+        end_time,
+    });
+
     Ok(())
+}
+
+#[event]
+pub struct CompetitionCreated {
+    pub competition_key: Pubkey,
+    pub token_a: Pubkey,
+    pub price_feed_id: String,
+    pub admin: Vec<Pubkey>,
+    pub house_cut_factor: u8,
+    pub min_payout_ratio: u8,
+    pub num_of_pools: u8,
+    pub interval: u64,
+    pub start_time: u64,
+    pub end_time: u64,
 }

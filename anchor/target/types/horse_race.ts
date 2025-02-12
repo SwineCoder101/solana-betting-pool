@@ -137,6 +137,10 @@ export type HorseRace = {
         {
           "name": "competition",
           "type": "pubkey"
+        },
+        {
+          "name": "leverageMultiplier",
+          "type": "u64"
         }
       ]
     },
@@ -617,6 +621,73 @@ export type HorseRace = {
       ]
     }
   ],
+  "events": [
+    {
+      "name": "betCancelled",
+      "discriminator": [
+        32,
+        179,
+        128,
+        184,
+        125,
+        193,
+        106,
+        104
+      ]
+    },
+    {
+      "name": "betCreated",
+      "discriminator": [
+        32,
+        153,
+        105,
+        71,
+        188,
+        72,
+        107,
+        114
+      ]
+    },
+    {
+      "name": "betSettled",
+      "discriminator": [
+        57,
+        145,
+        224,
+        160,
+        62,
+        119,
+        227,
+        206
+      ]
+    },
+    {
+      "name": "competitionCreated",
+      "discriminator": [
+        20,
+        172,
+        54,
+        140,
+        71,
+        253,
+        74,
+        235
+      ]
+    },
+    {
+      "name": "poolSettled",
+      "discriminator": [
+        71,
+        220,
+        136,
+        147,
+        65,
+        185,
+        90,
+        47
+      ]
+    }
+  ],
   "errors": [
     {
       "code": 6000,
@@ -661,6 +732,130 @@ export type HorseRace = {
                 "name": "betStatus"
               }
             }
+          },
+          {
+            "name": "leverage",
+            "type": "u64"
+          },
+          {
+            "name": "leverageMultiplier",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "betCancelled",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "betKey",
+            "type": "pubkey"
+          },
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "lowerBoundPrice",
+            "type": "u64"
+          },
+          {
+            "name": "upperBoundPrice",
+            "type": "u64"
+          },
+          {
+            "name": "poolKey",
+            "type": "pubkey"
+          },
+          {
+            "name": "competition",
+            "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "betCreated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "betKey",
+            "type": "pubkey"
+          },
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "lowerBoundPrice",
+            "type": "u64"
+          },
+          {
+            "name": "upperBoundPrice",
+            "type": "u64"
+          },
+          {
+            "name": "poolKey",
+            "type": "pubkey"
+          },
+          {
+            "name": "competition",
+            "type": "pubkey"
+          },
+          {
+            "name": "leverageMultiplier",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "betSettled",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "betKey",
+            "type": "pubkey"
+          },
+          {
+            "name": "user",
+            "type": "pubkey"
+          },
+          {
+            "name": "amount",
+            "type": "i64"
+          },
+          {
+            "name": "lowerBoundPrice",
+            "type": "u64"
+          },
+          {
+            "name": "upperBoundPrice",
+            "type": "u64"
+          },
+          {
+            "name": "hasWinningRange",
+            "type": "bool"
+          },
+          {
+            "name": "winningLowerBoundPrice",
+            "type": "u64"
+          },
+          {
+            "name": "winningUpperBoundPrice",
+            "type": "u64"
           }
         ]
       }
@@ -708,6 +903,56 @@ export type HorseRace = {
             "type": {
               "vec": "pubkey"
             }
+          },
+          {
+            "name": "interval",
+            "type": "u64"
+          },
+          {
+            "name": "startTime",
+            "type": "u64"
+          },
+          {
+            "name": "endTime",
+            "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "competitionCreated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "competitionKey",
+            "type": "pubkey"
+          },
+          {
+            "name": "tokenA",
+            "type": "pubkey"
+          },
+          {
+            "name": "priceFeedId",
+            "type": "string"
+          },
+          {
+            "name": "admin",
+            "type": {
+              "vec": "pubkey"
+            }
+          },
+          {
+            "name": "houseCutFactor",
+            "type": "u8"
+          },
+          {
+            "name": "minPayoutRatio",
+            "type": "u8"
+          },
+          {
+            "name": "numOfPools",
+            "type": "u8"
           },
           {
             "name": "interval",
@@ -787,6 +1032,58 @@ export type HorseRace = {
           },
           {
             "name": "bump",
+            "type": "u8"
+          }
+        ]
+      }
+    },
+    {
+      "name": "poolSettled",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "poolKey",
+            "type": "pubkey"
+          },
+          {
+            "name": "competition",
+            "type": "pubkey"
+          },
+          {
+            "name": "lowerBoundPrice",
+            "type": "u64"
+          },
+          {
+            "name": "upperBoundPrice",
+            "type": "u64"
+          },
+          {
+            "name": "hasWinningRange",
+            "type": "bool"
+          },
+          {
+            "name": "poolBalanceBefore",
+            "type": "u64"
+          },
+          {
+            "name": "winningBetsBalance",
+            "type": "u64"
+          },
+          {
+            "name": "losingBetsBalance",
+            "type": "u64"
+          },
+          {
+            "name": "numberOfBets",
+            "type": "u8"
+          },
+          {
+            "name": "numberOfWinningBets",
+            "type": "u8"
+          },
+          {
+            "name": "numberOfLosingBets",
             "type": "u8"
           }
         ]
