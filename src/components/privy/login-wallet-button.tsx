@@ -5,9 +5,11 @@ interface LoginWalletButtonProps {
     className?: string;
 }
 
-export function LoginWalletButton({ connectedAddress, className = '' }: LoginWalletButtonProps) {
-    const { authenticated, logout } = usePrivy();
+export function LoginWalletButton({className = '' }: LoginWalletButtonProps) {
+    const { authenticated, logout, user } = usePrivy();
     const { login } = useLogin();
+
+    const connectedAddress = user?.wallet?.address;
 
     // Format address for display
     const formatAddress = (address: string) => {
@@ -28,7 +30,7 @@ export function LoginWalletButton({ connectedAddress, className = '' }: LoginWal
             onClick={handleConnectWallet}
             className={`px-4 py-2 rounded font-medium transition-colors ${
                 authenticated 
-                    ? 'bg-red-500 hover:bg-red-600 text-white'
+                    ? 'bg-yellow-500 hover:bg-yellow-600 text-white'
                     : 'bg-blue-500 hover:bg-blue-600 text-white'
             } ${className}`}
         >
