@@ -1,9 +1,8 @@
-import { usePrivyWalletChecker } from '@/hooks/use-privy-wallet-checker'
-import { useEffect, useState } from 'react'
 import { useAllBets } from '@/hooks/queries'
-import { LAMPORTS_PER_SOL, PublicKey } from '@solana/web3.js'
+import { usePrivyWalletChecker } from '@/hooks/use-privy-wallet-checker'
 import { useSolanaPrivyWallet } from '@/hooks/use-solana-privy-wallet'
-import { useAnchorProgram } from '@/hooks/use-anchor-program'
+import { LAMPORTS_PER_SOL } from '@solana/web3.js'
+import { useEffect, useState } from 'react'
 
 interface AccountStats {
   volume: number
@@ -20,8 +19,8 @@ export default function AccountPage() {
   const { data: bets = [] } = useAllBets()
   const [solBalance, setSolBalance] = useState(0)
   const [usdBalance, setUsdBalance] = useState(0)
-  const { wallets, balances, loading } = useSolanaPrivyWallet()
-  const {program} = useAnchorProgram()
+  const { balances } = useSolanaPrivyWallet()
+  // const {program} = useAnchorProgram()
   const SOL_PRICE_USD = 198.73
 
   useEffect(() => {
