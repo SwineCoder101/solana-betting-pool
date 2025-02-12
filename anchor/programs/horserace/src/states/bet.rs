@@ -18,4 +18,6 @@ pub struct Bet {
     pub upper_bound_price: u64,
     pub pool_key: Pubkey,
     pub status: BetStatus,
+    pub leverage: u64,
+    pub leverage_multiplier: u64,
 }

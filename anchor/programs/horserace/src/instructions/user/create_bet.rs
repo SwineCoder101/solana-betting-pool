@@ -36,6 +36,7 @@ pub fn run_create_bet(
     upper_bound_price: u64,
     pool_key: Pubkey,
     competition: Pubkey,
+    leverage_multiplier: u64,
 ) -> Result<()> {
     // Check eligibility
     if !is_eligible(&ctx.accounts.user) {
@@ -73,6 +74,29 @@ pub fn run_create_bet(
     bet_account.upper_bound_price = upper_bound_price;
     bet_account.pool_key = pool_key;
     bet_account.status = BetStatus::Active;
+    bet_account.leverage_multiplier = leverage_multiplier;
 
+    emit!(BetCreated {
+        bet_key: bet_account.key(),
+        user: ctx.accounts.user.key(),
+        amount,
+        lower_bound_price,
+        upper_bound_price,
+        pool_key,
+        competition,
+        leverage_multiplier,
+    });
     Ok(())
+}
+
+#[event]
+pub struct BetCreated {
+    pub bet_key: Pubkey,
+    pub user: Pubkey,
+    pub amount: u64,
+    pub lower_bound_price: u64,
+    pub upper_bound_price: u64,
+    pub pool_key: Pubkey,
+    pub competition: Pubkey,
+    pub leverage_multiplier: u64,
 }

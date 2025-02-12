@@ -35,6 +35,7 @@ export function useCreateBet() {
           params.amount,
           params.lowerBoundPrice,
           params.upperBoundPrice,
+          1,
           new PublicKey(params.poolKey),
           new PublicKey(params.competition)
         );

@@ -170,10 +170,11 @@ export async function executeCreateBet(
   amount: number,
   lowerBoundPrice: number, 
   upperBoundPrice: number, 
+  leverageMultiplier: number = 1,
   poolKey: PublicKey,
   competitionPubkey: PublicKey,
   signer: Signer) {
-    const vtx = await createBet(program, user.publicKey, amount, lowerBoundPrice, upperBoundPrice, poolKey, competitionPubkey);
+    const vtx = await createBet(program, user.publicKey, amount, lowerBoundPrice, upperBoundPrice, leverageMultiplier, poolKey, competitionPubkey);
     vtx.sign([signer]);
     const signature = await program.provider.connection.sendTransaction(vtx);
     await program.provider.connection.confirmTransaction(signature, 'confirmed');

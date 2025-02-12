@@ -71,6 +71,7 @@ pub mod horse_race {
         upper_bound_price: u64,
         pool_key: Pubkey,
         competition: Pubkey,
+        leverage_multiplier: u64,
     ) -> Result<()> {
         instructions::user::create_bet::run_create_bet(
             ctx,
@@ -79,6 +80,7 @@ pub mod horse_race {
             upper_bound_price,
             pool_key,
             competition,
+            leverage_multiplier,
         )
     }
 
