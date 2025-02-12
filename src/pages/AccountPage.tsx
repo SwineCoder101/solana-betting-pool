@@ -1,5 +1,4 @@
 import { useAllBets } from '@/hooks/queries'
-import { usePrivyWalletChecker } from '@/hooks/use-privy-wallet-checker'
 import { useSolanaPrivyWallet } from '@/hooks/use-solana-privy-wallet'
 import { LAMPORTS_PER_SOL } from '@solana/web3.js'
 import { useEffect, useState } from 'react'
@@ -15,7 +14,7 @@ export default function AccountPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedChain, setSelectedChain] = useState('All Chains')
   const [selectedCurrency, setSelectedCurrency] = useState('Current')
-  const { embeddedWallet } = usePrivyWalletChecker()
+  const { embeddedWallet } = useSolanaPrivyWallet()
   const { data: bets = [] } = useAllBets()
   const [solBalance, setSolBalance] = useState(0)
   const [usdBalance, setUsdBalance] = useState(0)

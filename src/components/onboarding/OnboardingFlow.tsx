@@ -4,7 +4,6 @@ import { OldButton } from '../buttons/OldButton'
 import { LoginWalletButton } from '../privy/login-wallet-button'
 import { useSolanaPrivyWallet } from '@/hooks/use-solana-privy-wallet'
 import { WalletManager } from '../privy/wallet-manager'
-import { usePrivyWalletChecker } from '@/hooks/use-privy-wallet-checker'
 
 interface OnboardingFlowProps {
   onComplete: () => void
@@ -48,7 +47,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   const [isDesktop, setIsDesktop] = useState(window.innerWidth > 768)
   const [showWalletManager, setShowWalletManager] = useState(false)
   const { createWallet, wallets } = useSolanaPrivyWallet();
-  const { embeddedWallet, refreshWalletState } = usePrivyWalletChecker();
+  const { embeddedWallet, refreshWalletState } = useSolanaPrivyWallet();
 
   const { authenticated } = usePrivy();
   // const { login } = useLogin();

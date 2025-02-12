@@ -3,6 +3,8 @@ import { ROUTES } from '../../routes'
 import ButtonOutline from '../buttons/ButtonOutline'
 import Navigation from './Navigation'
 import { LoginWalletButton } from '../privy/login-wallet-button'
+import { useAdminCheck } from '@/hooks/use-admin-check'
+import { usePrivy } from '@privy-io/react-auth'
 
 interface Props {
   darkMode?: boolean
@@ -10,6 +12,8 @@ interface Props {
 
 export default function Header({ darkMode = false }: Props) {
   const navigate = useNavigate()
+  const { isAdmin } = useAdminCheck()
+  const { authenticated } = usePrivy()
 
   return (
     <div className={`w-full ${darkMode ? 'bg-black' : 'bg-[#FDFAD1]'} px-2.5 sticky top-0 z-10 border-b border-black sm:border-none`}>
@@ -59,6 +63,19 @@ export default function Header({ darkMode = false }: Props) {
           </ButtonOutline>
 
           <LoginWalletButton />
+
+          {isAdmin && (
+            <button
+              onClick={() => navigate(ROUTES.ADMIN)}
+              className={`px-4 py-2 rounded font-medium transition-colors ${
+                authenticated 
+                  ? 'bg-yellow-500 hover:bg-yellow-600 text-white'
+                  : 'bg-blue-500 hover:bg-blue-600 text-white'
+              }`}
+            >
+              Admin
+            </button>
+          )}
 
           <button onClick={() => {}} className="p-2 bg-[#FFF369] rounded-full cursor-pointer">
             <img src="/assets/svg/trophy.svg" alt="Profile" className="w-5 h-5" />
