@@ -1,6 +1,6 @@
 use anchor_lang::{prelude::*, solana_program::system_program};
 use crate::errors::SettlementError;
-use crate::states::{BetStatus};
+use crate::states::{BetStatus, Treasury};
 use crate::{states::{Pool, Bet, Competition}, errors::BettingError};
 
 #[derive(Accounts)]
@@ -10,6 +10,9 @@ pub struct SettlePool<'info> {
 
     #[account(mut)]
     pub pool: Account<'info, Pool>,
+
+    #[account(mut)]
+    pub pool_treasury: Account<'info, Treasury>,
 
     #[account(mut)]
     pub competition: Account<'info, Competition>,
@@ -65,7 +68,7 @@ pub fn run_settle_pool_by_price<'info>(
         let user_account_info = remaining_accounts_iter.next()
             .ok_or(BettingError::InvalidUserAccount)?;
 
-        let winnings = get_winnings(bet.amount);
+        let winnings = get_winnings(bet.amount, bet.leverage_multiplier);
         let won = has_won(&bet, lower_bound_price, upper_bound_price);
 
         if won {
@@ -78,9 +81,15 @@ pub fn run_settle_pool_by_price<'info>(
             number_of_winning_bets += 1;
             winning_bets_balance += winnings;
 
-            // Deduct winnings from the pool and add them to the user account
-            **pool.to_account_info().try_borrow_mut_lamports()? -= winnings as u64;
-            **user_account_info.try_borrow_mut_lamports()? += winnings;
+            // if sufficient funds are in the pool, send the winnings to the user account
+            if **pool.to_account_info().try_borrow_mut_lamports()? >= winnings {
+                **pool.to_account_info().try_borrow_mut_lamports()? -= winnings as u64;
+                **user_account_info.try_borrow_mut_lamports()? += winnings;
+            } else {
+                // if there are not enough funds in the pool, borrow from the pool treasury
+                **ctx.accounts.pool_treasury.to_account_info().try_borrow_mut_lamports()? -= winnings;
+                **user_account_info.try_borrow_mut_lamports()? += winnings;
+            }
         } else {
             number_of_losing_bets += 1;
             losing_bets_balance += bet.amount;
@@ -102,6 +111,7 @@ pub fn run_settle_pool_by_price<'info>(
             has_winning_range: won,
             winning_lower_bound_price: lower_bound_price,
             winning_upper_bound_price: upper_bound_price,
+            leverage_multiplier: bet.leverage_multiplier,
         });
     }
 
@@ -128,8 +138,8 @@ fn has_won(bet: &Bet, lower_bound_price: u64, upper_bound_price: u64) -> bool {
     bet.lower_bound_price >= lower_bound_price && bet.upper_bound_price <= upper_bound_price
 }
 
-fn get_winnings(amount: u64) -> u64 {
-    amount
+fn get_winnings(amount: u64, leverage_multiplier: u64) -> u64 {
+    amount * leverage_multiplier
 }
 
 #[event]
@@ -137,6 +147,7 @@ pub struct BetSettled {
     pub bet_key: Pubkey,
     pub user: Pubkey,
     pub amount: i64,
+    pub leverage_multiplier: u64,
     pub lower_bound_price: u64,
     pub upper_bound_price: u64,
     pub has_winning_range: bool,

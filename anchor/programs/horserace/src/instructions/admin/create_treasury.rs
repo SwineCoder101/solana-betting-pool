@@ -1,5 +1,7 @@
 use anchor_lang::prelude::*;
+use crate::errors::TreasuryError;
 use crate::states::Treasury;
+use crate::constants::TREASURY_SEED;
 
 #[derive(Accounts)]
 #[instruction(max_admins: u8, min_signatures: u8)]
@@ -8,7 +10,7 @@ pub struct CreateTreasury<'info> {
         init,
         payer = payer,
         space = Treasury::space(max_admins as usize),
-        seeds = [Treasury::SEED_PREFIX],
+        seeds = [TREASURY_SEED],
         bump
     )]
     pub treasury: Account<'info, Treasury>,
@@ -38,7 +40,7 @@ pub fn create_treasury(
     treasury.min_signatures = min_signatures;
     treasury.total_deposits = 0;
     treasury.total_withdrawals = 0;
-    treasury.bump = *ctx.bumps.get("treasury").unwrap();
+    treasury.bump = ctx.bumps.treasury;
 
     Ok(())
 } 

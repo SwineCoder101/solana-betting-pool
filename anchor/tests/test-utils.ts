@@ -17,6 +17,7 @@ import {
 } from "@solana/web3.js";
 import { createBet } from "../sdk/src/instructions/user/create-bet";
 import { HorseRace } from "../sdk/src";
+import { createTreasury } from "../sdk/src/instructions/admin/create-treasury";
 
 export const loggingOn = true; //Enable / disable logging
 // const program = anchor.workspace.MemePrice as Program<MemePrice>;
@@ -180,5 +181,26 @@ export async function executeCreateBet(
     await program.provider.connection.confirmTransaction(signature, 'confirmed');
   }
 
+export async function setupTreasury(program: Program<HorseRace>): Promise<{
+  treasuryKey: PublicKey
+  adminWallet: web3.Keypair
+}> {
+  const adminWallet = web3.Keypair.generate()
+  
+  // Fund admin wallet
+  const signature = await program.provider.connection.requestAirdrop(
+    adminWallet.publicKey,
+    2 * web3.LAMPORTS_PER_SOL
+  )
+  await program.provider.connection.confirmTransaction(signature)
 
+  // Create treasury with admin
+  const treasuryKey = await createTreasury(program, {
+    maxAdmins: 1,
+    minSignatures: 1,
+    initialAdmins: [adminWallet.publicKey],
+  })
+
+  return { treasuryKey, adminWallet }
+}
   

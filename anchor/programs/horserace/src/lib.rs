@@ -132,26 +132,26 @@ pub mod horse_race {
         instructions::admin::create_pool_oracle_transformer::run_init_pool_oracle(ctx, pool, price_feed, start_time, end_time)
     }
 
-    // pub fn create_treasury(
-    //     ctx: Context<CreateTreasury>,
-    //     max_admins: u8,
-    //     min_signatures: u8,
-    //     initial_admins: Vec<Pubkey>,
-    // ) -> Result<()> {
-    //     instructions::admin::create_treasury(ctx, max_admins, min_signatures, initial_admins)
-    // }
+    pub fn run_create_treasury(
+        ctx: Context<CreateTreasury>,
+        max_admins: u8,
+        min_signatures: u8,
+        initial_admins: Vec<Pubkey>,
+    ) -> Result<()> {
+        instructions::admin::create_treasury(ctx, max_admins, min_signatures, initial_admins)
+    }
 
-    // pub fn deposit_to_treasury(
-    //     ctx: Context<DepositToTreasury>,
-    //     amount: u64,
-    // ) -> Result<()> {
-    //     instructions::treasury::deposit(ctx, amount)
-    // }
+    pub fn run_deposit_to_treasury(
+        ctx: Context<DepositToTreasury>,
+        amount: u64,
+    ) -> Result<()> {
+        instructions::admin::deposit_to_treasury(ctx, amount)
+    }
 
-    // pub fn withdraw_from_treasury(
-    //     ctx: Context<WithdrawFromTreasury>,
-    //     amount: u64,
-    // ) -> Result<()> {
-    //     instructions::treasury::withdraw(ctx, amount)
-    // }
+    pub fn run_withdraw_from_treasury(
+        ctx: Context<WithdrawFromTreasury>,
+        amount: u64,
+    ) -> Result<()> {
+        instructions::admin::withdraw_from_treasury(ctx, amount)
+    }
 }

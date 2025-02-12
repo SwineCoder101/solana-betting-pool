@@ -385,6 +385,122 @@ export type HorseRace = {
       ]
     },
     {
+      "name": "runCreateTreasury",
+      "discriminator": [
+        82,
+        98,
+        53,
+        241,
+        26,
+        97,
+        130,
+        101
+      ],
+      "accounts": [
+        {
+          "name": "treasury",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  114,
+                  101,
+                  97,
+                  115,
+                  117,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "maxAdmins",
+          "type": "u8"
+        },
+        {
+          "name": "minSignatures",
+          "type": "u8"
+        },
+        {
+          "name": "initialAdmins",
+          "type": {
+            "vec": "pubkey"
+          }
+        }
+      ]
+    },
+    {
+      "name": "runDepositToTreasury",
+      "discriminator": [
+        196,
+        198,
+        205,
+        187,
+        190,
+        132,
+        4,
+        182
+      ],
+      "accounts": [
+        {
+          "name": "treasury",
+          "writable": true
+        },
+        {
+          "name": "treasuryAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  114,
+                  101,
+                  97,
+                  115,
+                  117,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "depositor",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "runSettlePoolByPrice",
       "docs": [
         "Settle a Pool"
@@ -407,6 +523,10 @@ export type HorseRace = {
         },
         {
           "name": "pool",
+          "writable": true
+        },
+        {
+          "name": "poolTreasury",
           "writable": true
         },
         {
@@ -552,6 +672,68 @@ export type HorseRace = {
         }
       ],
       "args": []
+    },
+    {
+      "name": "runWithdrawFromTreasury",
+      "discriminator": [
+        91,
+        83,
+        58,
+        157,
+        170,
+        173,
+        109,
+        130
+      ],
+      "accounts": [
+        {
+          "name": "treasury",
+          "writable": true
+        },
+        {
+          "name": "treasuryAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  114,
+                  101,
+                  97,
+                  115,
+                  117,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "recipient",
+          "writable": true
+        },
+        {
+          "name": "pool",
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "signer": true
+        },
+        {
+          "name": "systemProgram",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
     }
   ],
   "accounts": [
@@ -618,6 +800,19 @@ export type HorseRace = {
         126,
         244,
         205
+      ]
+    },
+    {
+      "name": "treasury",
+      "discriminator": [
+        238,
+        239,
+        123,
+        238,
+        89,
+        1,
+        168,
+        253
       ]
     }
   ],
@@ -865,6 +1060,10 @@ export type HorseRace = {
           {
             "name": "amount",
             "type": "i64"
+          },
+          {
+            "name": "leverageMultiplier",
+            "type": "u64"
           },
           {
             "name": "lowerBoundPrice",
@@ -1246,6 +1445,36 @@ export type HorseRace = {
           {
             "name": "postedSlot",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "treasury",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "adminAuthorities",
+            "type": {
+              "vec": "pubkey"
+            }
+          },
+          {
+            "name": "minSignatures",
+            "type": "u8"
+          },
+          {
+            "name": "totalDeposits",
+            "type": "u64"
+          },
+          {
+            "name": "totalWithdrawals",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
           }
         ]
       }
