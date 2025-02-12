@@ -675,6 +675,19 @@ export type HorseRace = {
       ]
     },
     {
+      "name": "poolCreated",
+      "discriminator": [
+        202,
+        44,
+        41,
+        88,
+        104,
+        220,
+        157,
+        82
+      ]
+    },
+    {
       "name": "poolSettled",
       "discriminator": [
         71,
@@ -993,6 +1006,30 @@ export type HorseRace = {
           {
             "name": "treasury",
             "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "poolCreated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "poolHash",
+            "type": "pubkey"
+          },
+          {
+            "name": "competitionKey",
+            "type": "pubkey"
+          },
+          {
+            "name": "startTime",
+            "type": "u64"
+          },
+          {
+            "name": "endTime",
+            "type": "u64"
           }
         ]
       }

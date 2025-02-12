@@ -46,5 +46,21 @@ pub fn run_create_pool(
     pool_account.start_time = start_time;
     pool_account.end_time = end_time;
     pool_account.treasury = treasury;
+
+    emit!(PoolCreated {
+        pool_hash: ctx.accounts.pool_hash_acc.key(),
+        competition_key: ctx.accounts.competition_acc.key(),
+        start_time,
+        end_time,
+    });
+
     Ok(())
+}
+
+#[event]
+pub struct PoolCreated {
+    pub pool_hash: Pubkey,
+    pub competition_key: Pubkey,
+    pub start_time: u64,
+    pub end_time: u64,
 }

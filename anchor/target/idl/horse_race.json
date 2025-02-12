@@ -669,6 +669,19 @@
       ]
     },
     {
+      "name": "PoolCreated",
+      "discriminator": [
+        202,
+        44,
+        41,
+        88,
+        104,
+        220,
+        157,
+        82
+      ]
+    },
+    {
       "name": "PoolSettled",
       "discriminator": [
         71,
@@ -987,6 +1000,30 @@
           {
             "name": "treasury",
             "type": "pubkey"
+          }
+        ]
+      }
+    },
+    {
+      "name": "PoolCreated",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "pool_hash",
+            "type": "pubkey"
+          },
+          {
+            "name": "competition_key",
+            "type": "pubkey"
+          },
+          {
+            "name": "start_time",
+            "type": "u64"
+          },
+          {
+            "name": "end_time",
+            "type": "u64"
           }
         ]
       }

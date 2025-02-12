@@ -15,10 +15,17 @@ export type CreateBetParams = {
   endTime?: number,
   competitionKey: PublicKey,
   poolKey?: PublicKey,
+  leverageMultiplier?: number,
 }
 
 export async function createBetEntry(program: Program<HorseRace>, params: CreateBetParams): Promise<VersionedTransaction> {
   const { user, amount, lowerBoundPrice, upperBoundPrice, startTime, endTime, competitionKey } = params;
+
+  let leverageMultiplier = params.leverageMultiplier;
+
+  if (!leverageMultiplier) {
+    leverageMultiplier = 1;
+  }
 
   if (!startTime || !endTime) {
     throw new Error('startTime and endTime are required');
@@ -27,7 +34,7 @@ export async function createBetEntry(program: Program<HorseRace>, params: Create
   if (!params.poolKey) {
     params.poolKey = await findPoolKeyFromStartEndTime(program, competitionKey, startTime, endTime);
   }
-  return createBet(program, user, amount, lowerBoundPrice, upperBoundPrice, params.poolKey, competitionKey);
+  return createBet(program, user, amount, lowerBoundPrice, upperBoundPrice, leverageMultiplier, params.poolKey, competitionKey);
 }
 
 export async function createBet(
@@ -36,6 +43,7 @@ export async function createBet(
   amount: number,
   lowerBoundPrice: number,
   upperBoundPrice: number,
+  leverageMultiplier: number,
   poolKey: PublicKey,
   competitionKey: PublicKey,
 ): Promise<VersionedTransaction> {
@@ -58,7 +66,8 @@ export async function createBet(
       new anchor.BN(lowerBoundPrice),
       new anchor.BN(upperBoundPrice),
       poolKey,
-      competitionKey
+      competitionKey,
+      new anchor.BN(leverageMultiplier)
     )
     .accountsStrict({
       user,

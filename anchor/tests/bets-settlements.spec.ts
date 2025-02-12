@@ -63,6 +63,7 @@ describe("settlements with bets", () => {
       amount.toNumber(), 
       betLowerBoundPrice, 
       betUpperBoundPrice, 
+      1,
       poolKey, 
       competitionPubkey, 
       signer
@@ -111,7 +112,7 @@ describe("settlements with bets", () => {
     const treasuryBalanceBefore = await connection.getBalance(treasuryKey);
     const poolBalanceBeforeBet = await connection.getBalance(poolKey);
 
-    await executeCreateBet(program, signer, amount.toNumber(), lowerBoundPrice, upperBoundPrice, poolKey, competitionPubkey, signer);
+    await executeCreateBet(program, signer, amount.toNumber(), lowerBoundPrice, upperBoundPrice, 1, poolKey, competitionPubkey, signer);
 
     //settle pool by price
     const settleTx = await settlePoolByPrice(program, signer.publicKey, poolKey, lowerBoundPrice, upperBoundPrice);
