@@ -48,7 +48,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   const [isDesktop, setIsDesktop] = useState(window.innerWidth > 768)
   const [showWalletManager, setShowWalletManager] = useState(false)
   const { createWallet, wallets } = useSolanaPrivyWallet();
-  const { mainWallet, embeddedWallet } = usePrivyWalletChecker();
+  const { embeddedWallet, refreshWalletState } = usePrivyWalletChecker();
 
   const { authenticated } = usePrivy();
   // const { login } = useLogin();
@@ -75,6 +75,8 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
       setStep(2);
     } catch (error) {
       console.error("Error creating wallet:", error);
+      refreshWalletState();
+      setStep(2);
     }
   };
 
@@ -115,7 +117,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
               <div className="flex flex-col text-center text-[#222222]">
                 <p className="text-5xl text-center font-serif" style={{ fontFamily: 'Instrument Serif' }}>
                   Click the icon to create <br /> your banana wallet
-                </p>∏
+                </p>
               </div>
               <button 
                 onClick={() => navigateToWalletManager()} 
