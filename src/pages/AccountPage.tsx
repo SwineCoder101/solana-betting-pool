@@ -1,5 +1,4 @@
 import { useAllBets } from '@/hooks/queries'
-import { useAnchorProgram } from '@/hooks/use-anchor-program'
 import { usePrivyWalletChecker } from '@/hooks/use-privy-wallet-checker'
 import { useSolanaPrivyWallet } from '@/hooks/use-solana-privy-wallet'
 import { LAMPORTS_PER_SOL } from '@solana/web3.js'
@@ -20,7 +19,7 @@ export default function AccountPage() {
   const { data: bets = [] } = useAllBets()
   const [solBalance, setSolBalance] = useState(0)
   const [usdBalance, setUsdBalance] = useState(0)
-  const { balances, loading, error, } = useSolanaPrivyWallet()
+  const { balances} = useSolanaPrivyWallet()
   const SOL_PRICE_USD = 198.73
 
   useEffect(() => {
