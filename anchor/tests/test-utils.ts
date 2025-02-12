@@ -16,8 +16,9 @@ import {
     VersionedTransaction
 } from "@solana/web3.js";
 import { createBet } from "../sdk/src/instructions/user/create-bet";
-import { HorseRace } from "../sdk/src";
+import { getVersionTxFromInstructions, HorseRace } from "../sdk/src";
 import { createTreasury } from "../sdk/src/instructions/admin/create-treasury";
+import { TreasuryAccount } from "../sdk/src/states/treasury-account";
 
 export const loggingOn = true; //Enable / disable logging
 // const program = anchor.workspace.MemePrice as Program<MemePrice>;
@@ -195,11 +196,16 @@ export async function setupTreasury(program: Program<HorseRace>): Promise<{
   await program.provider.connection.confirmTransaction(signature)
 
   // Create treasury with admin
-  const treasuryKey = await createTreasury(program, {
+  const ix =await createTreasury(program, {
     maxAdmins: 1,
     minSignatures: 1,
     initialAdmins: [adminWallet.publicKey],
   })
+
+  const vtx = await getVersionTxFromInstructions(program.provider.connection, [ix]);
+  await signAndSendVTx(vtx, adminWallet, program.provider.connection);
+
+  const [treasuryKey] = await TreasuryAccount.getPda(program);
 
   return { treasuryKey, adminWallet }
 }

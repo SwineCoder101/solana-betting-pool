@@ -1,85 +1,120 @@
 import * as anchor from '@coral-xyz/anchor'
-import { Program } from '@coral-xyz/anchor'
-import { HorseRace } from '../target/types/horse_race'
-import { setupTreasury } from './test-utils'
+import { BN } from '@coral-xyz/anchor'
+import { depositToTreasury, getVersionTxFromInstructions, withdrawFromTreasury } from '../sdk/src'
 import { TreasuryAccount } from '../sdk/src/states/treasury-account'
-import { depositToTreasury, withdrawFromTreasury } from '../sdk/src'
+import { CommonSetup, setupCommon } from './common-setup'
+import { createUserWithFunds, signAndSendVTx } from './test-utils'
 
 describe('Treasury', () => {
-  const program = anchor.workspace.HorseRace as Program<HorseRace>
-  const provider = program.provider as anchor.AnchorProvider
-
-  let treasuryKey: anchor.web3.PublicKey
-  let adminWallet: anchor.web3.Keypair
+  let setup: CommonSetup
+  let depositor: anchor.web3.Keypair
 
   beforeAll(async () => {
-    const setup = await setupTreasury(program)
-    treasuryKey = setup.treasuryKey
-    adminWallet = setup.adminWallet
-  })
+    setup = await setupCommon()
+    depositor = await createUserWithFunds(setup.program.provider.connection)
+  }, 100000)
 
   it('should create treasury with correct admin', async () => {
-    const treasury = await TreasuryAccount.fetch(program, treasuryKey)
-    expect(treasury.adminAuthorities).toContain([adminWallet.publicKey])
-    expect(treasury.minSignatures).toEqual(1)
-  })
+    const treasury = await TreasuryAccount.fetch(setup.program, setup.treasuryKey)
+    expect(treasury.adminAuthorities[0].toString()).toBe(setup.adminWallet.publicKey.toString())
+    expect(treasury.minSignatures).toBe(1)
+  }, 10000)
 
   it('should allow deposits to treasury', async () => {
-    const depositAmount = BigInt(1 * anchor.web3.LAMPORTS_PER_SOL)
-    const initialBalance = await TreasuryAccount.getBalance(program, treasuryKey)
+    const depositAmount = new BN(anchor.web3.LAMPORTS_PER_SOL)
+    const initialBalance = await TreasuryAccount.getBalance(setup.program, setup.treasuryKey)
 
-    await depositToTreasury(program, {
+    const tx = await depositToTreasury(setup.program, {
       amount: depositAmount,
+      depositor: depositor.publicKey,
     })
+    const vtx = await getVersionTxFromInstructions(setup.program.provider.connection, [tx]);
+    await signAndSendVTx(vtx, depositor, setup.program.provider.connection)
 
-    const newBalance = await TreasuryAccount.getBalance(program, treasuryKey)
-    expect(newBalance).toEqual(initialBalance + depositAmount)
+    const newBalance = await TreasuryAccount.getBalance(setup.program, setup.treasuryKey)
+    expect(newBalance.toString()).toBe((initialBalance + depositAmount).toString())
 
-    const treasury = await TreasuryAccount.fetch(program, treasuryKey)
-    expect(treasury.totalDeposits).toEqual(depositAmount)
-  })
+    const treasury = await TreasuryAccount.fetch(setup.program, setup.treasuryKey)
+    expect(treasury.totalDeposits.toString()).toBe(depositAmount.toString())
+  }, 10000)
+
+  it('should fail deposit with insufficient funds', async () => {
+    const poorDepositor = anchor.web3.Keypair.generate() // No funds
+    const depositAmount = new BN(anchor.web3.LAMPORTS_PER_SOL)
+
+    const tx = await depositToTreasury(setup.program, {
+      amount: depositAmount,
+      depositor: poorDepositor.publicKey,
+    })
+    const vtx = await getVersionTxFromInstructions(setup.program.provider.connection, [tx]);
+
+    await expect(
+      signAndSendVTx(vtx, poorDepositor, setup.program.provider.connection)
+    ).rejects.toThrow(/insufficient funds/)
+  }, 10000)
 
   it('should allow admin to withdraw from treasury', async () => {
-    const withdrawAmount = BigInt(0.5 * anchor.web3.LAMPORTS_PER_SOL)
-    const recipient = anchor.web3.Keypair.generate()
+    const withdrawAmount = new BN(anchor.web3.LAMPORTS_PER_SOL / 2)
+    const recipient = await createUserWithFunds(setup.program.provider.connection)
     const pool = anchor.web3.Keypair.generate()
     
-    const initialBalance = await TreasuryAccount.getBalance(program, treasuryKey)
-    const initialRecipientBalance = await provider.connection.getBalance(recipient.publicKey)
+    const initialBalance = await TreasuryAccount.getBalance(setup.program, setup.treasuryKey)
+    const initialRecipientBalance = await setup.program.provider.connection.getBalance(recipient.publicKey)
 
-    await withdrawFromTreasury(program, {
+    const tx = await withdrawFromTreasury(setup.program, {
       amount: withdrawAmount,
       recipient: recipient.publicKey,
       pool: pool.publicKey,
-      authority: adminWallet.publicKey,
+      authority: setup.adminWallet.publicKey,
     })
+    const vtx = await getVersionTxFromInstructions(setup.program.provider.connection, [tx]);
 
-    const newBalance = await TreasuryAccount.getBalance(program, treasuryKey)
-    const newRecipientBalance = await provider.connection.getBalance(recipient.publicKey)
+    await signAndSendVTx(vtx, setup.adminWallet, setup.program.provider.connection)
 
-    expect(newBalance).toEqual(initialBalance - withdrawAmount)
-    expect(newRecipientBalance).toEqual(initialRecipientBalance + Number(withdrawAmount))
+    const newBalance = await TreasuryAccount.getBalance(setup.program, setup.treasuryKey)
+    const newRecipientBalance = await setup.program.provider.connection.getBalance(recipient.publicKey)
 
-    const treasury = await TreasuryAccount.fetch(program, treasuryKey)
-    expect(treasury.totalWithdrawals).toEqual(withdrawAmount)
-  })
+    expect(newBalance.toString()).toBe((initialBalance - withdrawAmount).toString())
+    expect(newRecipientBalance.toString()).toBe((initialRecipientBalance + withdrawAmount).toString())
 
-  it('should not allow non-admin to withdraw', async () => {
-    const nonAdmin = anchor.web3.Keypair.generate()
-    const withdrawAmount = BigInt(0.1 * anchor.web3.LAMPORTS_PER_SOL)
+    const treasury = await TreasuryAccount.fetch(setup.program, setup.treasuryKey)
+    expect(treasury.totalWithdrawals.toString()).toBe(withdrawAmount.toString())
+  }, 10000)
+
+  it('should not allow withdrawal exceeding treasury balance', async () => {
+    const excessiveAmount = new BN(1000 * anchor.web3.LAMPORTS_PER_SOL) // More than treasury has
     const recipient = anchor.web3.Keypair.generate()
     const pool = anchor.web3.Keypair.generate()
 
-    try {
-      await withdrawFromTreasury(program, {
-        amount: withdrawAmount,
-        recipient: recipient.publicKey,
-        pool: pool.publicKey,
-        authority: nonAdmin.publicKey,
-      })
-      // expect.toFail('Should not allow non-admin to withdraw')
-    } catch (error) {
-      expect(error.message).toContain('Unauthorized')
-    }
-  })
+    const tx = await withdrawFromTreasury(setup.program, {
+      amount: excessiveAmount,
+      recipient: recipient.publicKey,
+      pool: pool.publicKey,
+      authority: setup.adminWallet.publicKey,
+    })
+    const vtx = await getVersionTxFromInstructions(setup.program.provider.connection, [tx]);
+
+    await expect(
+      signAndSendVTx(vtx, setup.adminWallet, setup.program.provider.connection)
+    ).rejects.toThrow(/insufficient funds/i)
+  }, 10000)
+
+  it('should not allow non-admin to withdraw', async () => {
+    const nonAdmin = await createUserWithFunds(setup.program.provider.connection)
+    const withdrawAmount = new BN(0.1 * anchor.web3.LAMPORTS_PER_SOL)
+    const recipient = anchor.web3.Keypair.generate()
+    const pool = anchor.web3.Keypair.generate()
+
+    const tx = await withdrawFromTreasury(setup.program, {
+      amount: withdrawAmount,
+      recipient: recipient.publicKey,
+      pool: pool.publicKey,
+      authority: nonAdmin.publicKey,
+    })
+    const vtx = await getVersionTxFromInstructions(setup.program.provider.connection, [tx]);
+
+    await expect(
+      signAndSendVTx(vtx, nonAdmin, setup.program.provider.connection)
+    ).rejects.toThrow(/unauthorized/i)
+  }, 20000)
 }) 

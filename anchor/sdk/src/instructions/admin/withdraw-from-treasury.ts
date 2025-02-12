@@ -1,10 +1,10 @@
-import { Program, web3 } from '@coral-xyz/anchor'
+import { Program, web3, BN } from '@coral-xyz/anchor'
 import { HorseRace } from '../../types/horse_race'
 import { TreasuryAccount } from '../../states/treasury-account'
 import { TransactionInstruction } from '@solana/web3.js'
 
 export interface WithdrawFromTreasuryParams {
-  amount: bigint
+  amount: BN
   recipient: web3.PublicKey
   pool: web3.PublicKey
   authority?: web3.PublicKey
@@ -17,7 +17,7 @@ export async function withdrawFromTreasury(
   const { amount, recipient, pool, authority = program.provider.publicKey } = params
   const [treasuryKey] = await TreasuryAccount.getPda(program)
 
-  return await program.methods
+  return program.methods
     .runWithdrawFromTreasury(amount)
     .accountsStrict({
       treasury: treasuryKey,
@@ -26,5 +26,6 @@ export async function withdrawFromTreasury(
       pool,
       authority,
       systemProgram: web3.SystemProgram.programId,
-    }).instruction();
+    })
+    .instruction()
 } 

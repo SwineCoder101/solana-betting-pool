@@ -1,5 +1,5 @@
 import { PublicKey } from '@solana/web3.js'
-import { Program } from '@coral-xyz/anchor'
+import { Program, BN } from '@coral-xyz/anchor'
 import { HorseRace } from '../types/horse_race'
 import { TREASURY_SEED } from '../constants'
 
@@ -7,8 +7,8 @@ export class TreasuryAccount {
   constructor(
     public adminAuthorities: PublicKey[],
     public minSignatures: number,
-    public totalDeposits: bigint,
-    public totalWithdrawals: bigint,
+    public totalDeposits: BN,
+    public totalWithdrawals: BN,
     public bump: number,
   ) {}
 

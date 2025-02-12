@@ -6,6 +6,10 @@ import { HorseRace, CompetitionData, createCompetition, IDL, getCompetitionData,
 import { createCompetitionWithPools } from "../sdk/src/instructions/admin/create-competition-with-pools";
 import { getVersionTxFromInstructions } from "../sdk/src/utils";
 import { signAndSendVTx } from "./test-utils";
+import { Program, web3 } from "@coral-xyz/anchor";
+import { createTreasury } from "../sdk/src";
+import { TreasuryAccount } from "../sdk/src/states/treasury-account";
+import { createUserWithFunds } from "./test-utils";
 
 export type SetupDTO = {
     adminKp: Keypair;
@@ -16,6 +20,7 @@ export type SetupDTO = {
     program: anchor.Program<HorseRace>;
     sdkConfig: SdkConfig;
     treasury: PublicKey;
+    poolTreasuryPubkey: PublicKey;
 }
 
 export type EnvironmentSetupDTO = {
@@ -144,6 +149,7 @@ export const setupCompetition = async function (): Promise<SetupDTO> {
     fakeAdmin,
     program,
     sdkConfig,
+    poolTreasuryPubkey: Keypair.generate().publicKey,
   };
 };
 
@@ -187,6 +193,20 @@ export const setupCompetitionWithPools = async function (): Promise<SetupDTO> {
 
   const competitionData = await getCompetitionData(competitionHash, program);
 
+
+
+  const ix = await createTreasury(program, {
+    maxAdmins: 1,
+    minSignatures: 1,
+    initialAdmins: [adminKp.publicKey],
+    payer: adminKp.publicKey,
+  });
+
+  const vtx = await getVersionTxFromInstructions(program.provider.connection, [ix], adminKp.publicKey);
+  await signAndSendVTx(vtx, adminKp, program.provider.connection);
+
+  const [treasuryKey] = await TreasuryAccount.getPda(program);
+
   return {
     adminKp,
     competitionPubkey,
@@ -196,5 +216,39 @@ export const setupCompetitionWithPools = async function (): Promise<SetupDTO> {
     program,
     sdkConfig,
     poolKeys: poolKeys ?? [Keypair.generate().publicKey],
+    poolTreasuryPubkey: treasuryKey,
+  };
+}
+
+export interface CommonSetup {
+  program: Program<HorseRace>;
+  treasuryKey: web3.PublicKey;
+  adminWallet: web3.Keypair;
+  payer: web3.Keypair;
+}
+
+export async function setupTreasury(): Promise<CommonSetup> {
+  const program = anchor.workspace.HorseRace as Program<HorseRace>;
+  const payer = await createUserWithFunds(program.provider.connection);
+  const adminWallet = await createUserWithFunds(program.provider.connection);
+
+  // Create treasury with admin
+  const ix = await createTreasury(program, {
+    maxAdmins: 1,
+    minSignatures: 1,
+    initialAdmins: [adminWallet.publicKey],
+    payer: payer.publicKey,
+  });
+
+  const vtx = await getVersionTxFromInstructions(program.provider.connection, [ix], payer.publicKey);
+  await signAndSendVTx(vtx, payer, program.provider.connection);
+
+  const [treasuryKey] = await TreasuryAccount.getPda(program);
+
+  return { 
+    program,
+    treasuryKey, 
+    adminWallet,
+    payer,
   };
 }
