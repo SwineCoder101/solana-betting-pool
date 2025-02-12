@@ -32,49 +32,74 @@ describe("Bets", () => {
     numberOfBetsForSigner = (await getBetAccountsForUser(program, signer.publicKey)).length;
   }, 30000);
 
-  it("should create bet against a pool", async () => {
+  it("should create bet against a pool with correct timestamps", async () => {
     const amount = LAMPORTS_PER_SOL;
     const lowerBoundPrice = 50;
     const upperBoundPrice = 150;
     const poolKey = poolKeys[0];    
     const userBalanceBefore = await connection.getBalance(signer.publicKey);
 
-    console.log('Creating bet with pool:', poolKey.toBase58());
-    console.log('Signer:', signer.publicKey.toBase58());
-
-    // Get initial bet count
-    const initialBetCount = (await getBetAccountsForPool(program, poolKey)).length;
-    console.log('Initial bet count:', initialBetCount);
+    // Get initial bet count and timestamp
+    const initialBets = await getBetAccountsForPool(program, poolKey);
+    const beforeCreateTime = new Date();
+    // Convert to seconds to match on-chain precision
+    const beforeCreateSeconds = Math.floor(beforeCreateTime.getTime() / 1000) * 1000;
+    console.log('Before create time:', beforeCreateSeconds);
 
     const vtx = await createBet(program, signer.publicKey, amount, lowerBoundPrice, upperBoundPrice, 1, poolKey, competitionPubkey);
     vtx.sign([signer]);
     const signature = await program.provider.connection.sendTransaction(vtx);
     await program.provider.connection.confirmTransaction(signature, 'confirmed');
-    
-    if (signature.err) {
-      console.error('Transaction failed:', signature.err);
-      throw new Error('Transaction failed: ' + signature.err);
-    }
 
+    const afterCreateTime = new Date();
+    
+    // Convert to seconds to match on-chain precision
+    const afterCreateSeconds = Math.floor(afterCreateTime.getTime() / 1000) * 1000;
+    console.log('After create time:', afterCreateSeconds);
+    
+    // Add delay to ensure transaction is processed
     await new Promise(resolve => setTimeout(resolve, 2000));
 
     const betAccounts = await getBetAccountsForPool(program, poolKey);
-    console.log('Updated bet count:', betAccounts.length);
+    console.log('Found bet accounts:', betAccounts.length);
+    betAccounts.forEach(acc => {
+      console.log('Bet account:', {
+        user: acc.user,
+        poolKey: acc.poolKey,
+        status: acc.status,
+        createdAt: acc.createdAt.getTime(),
+        updatedAt: acc.updatedAt.getTime()
+      });
+    });
+
+    // Find only the new bet by filtering out initial bets
+    const newBets = betAccounts.filter(b => 
+      !initialBets.some(ib => ib.publicKey === b.publicKey)
+    );
+    expect(newBets.length).toBe(1);
+    const bet = newBets[0];
     
-    const allAccounts = await program.account.bet.all();
-    console.log('All bet accounts:', allAccounts);
-    
-    expect(betAccounts.length).toEqual(initialBetCount + 1);
-    
-    const bet = betAccounts.find(b => b.user === signer.publicKey.toBase58());
-    console.log('Found bet:', bet);
+    console.log('New bet timestamps:', {
+      createdAt: bet.createdAt.getTime(),
+      updatedAt: bet.updatedAt.getTime(),
+      beforeCreate: beforeCreateSeconds,
+      afterCreate: afterCreateSeconds
+    });
+
     expect(bet).toBeDefined();
-    expect(bet!.amount).toEqual(amount);
-    expect(bet!.lowerBoundPrice).toEqual(lowerBoundPrice);
-    expect(bet!.upperBoundPrice).toEqual(upperBoundPrice);
-    expect(bet!.poolKey).toEqual(poolKey.toString());
-    expect(bet!.competition).toEqual(competitionPubkey.toString());
-    expect(bet!.status).toEqual(BetStatus.Active);
+    expect(bet.amount).toEqual(amount);
+    expect(bet.status).toEqual(BetStatus.Active);
+    
+    // Allow for small timing differences and account for second-level precision
+    const TIMING_TOLERANCE = 2000; // 2 seconds in milliseconds
+    expect(bet.createdAt.getTime()).toBeGreaterThanOrEqual(beforeCreateSeconds - TIMING_TOLERANCE);
+    expect(bet.createdAt.getTime()).toBeLessThanOrEqual(afterCreateSeconds + TIMING_TOLERANCE);
+    expect(bet.updatedAt.getTime()).toEqual(bet.createdAt.getTime());
+    
+    expect(bet.lowerBoundPrice).toEqual(lowerBoundPrice);
+    expect(bet.upperBoundPrice).toEqual(upperBoundPrice);
+    expect(bet.poolKey).toEqual(poolKey.toString());
+    expect(bet.competition).toEqual(competitionPubkey.toString());
     expect(userBalanceBefore - await connection.getBalance(signer.publicKey)).toBeGreaterThan(LAMPORTS_PER_SOL);
   });
 
@@ -166,11 +191,12 @@ describe("Bets", () => {
     console.log('Found bet to cancel:', bet);
     expect(bet).toBeDefined();
 
+    const beforeCancelTime = new Date();
+
     const cancelBetTx = await cancelBet(program, signer.publicKey, poolKey, signature.signature);
     await program.provider.connection.confirmTransaction(cancelBetTx, 'confirmed');
 
-
-    await new Promise(resolve => setTimeout(resolve, 2000));
+    const afterCancelTime = new Date();
 
     const [betPDA] = PublicKey.findProgramAddressSync(
       [
@@ -181,8 +207,12 @@ describe("Bets", () => {
       ],
       program.programId
     );
+    
     const updatedBet = await getBetData(program, betPDA);
     expect(updatedBet.status).toEqual(BetStatus.Cancelled);
+    expect(updatedBet.updatedAt.getTime()).toBeGreaterThanOrEqual(beforeCancelTime.getTime());
+    expect(updatedBet.updatedAt.getTime()).toBeLessThanOrEqual(afterCancelTime.getTime());
+    expect(updatedBet.updatedAt.getTime()).toBeGreaterThan(updatedBet.createdAt.getTime());
   });
 
   it("should not allow bet when time has surpassed the competition end time", async () => {

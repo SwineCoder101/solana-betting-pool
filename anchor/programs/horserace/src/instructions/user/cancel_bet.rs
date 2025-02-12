@@ -48,6 +48,7 @@ pub fn run_cancel_bet(ctx: Context<CancelBet>) -> Result<()> {
         upper_bound_price: ctx.accounts.bet.upper_bound_price,
         pool_key: ctx.accounts.pool.key(),
         competition: ctx.accounts.bet.competition,
+        cancelled_at: Clock::get()?.unix_timestamp as u64,
     });
 
     Ok(())
@@ -63,5 +64,6 @@ pub struct BetCancelled {
     pub upper_bound_price: u64,
     pub pool_key: Pubkey,
     pub competition: Pubkey,
+    pub cancelled_at: u64,
 }
 

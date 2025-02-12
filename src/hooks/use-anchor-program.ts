@@ -19,6 +19,7 @@ export function useAnchorProgram(): ProgramResult {
   const { wallets } = useSolanaWallets();
 
   const wallet = wallets.filter(wallet => wallet.type === "solana")[0];
+
   
   const connection = useMemo(() => new Connection(
     process.env.VITE_SOLANA_RPC_URL || 'https://api.devnet.solana.com'

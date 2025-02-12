@@ -20,4 +20,6 @@ pub struct Bet {
     pub status: BetStatus,
     pub leverage: u64,
     pub leverage_multiplier: u64,
+    pub created_at: u64,
+    pub updated_at: u64,
 }
