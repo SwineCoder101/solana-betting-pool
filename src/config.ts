@@ -62,3 +62,14 @@ export const MULTIPLIER_PRESETS = {
     // Results in: 1.05x, 1.10x, 1.15x, 1.20x, 1.25x
   },
 } as const
+
+export const ADMIN_ADDRESSES : string[] = [
+  'GJwvBRbBZwNYzJEECfCEjKqkDf9YfKzYKwqEEmyKRYHF', // Example admin address
+  'BKPMTGPrLXDdrHBQSBhH33dqPNDtyTcuMh8BG9Ce1aa',  // Example admin address
+  '6oMF85KwcY57VaweFE7JNeziNaVRdCKHzNLpARdG9mMw'
+];
+
+// Optional: Add different admin role levels if needed
+export const SUPER_ADMIN_ADDRESSES : string[] = [
+  'GJwvBRbBZwNYzJEECfCEjKqkDf9YfKzYKwqEEmyKRYHF',
+];

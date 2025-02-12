@@ -4,6 +4,7 @@ import BettingPage from './pages/BettingPage'
 import LeaderboardPage from './pages/LeaderboardPage'
 import LeaderboardPage2 from './pages/LeaderboardPage2'
 import AccountPage from './pages/AccountPage'
+import AdminPage from './pages/AdminPage'
 import { UserBet } from './types'
 
 // Route paths as constants for type-safe navigation
@@ -12,6 +13,7 @@ export const ROUTES = {
   LEADERBOARD: '/leaderboard',
   LEADERBOARD_2: '/leaderboard-2',
   ACCOUNT: '/account',
+  ADMIN: '/admin',
 } as const
 
 function BettingPageWrapper() {
@@ -46,6 +48,10 @@ export const router = createBrowserRouter([
       {
         path: ROUTES.ACCOUNT,
         element: <AccountPage />,
+      },
+      {
+        path: ROUTES.ADMIN,
+        element: <AdminPage />,
       },
       {
         path: '*',
