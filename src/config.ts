@@ -73,3 +73,15 @@ export const ADMIN_ADDRESSES : string[] = [
 export const SUPER_ADMIN_ADDRESSES : string[] = [
   'GJwvBRbBZwNYzJEECfCEjKqkDf9YfKzYKwqEEmyKRYHF',
 ];
+
+// Privy Chain Ids
+// Mainnet: 'solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp'
+// Devnet: 'solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1'
+// Testnet: 'solana:4uhcVJyU9pJkvQyS88uRDiswHXSCkY3z'
+
+export const PRIVY_CHAIN_IDS = {
+  MAINNET: 'solana:5eykt4UsFv8P8NJdTREpY1vzqKqZKvdp',
+  DEVNET: 'solana:EtWTRABZaYq6iMfeYKouRu166VU2xqa1',
+  TESTNET: 'solana:4uhcVJyU9pJkvQyS88uRDiswHXSCkY3z',
+} as const;
+

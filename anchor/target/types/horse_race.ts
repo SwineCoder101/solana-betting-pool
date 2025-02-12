@@ -753,6 +753,14 @@ export type HorseRace = {
           {
             "name": "leverageMultiplier",
             "type": "u64"
+          },
+          {
+            "name": "createdAt",
+            "type": "u64"
+          },
+          {
+            "name": "updatedAt",
+            "type": "u64"
           }
         ]
       }
@@ -789,6 +797,10 @@ export type HorseRace = {
           {
             "name": "competition",
             "type": "pubkey"
+          },
+          {
+            "name": "cancelledAt",
+            "type": "u64"
           }
         ]
       }
@@ -828,6 +840,10 @@ export type HorseRace = {
           },
           {
             "name": "leverageMultiplier",
+            "type": "u64"
+          },
+          {
+            "name": "createdAt",
             "type": "u64"
           }
         ]

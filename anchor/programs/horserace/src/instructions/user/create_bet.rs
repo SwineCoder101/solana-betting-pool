@@ -2,7 +2,7 @@ use anchor_lang::prelude::*;
 use crate::{
     errors::BettingError, states::{Bet, BetStatus, Pool}, utils::*
 };
-
+use anchor_lang::solana_program::clock::Clock;
 #[derive(Accounts)]
 #[instruction(amount: u64, lower_bound_price: u64, upper_bound_price: u64, pool_key: Pubkey, competition: Pubkey)]
 pub struct CreateBet<'info> {
@@ -75,6 +75,8 @@ pub fn run_create_bet(
     bet_account.pool_key = pool_key;
     bet_account.status = BetStatus::Active;
     bet_account.leverage_multiplier = leverage_multiplier;
+    bet_account.created_at = Clock::get()?.unix_timestamp as u64;
+    bet_account.updated_at = Clock::get()?.unix_timestamp as u64;
 
     emit!(BetCreated {
         bet_key: bet_account.key(),
@@ -85,6 +87,7 @@ pub fn run_create_bet(
         pool_key,
         competition,
         leverage_multiplier,
+        created_at: Clock::get()?.unix_timestamp as u64,
     });
     Ok(())
 }
@@ -99,4 +102,5 @@ pub struct BetCreated {
     pub pool_key: Pubkey,
     pub competition: Pubkey,
     pub leverage_multiplier: u64,
+    pub created_at: u64,
 }
