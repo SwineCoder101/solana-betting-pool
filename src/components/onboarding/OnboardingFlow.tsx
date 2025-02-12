@@ -3,6 +3,8 @@ import { useEffect, useState } from 'react'
 import { OldButton } from '../buttons/OldButton'
 import { LoginWalletButton } from '../privy/login-wallet-button'
 import { useSolanaPrivyWallet } from '@/hooks/use-solana-privy-wallet'
+import { WalletManager } from '../privy/wallet-manager'
+import { usePrivyWalletChecker } from '@/hooks/use-privy-wallet-checker'
 
 interface OnboardingFlowProps {
   onComplete: () => void
@@ -44,7 +46,9 @@ const DESKTOP_BANANA_POSITIONS = [
 export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   const [step, setStep] = useState(0)
   const [isDesktop, setIsDesktop] = useState(window.innerWidth > 768)
-  const { createWallet} = useSolanaPrivyWallet();
+  const [showWalletManager, setShowWalletManager] = useState(false)
+  const { createWallet, wallets } = useSolanaPrivyWallet();
+  const { embeddedWallet, refreshWalletState } = usePrivyWalletChecker();
 
   const { authenticated } = usePrivy();
   // const { login } = useLogin();
@@ -53,19 +57,32 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
     const handleResize = () => {
       setIsDesktop(window.innerWidth > 768)
     }
+    console.log("wallets", wallets);
+    console.log("embeddedWallet", embeddedWallet);
+
+    // If user is authenticated and has an embedded wallet, move to step 2
+    if (authenticated && embeddedWallet) {
+      setStep(2);
+    }
 
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
-  }, [])
+  }, [authenticated, embeddedWallet])
 
   const handleCreateWallet = async () => {
     try {
-        await createWallet();
-        setStep(2);
+      await createWallet();
+      setStep(2);
     } catch (error) {
-        console.error("Error creating wallet:", error);
+      console.error("Error creating wallet:", error);
+      refreshWalletState();
+      setStep(2);
     }
-};
+  };
+
+  const navigateToWalletManager = () => {
+    setShowWalletManager(true)
+  }
 
   const steps = [
     {
@@ -102,6 +119,12 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
                   Click the icon to create <br /> your banana wallet
                 </p>
               </div>
+              <button 
+                onClick={() => navigateToWalletManager()} 
+                className="px-4 py-2 bg-[#FFCF00] rounded-lg hover:bg-[#E6B800] transition-colors"
+              >
+                Manage Wallets
+              </button>
             </>
           ) : (
             <div className="flex flex-col items-center gap-8">
@@ -179,6 +202,22 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   ]
 
   const currentStep = steps[step]
+
+  if (showWalletManager) {
+    return (
+      <div className="fixed inset-0 z-50 bg-white">
+        <div className="p-4">
+          <button 
+            onClick={() => setShowWalletManager(false)}
+            className="mb-4 px-4 py-2 bg-[#FFCF00] rounded-lg hover:bg-[#E6B800] transition-colors"
+          >
+            Back to Onboarding
+          </button>
+          <WalletManager />
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="fixed inset-0 z-50">

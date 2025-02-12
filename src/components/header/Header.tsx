@@ -2,6 +2,7 @@ import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '../../routes'
 import ButtonOutline from '../buttons/ButtonOutline'
 import Navigation from './Navigation'
+import { LoginWalletButton } from '../privy/login-wallet-button'
 
 interface Props {
   darkMode?: boolean
@@ -56,6 +57,8 @@ export default function Header({ darkMode = false }: Props) {
           <ButtonOutline title="$1,211.32" onClick={() => {}}>
             <img src="/assets/images/bananas.png" alt="Banana" className="w-7 h-7 drop-shadow-lg" />
           </ButtonOutline>
+
+          <LoginWalletButton />
 
           <button onClick={() => {}} className="p-2 bg-[#FFF369] rounded-full cursor-pointer">
             <img src="/assets/svg/trophy.svg" alt="Profile" className="w-5 h-5" />
