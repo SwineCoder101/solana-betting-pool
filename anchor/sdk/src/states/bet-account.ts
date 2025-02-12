@@ -90,7 +90,7 @@ export function convertToBetProgramStatus(status: BetStatus): StatusEnumProgram 
   }
 }
 
-export async function convertProgramToBetData(program: Program<HorseRace>, account: any): Promise<BetData> {
+export async function convertProgramToBetData(account: any): Promise<BetData> {
   return {
     publicKey: account.publicKey?.toString() || '',
     user: account.user.toString(),
@@ -164,7 +164,7 @@ export async function getBetAccountsForUser(
 
 export async function getAllBetAccounts(program: Program<HorseRace>): Promise<BetData[]> {
   const accounts = await program.account.bet.all();
-  return await Promise.all(accounts.map(async (account) => convertProgramToBetData(program, account.account)));
+  return await Promise.all(accounts.map(async (account) => convertProgramToBetData(account.account)));
 }
 
 export async function getActiveBetAccountsForPool(
@@ -206,5 +206,5 @@ export async function getBetAccountsForPool(
 
 export async function getAllBetDataByUser(program: Program<HorseRace>, user: PublicKey): Promise<BetData[]> {
   const bets = await program.account.bet.all();
-  return await Promise.all(bets.filter((bet) => bet.account.user.toBase58() === user.toBase58()).map(async (bet) => convertProgramToBetData(program, bet.account)));
+  return await Promise.all(bets.filter((bet) => bet.account.user.toBase58() === user.toBase58()).map(async (bet) => convertProgramToBetData(bet.account)));
 }

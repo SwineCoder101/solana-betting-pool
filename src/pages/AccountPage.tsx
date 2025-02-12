@@ -1,9 +1,9 @@
 import { useAllBets } from '@/hooks/queries'
 import { useSolanaPrivyWallet } from '@/hooks/use-solana-privy-wallet'
+import { Dialog } from '@headlessui/react'
+import { SolanaFundingConfig } from '@privy-io/react-auth'
 import { LAMPORTS_PER_SOL } from '@solana/web3.js'
 import { useEffect, useState } from 'react'
-import { Dialog } from '@headlessui/react'
-import { NativeFundingConfig } from '@privy-io/react-auth'
 
 interface AccountStats {
   volume: number
@@ -139,10 +139,11 @@ export default function AccountPage() {
     }
 
     try {
-      const config : NativeFundingConfig = {
-        chain: 'solana',
+      const config : SolanaFundingConfig = {
+        cluster: {
+          name: 'devnet'
+        },
         amount,
-        asset: 'native-currency',
         defaultFundingMethod: 'wallet' as const
       }
 
