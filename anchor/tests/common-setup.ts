@@ -195,17 +195,17 @@ export const setupCompetitionWithPools = async function (): Promise<SetupDTO> {
 
 
 
-  const ix = await createTreasury(program, {
-    maxAdmins: 1,
-    minSignatures: 1,
-    initialAdmins: [adminKp.publicKey],
-    payer: adminKp.publicKey,
-  });
+  // const ix = await createTreasury(program, {
+  //   maxAdmins: 1,
+  //   minSignatures: 1,
+  //   initialAdmins: [adminKp.publicKey],
+  //   payer: adminKp.publicKey,
+  // });
 
-  const vtx = await getVersionTxFromInstructions(program.provider.connection, [ix], adminKp.publicKey);
-  await signAndSendVTx(vtx, adminKp, program.provider.connection);
+  // const vtx = await getVersionTxFromInstructions(program.provider.connection, [ix], adminKp.publicKey);
+  // await signAndSendVTx(vtx, adminKp, program.provider.connection);
 
-  const [treasuryKey] = await TreasuryAccount.getPda(program);
+  // const [treasuryKey] = await TreasuryAccount.getPda(program);
 
   return {
     adminKp,
@@ -216,7 +216,7 @@ export const setupCompetitionWithPools = async function (): Promise<SetupDTO> {
     program,
     sdkConfig,
     poolKeys: poolKeys ?? [Keypair.generate().publicKey],
-    poolTreasuryPubkey: treasuryKey,
+    poolTreasuryPubkey: Keypair.generate().publicKey,
   };
 }
 
@@ -241,10 +241,10 @@ export async function setupTreasury(): Promise<CommonSetup> {
   });
 
   const vtx = await getVersionTxFromInstructions(program.provider.connection, [ix], payer.publicKey);
-  await signAndSendVTx(vtx, payer, program.provider.connection);
+  const sig = await signAndSendVTx(vtx, payer, program.provider.connection);
+  await confirmTransaction(sig, program);
 
   const [treasuryKey] = await TreasuryAccount.getPda(program);
-
   return { 
     program,
     treasuryKey, 
