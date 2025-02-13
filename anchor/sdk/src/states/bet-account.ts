@@ -126,6 +126,15 @@ export async function getBetData(program: Program<HorseRace>, betPubkey: PublicK
   };
 }
 
+export async function getBetsForUserAndPool(
+  program: Program<HorseRace>,
+  userPubkey: PublicKey,
+  poolPubkey: PublicKey
+): Promise<BetData[]> {
+  const bets = await program.account.bet.all();
+  return await Promise.all(bets.filter((bet) => bet.account.user.toBase58() === userPubkey.toBase58() && bet.account.poolKey.toBase58() === poolPubkey.toBase58()).map(async (bet) => convertProgramToBetData(bet.account)));
+}
+
 export async function getBetAccount(
   program: Program<HorseRace>,
   betPubkey: PublicKey

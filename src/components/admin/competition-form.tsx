@@ -12,7 +12,7 @@ const CompetitionForm: React.FC = () => {
   const [startTime, setStartTime] = useState<string>("");
   const [endDate, setEndDate] = useState<string>("");
   const [endTime, setEndTime] = useState<string>("");
-  const [interval, setInterval] = useState<string>("300"); // 5 minutes default
+  const [interval, setInterval] = useState<string>("10");
   const [tokenSymbol, setTokenSymbol] = useState<string>(tokens[0].symbol);
   const [houseCutFactor, setHouseCutFactor] = useState<string>("5"); // 5%
   const [minPayoutRatio, setMinPayoutRatio] = useState<string>("1.5"); // 150%
