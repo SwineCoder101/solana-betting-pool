@@ -17,7 +17,7 @@ export type SetupDTO = {
     competitionData: CompetitionData;
     poolKeys?: PublicKey[];
     fakeAdmin: Keypair;
-    program: anchor.Program<HorseRace>;
+    program: Program<HorseRace>;
     sdkConfig: SdkConfig;
     treasury: PublicKey;
     poolTreasuryPubkey: PublicKey;
@@ -164,7 +164,7 @@ export const confirmTransaction = async function (signature: string, program: an
   return confirmation;
 }
 
-export const setupCompetitionWithPools = async function (): Promise<SetupDTO> {
+export const setupCompetitionWithPools = async function (bypassTreasury: boolean = false): Promise<SetupDTO> {
   const { fakeAdmin, program, sdkConfig, adminKeys, treasury, adminKp} = await setupEnvironment();
   const {tokenA, priceFeedId, houseCutFactor, minPayoutRatio, interval, startTime, endTime, competitionHash, competitionPubkey} = getCompetitionTestData(program);
 
@@ -193,19 +193,20 @@ export const setupCompetitionWithPools = async function (): Promise<SetupDTO> {
 
   const competitionData = await getCompetitionData(competitionHash, program);
 
-
-
-  // const ix = await createTreasury(program, {
-  //   maxAdmins: 1,
-  //   minSignatures: 1,
-  //   initialAdmins: [adminKp.publicKey],
-  //   payer: adminKp.publicKey,
-  // });
-
-  // const vtx = await getVersionTxFromInstructions(program.provider.connection, [ix], adminKp.publicKey);
-  // await signAndSendVTx(vtx, adminKp, program.provider.connection);
-
-  // const [treasuryKey] = await TreasuryAccount.getPda(program);
+  // if treasury is not created, create it
+  const treasuryInitialized = await TreasuryAccount.isInitialized(program)
+  let poolTreasuryPubkey: PublicKey = Keypair.generate().publicKey;
+  
+  if (!bypassTreasury) {
+    if (!treasuryInitialized) {
+      poolTreasuryPubkey =  await Util.createTreasuryUtil(program, adminKp);
+      console.log('poolTreasuryPubkey:', poolTreasuryPubkey.toBase58());
+    } else {
+      console.log('Treasury already initialized, using existing treasury');
+    }
+  } else {
+    console.log('Bypassing treasury creation');
+  }
 
   return {
     adminKp,
@@ -216,7 +217,7 @@ export const setupCompetitionWithPools = async function (): Promise<SetupDTO> {
     program,
     sdkConfig,
     poolKeys: poolKeys ?? [Keypair.generate().publicKey],
-    poolTreasuryPubkey: Keypair.generate().publicKey,
+    poolTreasuryPubkey,
   };
 }
 
@@ -233,16 +234,20 @@ export async function setupTreasury(): Promise<CommonSetup> {
   const adminWallet = await createUserWithFunds(program.provider.connection);
 
   // Create treasury with admin
-  const ix = await createTreasury(program, {
-    maxAdmins: 1,
-    minSignatures: 1,
-    initialAdmins: [adminWallet.publicKey],
-    payer: payer.publicKey,
-  });
+  const treasuryInitialized = await TreasuryAccount.isInitialized(program)
 
-  const vtx = await getVersionTxFromInstructions(program.provider.connection, [ix], payer.publicKey);
-  const sig = await signAndSendVTx(vtx, payer, program.provider.connection);
-  await confirmTransaction(sig, program);
+  if (!treasuryInitialized) {
+    const ix = await createTreasury(program, {
+      maxAdmins: 1,
+      minSignatures: 1,
+      initialAdmins: [adminWallet.publicKey],
+      payer: payer.publicKey,
+    });
+
+    const vtx = await getVersionTxFromInstructions(program.provider.connection, [ix], payer.publicKey);
+    const sig = await signAndSendVTx(vtx, payer, program.provider.connection);
+    await confirmTransaction(sig, program);
+  }
 
   const [treasuryKey] = await TreasuryAccount.getPda(program);
   return { 

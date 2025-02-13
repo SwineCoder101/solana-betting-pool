@@ -123,6 +123,20 @@ export async function signAndSendVTx(
     throw new Error(`Submission failed: ${error.message}`);
   }
 }
+
+  export async function createTreasuryUtil(program: Program<HorseRace>, adminKp: Keypair): Promise<PublicKey> {
+    const ix = await createTreasury(program, {
+      maxAdmins: 1,
+      minSignatures: 1,
+      initialAdmins: [adminKp.publicKey],
+    })
+
+    const vtx = await getVersionTxFromInstructions(program.provider.connection, [ix]);
+    await signAndSendVTx(vtx, adminKp, program.provider.connection);
+    const [treasuryKey] = await TreasuryAccount.getPda(program);
+
+    return treasuryKey;
+  }
   
   export async function waitAndConfirmSignature(
     connection: Connection,

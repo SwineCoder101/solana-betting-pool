@@ -7,7 +7,7 @@ import { createBet } from "../sdk/src/instructions/user/create-bet";
 import { setupCompetitionWithPools, SetupDTO } from "./common-setup";
 import { createUserWithFunds } from "./test-utils";
 
-describe.skip("Bets", () => {
+describe("Bets", () => {
   let setupDto: SetupDTO;
   let program, poolKeys: PublicKey[], competitionPubkey, connection;
   let signer: Keypair;
@@ -15,7 +15,7 @@ describe.skip("Bets", () => {
   let numberOfBetsForSigner: number; 
 
   beforeAll(async () => {
-    setupDto = await setupCompetitionWithPools();
+    setupDto = await setupCompetitionWithPools(true);
     program = setupDto.program;
     poolKeys = setupDto.poolKeys ?? [Keypair.generate().publicKey];
     competitionPubkey = setupDto.competitionPubkey;

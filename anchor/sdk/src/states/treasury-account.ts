@@ -41,4 +41,16 @@ export class TreasuryAccount {
     const balance = await connection.getBalance(treasuryKey)
     return BigInt(balance)
   }
+
+  static async isInitialized(program: Program<HorseRace>): Promise<boolean> {
+    try {
+      const [treasuryPda] = await TreasuryAccount.getPda(program)
+      // Attempt to fetch the treasury account; if it does not exist, an error will be thrown.
+      await program.account.treasury.fetch(treasuryPda)
+      return true
+    } catch (err) {
+      console.log('treasury not initialized', err);
+      return false
+    }
+  }
 } 
