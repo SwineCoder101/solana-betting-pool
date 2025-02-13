@@ -48,6 +48,9 @@ anchor.setProvider(provider);
 
 const program = anchor.workspace.HorseRace as anchor.Program<HorseRace>;
 
+console.log("Declared Program ID:", program.programId.toBase58());
+
+
 
 
 const params : CompetitionPoolParams = {
@@ -82,7 +85,7 @@ async function main() {
 
     // Send and confirm pool transactions
     const poolSigs = await Promise.all(
-      poolTxs.map(tx => signAndSendVTx(tx, payer, connection))
+      poolTxs.map(tx => signAndSendVTx(tx, payer, program.provider.connection))
     );
     await Promise.all(
       poolSigs.map(sig => confirmTransaction(sig, program))

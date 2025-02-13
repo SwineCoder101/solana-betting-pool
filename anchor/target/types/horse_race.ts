@@ -5,7 +5,7 @@
  * IDL can be found at `target/idl/horse_race.json`.
  */
 export type HorseRace = {
-  "address": "BSKPMTGPrLXDdrHBQSBhH33dqPNDtyTcuMh8BG9Ce1aa",
+  "address": "2Hw1SskuFzbdxFACL74E79AYymNZzmwEh2iymts3XU8D",
   "metadata": {
     "name": "horseRace",
     "version": "0.1.0",
