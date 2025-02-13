@@ -20,7 +20,7 @@ const TreasuryDisplay: React.FC = () => {
         setBalance(BigInt(lamports));
       } catch (err) {
         console.error("Error fetching treasury balance:", err);
-        setError(err.message);
+        setError(err instanceof Error ? err.message : "An unknown error occurred");
       }
     };
 
