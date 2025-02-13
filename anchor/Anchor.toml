@@ -6,16 +6,16 @@ resolution = true
 skip-lint = false
 
 [programs.localnet]
-horserace = "BSKPMTGPrLXDdrHBQSBhH33dqPNDtyTcuMh8BG9Ce1aa"
+horserace = "2Hw1SskuFzbdxFACL74E79AYymNZzmwEh2iymts3XU8D"
 
 [programs.devnet]
-horserace = "BSKPMTGPrLXDdrHBQSBhH33dqPNDtyTcuMh8BG9Ce1aa"
+horserace = "2Hw1SskuFzbdxFACL74E79AYymNZzmwEh2iymts3XU8D"
 
 [registry]
 url = "https://api.apr.dev"
 
 [provider]
-cluster = "Localnet"
+cluster = "Devnet"
 wallet = "~/.config/solana/id.json"
 
 [scripts]
@@ -24,7 +24,7 @@ test = "../node_modules/.bin/jest --preset ts-jest"
 [test]
 startup_wait = 10000
 shutdown_wait = 2000
-upgradeable = false
+upgradeable = true
 
 [test.validator]
 bind_address = "127.0.0.1"
