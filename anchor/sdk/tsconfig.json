@@ -11,6 +11,6 @@
     "moduleResolution": "node",
     "resolveJsonModule": true,
   },
-  "include": ["src"],
+  "include": ["src", "../../src/components/admin/treasury-display.tsx"],
   "exclude": ["node_modules", "lib"]
 } 

@@ -49,7 +49,7 @@ const program = anchor.workspace.HorseRace as anchor.Program<HorseRace>;
 
 const createBetParams : CancelBetParams = {
     user: new PublicKey('7wVwUpoUTUKwRXSaKMgHEcF8AJpkAxPogJyWvdcBm5CJ'),
-    poolKey: new PublicKey('ADAG9ga5fEccoPyemEotXFJ39AizENq8nUxZWWtHAeMJ'),
+    poolKey: new PublicKey('8b2NzhZ1ucFr9jvXPpJzwTsp9JyNhswWP22dVaDv7JZG'),
     betHash: new PublicKey('9GTw54S8VJytoCvzw7NGyFdJSVwi2qPM78hFDPxRewbc'),
 }
 

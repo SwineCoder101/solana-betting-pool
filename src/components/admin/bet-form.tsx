@@ -111,6 +111,7 @@ const BetForm: React.FC = () => {
         competitionKey: formState.competition,
         lowerBoundPrice: selectedRange.lower,
         upperBoundPrice: selectedRange.upper,
+        leverageMultiplier: 1,
       });
 
       // Reset form on success

@@ -1,3 +1,5 @@
+import { CellState, ChartBounds, LineData } from './components/betting-chart/types'
+
 export interface ConfirmationState {
   col: number
   row: number
@@ -46,4 +48,35 @@ export interface UserBet {
     col: number
     row: number
   }
+}
+
+export interface ColumnData {
+  poolKey: string
+  poolHash: string
+  competitionKey: string
+  startTime: number
+  endTime: number
+  treasury: string
+  bets?: BetData[]
+  totalBets?: number
+  isFull?: boolean
+  isHot?: boolean
+}
+
+export interface BetData {
+  publicKey: string
+  user: string
+  amount: number
+  lowerBoundPrice: number
+  upperBoundPrice: number
+  userAvatar?: string
+}
+
+export interface GridState {
+  cells: Record<string, CellState>
+  activeColumn: number
+  lastPrice: number
+  chartBounds: ChartBounds
+  lineData: LineData[]
+  columnData: Record<number, ColumnData>
 }

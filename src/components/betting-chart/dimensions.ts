@@ -21,7 +21,7 @@ export const getImageDimensions = (chartSize: BettingChartSize): Record<string, 
       return {
         fullCell: { width: 40, height: 40, x: -20, y: -20 },
         bananaSmiling: { width: 16, height: 16, x: -8, y: -16 },
-        fire: { width: 10, height: 10, x: -5, y: -5 },
+        fire: { width: 10, height: 10, x: -50, y: -50 },
       }
 
     case BettingChartSize.MOBILE_EXPANDED:
@@ -34,7 +34,7 @@ export const getImageDimensions = (chartSize: BettingChartSize): Record<string, 
     case BettingChartSize.DESKTOP_COMPACT:
       return {
         fullCell: { width: 60, height: 60, x: -30, y: -30 },
-        bananaSmiling: { width: 24, height: 24, x: -12, y: -24 },
+        bananaSmiling: { width: 40, height: 40, x: -20, y: -20 },
         fire: { width: 14, height: 14, x: -7, y: -7 },
       }
 
@@ -43,7 +43,7 @@ export const getImageDimensions = (chartSize: BettingChartSize): Record<string, 
       return {
         fullCell: { width: 32, height: 32, x: -16, y: -16 },
         bananaSmiling: { width: 28, height: 28, x: -14, y: -28 },
-        fire: { width: 16, height: 16, x: -8, y: -8 },
+        fire: { width: 12, height: 12, x: -6, y: -6 },
       }
   }
 }

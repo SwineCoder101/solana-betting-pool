@@ -40,6 +40,14 @@
   fill: #000000 !important;
 }
 
+.amount-label {
+  font-size: 30px !important;
+
+  @media screen and (max-width: 768px) {
+    font-size: 14px !important;
+  }
+}
+
 .betting-cell__label--confirming {
   -webkit-user-select: none;
   -moz-user-select: none;
@@ -47,7 +55,12 @@
   user-select: none;
   pointer-events: none;
   -webkit-touch-callout: none;
-  transform: translateY(12px);
+
+  font-size: 20px;
+
+  @media screen and (max-width: 768px) {
+    font-size: 10px;
+  }
 }
 
 .betting-cell__emoji {

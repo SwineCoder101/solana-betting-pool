@@ -1,18 +1,21 @@
-import React, { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from 'react'
+import React, { Dispatch, SetStateAction, useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { Line, LineChart, ReferenceArea, XAxis, YAxis } from 'recharts'
 import { CHART_CONFIGS, MULTIPLIER_CONFIG, PADDING, SECONDS_PER_CELL_BLOCK } from '../../config'
+import { useBettingData } from '../../hooks/useBettingData'
 import { MockData } from '../../mockdata'
-import { BettingChartSize, ConfirmationState, UserBet } from '../../types'
+import { BettingChartSize, UserBet } from '../../types'
 import { generateRandomId, getCurrentTime, timeToMinutes } from '../../utils'
 import { ConfirmationDialog } from '../dialog/ConfirmationDialog'
 import './BettingChart.css'
+import ChartFooter from './components/ChartFooter'
 import { ChartHeader } from './components/ChartHeader'
 import { getCellDimensions, getImageDimensions } from './dimensions'
-import { ChartBounds, LineData, Rectangle } from './types'
-import { checkIfCellIsActive, getActiveColumnBounds, getStartTime } from './utils'
+import { rectangleReducer } from './rectangleReducer'
+import { ChartBounds, Rectangle } from './types'
+import { getActiveColumnBounds, getStartTime } from './utils'
 import bananaSmiling from '/assets/images/banana-smiling.png'
 import fullCellPool from '/assets/svg/full-cell-pool.svg'
-import { useBettingData } from '@/hooks/useBettingData'
+import { useColumnData } from '../../hooks/useColumnData'
 
 export interface Props {
   tokenCode: string
@@ -25,7 +28,7 @@ export interface Props {
 
 // Update the CustomLabel component to use chartSize instead of isCompactMode
 const CustomLabel = (props: any) => {
-  const { viewBox, value, cellState, chartSize, totalPrice } = props
+  const { viewBox, value, cellState, chartSize, totalPrice, amount } = props
   const x = viewBox.x + viewBox.width / 2 || 0
   const y = viewBox.y + viewBox.height / 2 || 0
 
@@ -54,6 +57,14 @@ const CustomLabel = (props: any) => {
       return <g transform={`translate(${x},${y})`}></g>
 
     case 'confirm':
+      return (
+        <g transform={`translate(${x},${y})`}>
+          <text textAnchor="middle" dominantBaseline="middle" className="betting-cell__label betting-cell__label--confirming">
+            {value}
+          </text>
+        </g>
+      )
+
     case 'remove':
       return (
         <g transform={`translate(${x},${y})`}>
@@ -68,32 +79,66 @@ const CustomLabel = (props: any) => {
       const isPredicted = cellState === 'predicted' || props?.isPredicted
       return (
         <g transform={`translate(${x},${y})`}>
-          <text
-            textAnchor="middle"
-            dominantBaseline="middle"
-            className={`
+          {amount ? (
+            <>
+              <text
+                textAnchor="middle"
+                dominantBaseline="middle"
+                className={`
+              betting-cell__price 
+              betting-cell__price--default
+              ${isPredicted ? 'betting-cell__price--predicted' : ''}
+              ${chartSize === BettingChartSize.MOBILE_EXPANDED ? 'betting-cell__price--mobile-expanded' : ''}
+              amount-label
+            `}
+                dy="-0.5em"
+              >
+                ${amount}
+              </text>
+              <text
+                textAnchor="middle"
+                dominantBaseline="middle"
+                className={`
               betting-cell__label 
               betting-cell__label--default 
               ${isPredicted ? 'betting-cell__label--predicted' : ''}
               ${chartSize === BettingChartSize.MOBILE_EXPANDED ? 'betting-cell__label--mobile-expanded' : ''}
             `}
-            dy="-0.5em"
-          >
-            ${value}
-          </text>
-          <text
-            textAnchor="middle"
-            dominantBaseline="middle"
-            className={`
+                dy="0.5em"
+              >
+                {value}
+              </text>
+            </>
+          ) : (
+            <>
+              <text
+                textAnchor="middle"
+                dominantBaseline="middle"
+                className={`
+              betting-cell__label 
+              betting-cell__label--default 
+              ${isPredicted ? 'betting-cell__label--predicted' : ''}
+              ${chartSize === BettingChartSize.MOBILE_EXPANDED ? 'betting-cell__label--mobile-expanded' : ''}
+            `}
+                dy="-0.5em"
+              >
+                {value}
+              </text>
+              <text
+                textAnchor="middle"
+                dominantBaseline="middle"
+                className={`
               betting-cell__price 
               betting-cell__price--default
               ${isPredicted ? 'betting-cell__price--predicted' : ''}
               ${chartSize === BettingChartSize.MOBILE_EXPANDED ? 'betting-cell__price--mobile-expanded' : ''}
             `}
-            dy="0.5em"
-          >
-            ${totalPrice}
-          </text>
+                dy="0.5em"
+              >
+                ${totalPrice}
+              </text>
+            </>
+          )}
         </g>
       )
   }
@@ -105,13 +150,16 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
   const latestPriceRef = useRef<number | null>(null)
   const gameStartTimeRef = useRef<number>(Date.now())
 
-  const [chartBounds, setChartBounds] = useState<ChartBounds>({ lowest: 0, highest: 1 })
-  const [lineData, setLineData] = useState<LineData[]>([])
-  const [basePrice, setBasePrice] = useState<number | null>(null)
+  const [gridState, dispatch] = useReducer(rectangleReducer, {
+    cells: {},
+    activeColumn: 0,
+    lastPrice: 0,
+    chartBounds: { lowest: 0, highest: 1 },
+    lineData: [],
+  })
+
   const [isLoading, setIsLoading] = useState(true)
   const [isConnected, setIsConnected] = useState(false)
-  const [predictions, setPredictions] = useState<{ x: number; y: number }[]>([])
-  const [confirmationCell, setConfirmationCell] = useState<ConfirmationState | null>(null)
   const [selectedAmount, setSelectedAmount] = useState(1)
   const [chartSize, setChartSize] = useState<BettingChartSize>(BettingChartSize.DESKTOP_COMPACT)
   const [startTime, setStartTime] = useState(getStartTime())
@@ -120,6 +168,7 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
   const [betToCancel, setBetToCancel] = useState<UserBet | null>(null)
 
   const { bettingPools, placeBet } = useBettingData(competitionKey)
+  const { columnData, isLoading: isColumnDataLoading } = useColumnData(competitionKey)
 
   const currentConfig = CHART_CONFIGS[chartSize]
   const CHART_HEIGHT = currentConfig.height
@@ -167,7 +216,7 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
   useEffect(() => {
     const handleResize = () => {
       const isMobile = window.innerWidth <= 768
-      setChartSize(isMobile ? BettingChartSize.MOBILE_COMPACT : BettingChartSize.DESKTOP_EXPANDED)
+      setChartSize(isMobile ? BettingChartSize.MOBILE_COMPACT : BettingChartSize.DESKTOP_COMPACT)
     }
 
     window.addEventListener('resize', handleResize)
@@ -190,34 +239,20 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
   // Update resetGame to ensure all state is properly reset
   const resetGame = (lastPrice: number) => {
     // Reset all state and refs
-    setBasePrice(lastPrice)
-    setRowHeightPriceValue(Number(lastPrice.toFixed(8)))
+    dispatch({ type: 'RESET_GAME', price: lastPrice })
     basePriceRef.current = lastPrice
     priceRangeShiftRef.current = 0
 
     const totalRange = lastPrice * PADDING * 2
 
     // Reset chart bounds with new price
-    setChartBounds({
-      lowest: lastPrice - totalRange / 2,
-      highest: lastPrice + totalRange / 2,
-    })
-
-    // Reset line data with new starting point
-    setLineData([
-      {
-        time: new Date().toTimeString().slice(0, 8),
-        price: lastPrice,
-        index: 0,
-      },
-    ])
-
-    // Clear predictions and confirmation
-    setPredictions([])
-    setConfirmationCell(null)
+    dispatch({ type: 'UPDATE_CHART_BOUNDS', lowest: lastPrice - totalRange / 2, highest: lastPrice + totalRange / 2 })
 
     // Update start time
     setStartTime(getCurrentTime())
+
+    // Clear user bets for this token
+    setUserBets((prevBets) => prevBets.filter((bet) => bet.tokenCode !== tokenCode))
   }
 
   // Check and update price range on Y axis
@@ -229,67 +264,47 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
 
     if (currentPrice > (isCompactMode ? chartBounds.highest - rowHeightPriceValue * 3 : chartBounds.highest)) {
       priceRangeShiftRef.current += 1
-      setChartBounds({
-        lowest: chartBounds.lowest + rowHeightPriceValue,
-        highest: chartBounds.highest + rowHeightPriceValue,
-      })
+      dispatch({ type: 'UPDATE_CHART_BOUNDS', lowest: chartBounds.lowest + rowHeightPriceValue, highest: chartBounds.highest + rowHeightPriceValue })
 
-      // Shift predictions down by one row
-      setPredictions((prev) =>
-        prev
-          .map((p) => ({
-            ...p,
-            y: p.y - 1,
-          }))
-          .filter((p) => p.y >= 0),
-      ) // Filter out predictions that would go out of bounds
-
-      // Shift confirmation cell if it exists
-      if (confirmationCell) {
-        setConfirmationCell((prev) =>
-          prev
+      // Shift predictions and bets down by one row
+      dispatch({ type: 'SHIFT_PREDICTIONS', shift: 1 })
+      // Update user bets positions
+      setUserBets((prevBets) =>
+        prevBets.map((bet) => ({
+          ...bet,
+          position: bet.position
             ? {
-                ...prev,
-                row: prev.row - 1,
+                ...bet.position,
+                row: bet.position.row - 1, // Shift down (subtract because grid goes up)
               }
-            : null,
-        )
-      }
+            : bet.position,
+        })),
+      )
     } else if (currentPrice < (isCompactMode ? chartBounds.lowest + rowHeightPriceValue * 3 : chartBounds.lowest)) {
       priceRangeShiftRef.current -= 1
-      setChartBounds({
-        lowest: chartBounds.lowest - rowHeightPriceValue,
-        highest: chartBounds.highest - rowHeightPriceValue,
-      })
+      dispatch({ type: 'UPDATE_CHART_BOUNDS', lowest: chartBounds.lowest - rowHeightPriceValue, highest: chartBounds.highest - rowHeightPriceValue })
 
-      // Shift predictions up by one row
-      setPredictions((prev) =>
-        prev
-          .map((p) => ({
-            ...p,
-            y: p.y + 1,
-          }))
-          .filter((p) => p.y < TOTAL_ROWS),
-      ) // Remove predictions that would go out of bounds
-
-      // Shift confirmation cell if it exists
-      if (confirmationCell) {
-        setConfirmationCell((prev) =>
-          prev
+      // Shift predictions and bets up by one row
+      dispatch({ type: 'SHIFT_PREDICTIONS', shift: -1 })
+      // Update user bets positions
+      setUserBets((prevBets) =>
+        prevBets.map((bet) => ({
+          ...bet,
+          position: bet.position
             ? {
-                ...prev,
-                row: prev.row + 1,
+                ...bet.position,
+                row: bet.position.row + 1, // Shift up (add because grid goes up)
               }
-            : null,
-        )
-      }
+            : bet.position,
+        })),
+      )
     }
   }
 
   const getRowPriceBounds = (row: number) => {
     return {
-      lowerBound: chartBounds.lowest + row * rowHeightPriceValue,
-      upperBound: chartBounds.lowest + (row + 1) * rowHeightPriceValue,
+      lowerBound: gridState.chartBounds.lowest + row * rowHeightPriceValue,
+      upperBound: gridState.chartBounds.lowest + (row + 1) * rowHeightPriceValue,
     }
   }
 
@@ -315,15 +330,12 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
 
         if (isFirstMessage) {
           gameStartTimeRef.current = Date.now()
-          setBasePrice(price)
+          dispatch({ type: 'UPDATE_PRICE', price })
           basePriceRef.current = price
 
           // Set initial chart bounds on first message
           const totalRange = price * PADDING * 2
-          setChartBounds({
-            lowest: price - totalRange / 2,
-            highest: price + totalRange / 2,
-          })
+          dispatch({ type: 'UPDATE_CHART_BOUNDS', lowest: price - totalRange / 2, highest: price + totalRange / 2 })
 
           // Set cell height value based on total range and number of rows
           // Use desktop expanded rows as a base for all calculations
@@ -331,13 +343,14 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
 
           setRowHeightPriceValue(cellHeight)
 
-          setLineData([
-            {
+          dispatch({
+            type: 'ADD_LINE_DATA',
+            data: {
               time: new Date(kline.t).toTimeString().slice(0, 8),
               price,
               index: 0,
             },
-          ])
+          })
           setIsLoading(false)
           isFirstMessage = false
         }
@@ -362,64 +375,72 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
     }
   }, [tokenCode])
 
-  // Update the interval effect to properly handle game reset
+  // First, let's modify the interval effect to properly track the active column
   useEffect(() => {
-    if (chartBounds.lowest === 0) return
+    if (gridState.chartBounds.lowest === 0) return
 
     const intervalId = setInterval(() => {
       if (latestPriceRef.current === null) return
 
       // Calculate current position
       const elapsedSeconds = (Date.now() - gameStartTimeRef.current) / 1000
-      const newIndex = Math.floor(elapsedSeconds / SECONDS_PER_CELL_BLOCK) + (elapsedSeconds % SECONDS_PER_CELL_BLOCK) / SECONDS_PER_CELL_BLOCK
+      const newIndex = Math.floor(elapsedSeconds / SECONDS_PER_CELL_BLOCK)
 
       // Check if we need to reset the game
       if (newIndex >= TOTAL_COLUMNS) {
-        // Reset game with latest price
-        gameStartTimeRef.current = Date.now() // Update start time first
+        gameStartTimeRef.current = Date.now()
         resetGame(latestPriceRef.current)
-        return // Skip the rest of the update for this tick
+        return
+      }
+
+      // If we've moved to a new column, advance the active column
+      if (newIndex > gridState.activeColumn) {
+        dispatch({ type: 'ADVANCE_COLUMN', price: latestPriceRef.current })
       }
 
       // Regular price range and line data updates
       checkAndUpdatePriceRange({
         currentBaseprice: basePriceRef.current,
         currentPrice: latestPriceRef.current,
-        chartBounds,
+        chartBounds: gridState.chartBounds,
       })
 
-      setLineData((prev) => [
-        ...prev,
-        {
+      dispatch({
+        type: 'ADD_LINE_DATA',
+        data: {
           time: new Date().toTimeString().slice(0, 8),
-          price: latestPriceRef.current!,
-          index: newIndex,
+          price: latestPriceRef.current,
+          index: newIndex + (elapsedSeconds % SECONDS_PER_CELL_BLOCK) / SECONDS_PER_CELL_BLOCK,
         },
-      ])
+      })
     }, 1000)
 
     return () => clearInterval(intervalId)
-    // disabling lints for warning about seconds per cell block until turbo mode and sizes are implemented
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [TOTAL_COLUMNS, SECONDS_PER_CELL_BLOCK, chartBounds])
+  }, [TOTAL_COLUMNS, SECONDS_PER_CELL_BLOCK, gridState.chartBounds, gridState.activeColumn])
 
-  // Handle cell click
-  const handleCellClick = (col: number, row: number, isBettingDisabled: boolean, multiplier: string) => {
-    if (isBettingDisabled) return
+  // Then update the handleCellClick function
+  const handleCellClick = (col: number, row: number, isBettingDisabled: boolean, multiplier: string, isFull: boolean) => {
+    if (isBettingDisabled || isFull) return
+
+    const colData = columnData[col]
+    if (!colData) {
+      console.error('No column data found for column:', col)
+      return
+    }
 
     const existingBet = findBetAtPosition(col, row)
-    const isPredicted = predictions.some((p) => p.x === col && p.y === row)
+    const isPredicted = gridState.cells[`${col}-${row}`]?.isPredicted
 
     // If cell has a bet and is marked for removal, show confirmation dialog
     if (existingBet && existingBet.id === removingBetId) {
-      setBetToCancel(existingBet) // This will trigger the confirmation dialog
+      setBetToCancel(existingBet)
       return
     }
 
     // If cell has a bet and is predicted, mark it for removal
     if (isPredicted && existingBet) {
       setRemovingBetId(existingBet.id)
-      setConfirmationCell(null)
+      dispatch({ type: 'REMOVE_BET', col, row })
       return
     }
 
@@ -427,15 +448,17 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
     setRemovingBetId(null)
 
     // Regular bet placement logic
-    if (confirmationCell?.col === col && confirmationCell?.row === row) {
+    if (gridState.cells[`${col}-${row}`]?.isAwaitingConfirmation) {
+      console.log('💰', gridState.cells[`${col}-${row}`], bettingPools[col])
+
       const pool = bettingPools[col]
-      if (!pool || !basePrice) return
+      if (!pool || !basePriceRef.current) return
 
       const bounds = getRowPriceBounds(row)
 
       if (latestPriceRef.current) {
         const bet = placeBet(
-          pool.poolKey,
+          colData.poolKey,
           {
             lowerBound: Number(bounds.lowerBound.toFixed(5)),
             upperBound: Number(bounds.upperBound.toFixed(5)),
@@ -443,8 +466,7 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
           selectedAmount,
         )
 
-        console.log('Bet placed successfully:', bet)
-        const newBet = {
+        const newBet: UserBet = {
           id: generateRandomId(),
           amount: bet.amount,
           multiplier: multiplier,
@@ -454,26 +476,25 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
         }
 
         setUserBets([newBet, ...userBets])
-        setPredictions((prev) => [...prev, { x: col, y: row }])
+        dispatch({ type: 'ADD_BET', bet: newBet })
+        dispatch({ type: 'REMOVE_CONFIRMATION_CELL', col, row })
       }
-
-      setConfirmationCell(null)
     } else {
-      setConfirmationCell({ col, row })
+      dispatch({ type: 'SET_CONFIRMATION_CELL', col, row })
     }
   }
 
   // Calculate visible range for the y-axis
   const getYAxisMinAndMaxValues = () => {
     if (chartSize === BettingChartSize.DESKTOP_EXPANDED || chartSize === BettingChartSize.MOBILE_EXPANDED) {
-      return [chartBounds.lowest, chartBounds.highest]
+      return [gridState.chartBounds.lowest, gridState.chartBounds.highest]
     }
 
     // For compact mode, calculate visible range
-    const totalRange = chartBounds.highest - chartBounds.lowest
+    const totalRange = gridState.chartBounds.highest - gridState.chartBounds.lowest
     const rowHeight = totalRange / CHART_CONFIGS[BettingChartSize.DESKTOP_EXPANDED].rows
-    const visibleStart = chartBounds.lowest + visibleRowRange.start * rowHeight
-    const visibleEnd = chartBounds.lowest + visibleRowRange.end * rowHeight
+    const visibleStart = gridState.chartBounds.lowest + visibleRowRange.start * rowHeight
+    const visibleEnd = gridState.chartBounds.lowest + visibleRowRange.end * rowHeight
 
     return [visibleStart, visibleEnd]
   }
@@ -487,13 +508,17 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
     const timePerIndex = BASE_TIME_RANGE / TOTAL_COLUMNS
 
     return Array.from({ length: TOTAL_COLUMNS }, (_, col) => {
+      const colData = columnData[col] || {}
       const startTime = col
       const endTime = col + 1
       const startIndex = Math.floor(startTime / timePerIndex)
       const endIndex = Math.floor(endTime / timePerIndex)
 
       // Check if this column is within our line data range
-      const isBettingDisabled = lineData.length > 0 && col <= Math.floor(lineData[lineData.length - 1].index)
+      const isBettingDisabled = col <= gridState.activeColumn
+
+      // Get all prices for this column if it's a past column
+      const columnPrices = isBettingDisabled ? gridState.lineData.filter((data) => Math.floor(data.index) === col).map((data) => data.price) : []
 
       // Define array of indexes of rows to render
       const rowsToRender =
@@ -517,8 +542,8 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
         const priceBounds = getRowPriceBounds(absoluteRow)
 
         // Rest of rectangle properties using absoluteRow for betting logic
-        const isPredicted = predictions.some((p) => p.x === col && p.y === absoluteRow)
-        const isAwaitingConfirmation = confirmationCell?.col === col && confirmationCell?.row === absoluteRow
+        const isPredicted = gridState.cells[`${col}-${absoluteRow}`]?.isPredicted
+        const isAwaitingConfirmation = gridState.cells[`${col}-${absoluteRow}`]?.isAwaitingConfirmation
         const existingBet = findBetAtPosition(col, absoluteRow)
         const isRemoving = existingBet?.id === removingBetId
 
@@ -527,6 +552,12 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
         const distanceFromMiddle = Math.abs(absoluteRow - middleRow)
         const multiplier = distanceFromMiddle === 0 ? MULTIPLIER_CONFIG.BASE : MULTIPLIER_CONFIG.BASE + distanceFromMiddle * MULTIPLIER_CONFIG.INCREMENT
         const multiplierLabel = multiplier.toFixed(MULTIPLIER_CONFIG.FORMAT_DECIMALS)
+
+        // Calculate if the prediction was correct for past cells
+        let isCorrectlyPredicted = false
+        if (isPredicted && isBettingDisabled && columnPrices.length > 0) {
+          isCorrectlyPredicted = columnPrices.some((price) => price >= priceBounds.lowerBound && price <= priceBounds.upperBound)
+        }
 
         return {
           x1: startIndex,
@@ -538,18 +569,37 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
           isPredicted,
           isBettingDisabled,
           isAwaitingConfirmation,
-          label: isBettingDisabled ? '' : isRemoving ? 'REMOVE' : isAwaitingConfirmation ? (isPredicted ? 'REMOVE' : 'CONFIRM') : `${multiplierLabel}x`,
+          isCorrectlyPredicted,
+          label: isBettingDisabled ? '' : isRemoving ? 'REMOVE' : isAwaitingConfirmation ? 'CONFIRM' : `${multiplierLabel}x`,
           totalPrice: 100,
           borderColor: isBettingDisabled ? '#4A2424' : '#2C2C2C',
           innerBorderColor: isBettingDisabled ? '#2D1717' : '#19181C',
-          userAvatars: (bettingPools[col] as any)?.bets?.map((bet: any) => bet.userAvatar) || [],
+          userAvatars: colData.bets?.map((bet) => bet.userAvatar ?? '').filter(Boolean) || [],
           multiplier: multiplierLabel,
           priceBounds,
-          isFull: false, // update from BE request
+          isFull: colData.isFull || false,
+          isRemoving,
+          amount: existingBet?.amount,
+          isHot: colData.isHot || false,
+          totalBets: colData.totalBets || 0,
+          poolKey: colData.poolKey,
         }
       })
     }).flat()
-  }, [BASE_TIME_RANGE, confirmationCell, gridDimensions, predictions, lineData, chartSize, visibleRowRange, removingBetId, userBets])
+  }, [
+    BASE_TIME_RANGE,
+    gridState.cells,
+    gridState.activeColumn,
+    gridState.chartBounds,
+    gridDimensions,
+    gridState.lineData,
+    chartSize,
+    visibleRowRange,
+    removingBetId,
+    userBets,
+    rowHeightPriceValue,
+    columnData,
+  ])
 
   // SVG defs which are used for styling cells
   // These are patterns and gradients which we use so we don't have to add space between cells and
@@ -575,10 +625,6 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
         <stop offset="0%" stopColor="#FDC214" />
         <stop offset="100%" stopColor="#FFF369" />
       </linearGradient>
-
-      {/* <pattern id={`hatchPattern-${tokenCode}`} patternUnits="userSpaceOnUse" width="4" height="4">
-        <path d="M-1,1 l2,-2 M0,4 l4,-4 M3,5 l2,-2" stroke="#1A191E" strokeWidth="1" />
-      </pattern> */}
 
       {/* Create patterns for both modes */}
       {[true, false].map((isCompact) => {
@@ -608,7 +654,15 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
             </pattern>
 
             {/* Past correctly predicted */}
-            <pattern id={`cellPattern-past-predicted-${tokenCode}`} patternUnits="objectBoundingBox" width="1" height="1" patternContentUnits="objectBoundingBox">
+            <pattern id={`cellPattern-past-correctly-predicted-${tokenCode}`} patternUnits="objectBoundingBox" width="1" height="1" patternContentUnits="objectBoundingBox">
+              <rect width={dims.outerBorder.width} height={dims.outerBorder.height} x={dims.outerBorder.x} y={dims.outerBorder.y} fill="#382328" />
+              <rect width={dims.innerBorder.width} height={dims.innerBorder.height} x={dims.innerBorder.x} y={dims.innerBorder.y} rx={dims.innerBorder.radius} fill="#2D1717" />
+              <rect width={dims.fill.width} height={dims.fill.height} x={dims.fill.x} y={dims.fill.y} rx={dims.fill.radius} fill="#382328" />
+              {/* <rect width={dims.fill.width} height={dims.fill.height} x={dims.fill.x} y={dims.fill.y} rx={dims.fill.radius} fill="#00CA5E" fillOpacity="0.2" /> */}
+            </pattern>
+
+            {/* Past incorrectly predicted */}
+            <pattern id={`cellPattern-past-incorrectly-predicted-${tokenCode}`} patternUnits="objectBoundingBox" width="1" height="1" patternContentUnits="objectBoundingBox">
               <rect width={dims.outerBorder.width} height={dims.outerBorder.height} x={dims.outerBorder.x} y={dims.outerBorder.y} fill="#382328" />
               <rect width={dims.innerBorder.width} height={dims.innerBorder.height} x={dims.innerBorder.x} y={dims.innerBorder.y} rx={dims.innerBorder.radius} fill="#2D1717" />
               <rect width={dims.fill.width} height={dims.fill.height} x={dims.fill.x} y={dims.fill.y} rx={dims.fill.radius} fill="#382328" />
@@ -634,12 +688,52 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
     </defs>
   )
 
+  const checkPredictionState = (rect: Rectangle) => {
+    if (rect.isFull) return 'full'
+    if (rect.isBettingDisabled && rect.isPredicted && rect.isCorrectlyPredicted) return 'past-won'
+    if (rect.isBettingDisabled) return 'past-lost'
+    if (rect.isRemoving) return 'remove'
+    if (gridState.cells[`${rect.col}-${rect.row}`]?.isAwaitingConfirmation) {
+      return 'confirm'
+    }
+    if (rect.isPredicted) return 'predicted'
+    return 'default'
+  }
+
+  // Add this function near checkPredictionState
+  const getCellPattern = (rect: Rectangle, tokenCode: string) => {
+    if (rect.isFull) {
+      return `url(#cellPattern-full-${tokenCode})`
+    }
+
+    if (rect.isRemoving) {
+      return `url(#cellPattern-confirming-${tokenCode})`
+    }
+
+    if (gridState.cells[`${rect.col}-${rect.row}`]?.isAwaitingConfirmation) {
+      return `url(#cellPattern-confirming-${tokenCode})`
+    }
+
+    if (rect.isPredicted) {
+      if (rect.isBettingDisabled) {
+        return `url(#cellPattern-past-correctly-predicted-${tokenCode})`
+      }
+      return `url(#cellPattern-predicted-${tokenCode})`
+    }
+
+    if (rect.isBettingDisabled) {
+      return `url(#cellPattern-past-${tokenCode})`
+    }
+
+    return `url(#cellPattern-default-${tokenCode})`
+  }
+
   // Loading state
-  if (isLoading || !isConnected) {
+  if (isLoading || isColumnDataLoading || !isConnected) {
     return (
-      <div>
-        <ChartHeader title={tokenName} lineData={lineData} selectedAmount={selectedAmount} setSelectedAmount={setSelectedAmount} showLogo={showLogo} />
-        <div className="container mx-auto">
+      <div className="w-full">
+        <ChartHeader title={tokenName} lineData={gridState.lineData} selectedAmount={selectedAmount} setSelectedAmount={setSelectedAmount} showLogo={showLogo} />
+        <div className="container mx-auto w-full">
           <div className="rounded-lg w-full">
             <div className="items-center gap-4 w-full relative p-2.5" style={{ width: '100%', height: '100%' }}>
               <div className="flex flex-col justify-center items-center gap-4 aspect-[1.5/1]">
@@ -649,22 +743,23 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
             </div>
           </div>
         </div>
+        <ChartFooter tokenName={tokenName} />
       </div>
     )
   }
 
   // Main render
   return (
-    <div>
-      <ChartHeader title={tokenName} lineData={lineData} selectedAmount={selectedAmount} setSelectedAmount={setSelectedAmount} showLogo={showLogo} />
+    <div className="w-full">
+      <ChartHeader title={tokenName} lineData={gridState.lineData} selectedAmount={selectedAmount} setSelectedAmount={setSelectedAmount} showLogo={showLogo} />
       <div className={`${isMobile ? 'w-full' : 'container mx-auto'}`}>
         <div className={`rounded-lg ${isMobile ? 'w-full' : 'w-fit'}`}>
-          <div className={`relative w-full sm:p-2.5`}>
+          <div className={`relative w-full sm:p-2.5 border-[5px] border-solid border-black bg-[#2C2C2C]`}>
             {/* We use width: 100% make the chart responsive, while keeping specific width for the logic and svg stiling */}
             <LineChart
               width={CHART_WIDTH}
               height={CHART_HEIGHT}
-              data={lineData}
+              data={gridState.lineData}
               margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
               className="w-full"
               style={{ width: '100%', height: '100%' }}
@@ -682,26 +777,14 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
                     className={`
                       betting-cell
                       ${rect.isBettingDisabled ? 'betting-cell--crossed' : ''}
-                      ${confirmationCell?.col === rect.col && confirmationCell?.row === rect.row ? 'betting-cell--confirming' : ''}
+                      ${gridState.cells[`${rect.col}-${rect.row}`]?.isAwaitingConfirmation ? 'betting-cell--confirming' : ''}
                       ${rect.isPredicted ? 'betting-cell--predicted' : ''}
                     `}
                     fillOpacity={1}
                     strokeWidth={0}
-                    fill={
-                      rect.isFull
-                        ? `url(#cellPattern-full-${tokenCode})`
-                        : rect.isPredicted
-                        ? rect.isBettingDisabled
-                          ? `url(#cellPattern-past-predicted-${tokenCode})`
-                          : `url(#cellPattern-predicted-${tokenCode})`
-                        : rect.isBettingDisabled
-                        ? `url(#cellPattern-past-${tokenCode})`
-                        : confirmationCell?.col === rect.col && confirmationCell?.row === rect.row
-                        ? `url(#cellPattern-confirming-${tokenCode})`
-                        : `url(#cellPattern-default-${tokenCode})`
-                    }
+                    fill={getCellPattern(rect, tokenCode)}
                     onClick={() => {
-                      handleCellClick(rect.col, rect.row, rect.isBettingDisabled, rect.multiplier)
+                      handleCellClick(rect.col, rect.row, rect.isBettingDisabled, rect.multiplier, rect.isFull || false)
                     }}
                     style={{ pointerEvents: 'all' }}
                     label={{
@@ -712,25 +795,16 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
                           {...props}
                           totalPrice={rect.totalPrice}
                           chartSize={chartSize}
-                          cellState={
-                            rect.isFull
-                              ? 'full'
-                              : rect.isBettingDisabled && rect.isPredicted
-                              ? 'past-won'
-                              : rect.isBettingDisabled
-                              ? 'past-lost'
-                              : confirmationCell?.col === rect.col && confirmationCell?.row === rect.row
-                              ? rect.isPredicted
-                                ? 'remove'
-                                : 'confirm'
-                              : 'default'
-                          }
+                          cellState={checkPredictionState(rect)}
+                          isRemoving={rect.isRemoving}
+                          amount={rect.amount}
+                          isHot={rect.isHot}
                         />
                       ),
                     }}
                   />
                   {/* Fire emoji for predicted cells */}
-                  {rect.isPredicted && checkIfCellIsActive(rect, lineData) && (
+                  {rect.isHot && chartSize !== BettingChartSize.MOBILE_EXPANDED && (
                     <ReferenceArea
                       x1={rect.x1}
                       x2={rect.x2}
@@ -742,7 +816,9 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
                       label={{
                         value: '🔥',
                         position: 'insideTopRight',
-                        offset: 10,
+                        offset: 15,
+                        dx: chartSize === BettingChartSize.DESKTOP_COMPACT ? 5 : chartSize === BettingChartSize.MOBILE_COMPACT ? 7 : 10,
+                        dy: chartSize === BettingChartSize.DESKTOP_COMPACT ? 5 : chartSize === BettingChartSize.MOBILE_COMPACT ? -5 : -5,
                         fontSize: getImageDimensions(chartSize).fire.width,
                         fill: '#ffffff',
                       }}
@@ -795,22 +871,22 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
               <YAxis stroke="#9ca3af" domain={getYAxisMinAndMaxValues()} allowDataOverflow={true} scale="linear" hide={isMobile} />
 
               {/* Line chart */}
-              <Line type="monotone" data={lineData} dataKey="price" stroke="#00CA5E" strokeWidth={4} dot={false} isAnimationActive={false} connectNulls={true} />
+              <Line type="monotone" data={gridState.lineData} dataKey="price" stroke="#00CA5E" strokeWidth={4} dot={false} isAnimationActive={false} connectNulls={true} />
 
               {/* Next active column border */}
               {getActiveColumnBounds({
-                lineData,
+                activeColumn: gridState.activeColumn,
                 chartBounds: {
-                  lowest: isCompactMode ? chartBounds.lowest + rowHeightPriceValue * 3 : chartBounds.lowest,
-                  highest: isCompactMode ? chartBounds.highest - rowHeightPriceValue * 3 : chartBounds.highest,
+                  lowest: isCompactMode ? gridState.chartBounds.lowest + rowHeightPriceValue * 3 : gridState.chartBounds.lowest,
+                  highest: isCompactMode ? gridState.chartBounds.highest - rowHeightPriceValue * 3 : gridState.chartBounds.highest,
                 },
               }) && (
                 <ReferenceArea
                   {...getActiveColumnBounds({
-                    lineData,
+                    activeColumn: gridState.activeColumn,
                     chartBounds: {
-                      lowest: isCompactMode ? chartBounds.lowest + rowHeightPriceValue * 3 : chartBounds.lowest,
-                      highest: isCompactMode ? chartBounds.highest - rowHeightPriceValue * 3 : chartBounds.highest,
+                      lowest: isCompactMode ? gridState.chartBounds.lowest + rowHeightPriceValue * 3 : gridState.chartBounds.lowest,
+                      highest: isCompactMode ? gridState.chartBounds.highest - rowHeightPriceValue * 3 : gridState.chartBounds.highest,
                     },
                   })}
                   fill="none"
@@ -820,34 +896,27 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
                 />
               )}
             </LineChart>
-            <div className="flex gap-2">
-              <button className="p-2 bg-gray-800 text-white rounded ml-auto block cursor-pointer" onClick={handleSizeToggle}>
-                <svg width="8" height="8" viewBox="0 0 8 8" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path
-                    d="M1.95092 6.85714L6.85712 6.85714C7.17295 6.85714 7.42855 7.11274 7.42855 7.42857C7.42855 7.7444 7.17295 8 6.85712 8L1.05916 8C0.475966 8 6.58177e-07 7.52867 6.06788e-07 6.94084L9.99117e-08 1.14286C7.23008e-08 0.827026 0.255596 0.571429 0.571427 0.571429C0.887258 0.571429 1.14285 0.827026 1.14285 1.14286L1.14285 6.04908L7.02452 0.167395C7.24771 -0.0557983 7.60932 -0.0557983 7.83258 0.167395C8.05584 0.390588 8.05577 0.752202 7.83258 0.975462L1.95092 6.85714Z"
-                    fill="#D9D9D9"
-                    strokeWidth="0"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+            <div className="flex gap-2 pt-2">
+              <button className="ml-auto cursor-pointer" onClick={handleSizeToggle}>
+                <img src="/assets/svg/arrow-top-right.svg" alt="Arrow top right" className={`w-3 h-3 ${isCompactMode ? '' : 'rotate-180'}`} />
               </button>
             </div>
           </div>
         </div>
       </div>
-      {/* <ChartFooter tokenName={tokenName} /> */}
+      <ChartFooter tokenName={tokenName} />
       <ConfirmationDialog
         isOpen={!!betToCancel}
         title="Cancel Bet"
         description="Are you sure you want to cancel this bet? A small fee will be charged."
         onConfirm={() => {
           if (betToCancel) {
-            // Remove the bet
+            // Remove the bet from userBets state
             setUserBets(userBets.filter((bet) => bet.id !== betToCancel.id))
-            // Remove the prediction for this bet's position
-            setPredictions(predictions.filter((p) => !(p.x === betToCancel.position?.col && p.y === betToCancel.position?.row)))
+            // Remove the bet from grid state
+            dispatch({ type: 'REMOVE_BET_BY_ID', id: betToCancel.id })
             setBetToCancel(null)
-            setRemovingBetId(null) // Also reset the removing state
+            setRemovingBetId(null)
           }
         }}
         onCancel={() => {

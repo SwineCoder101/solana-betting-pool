@@ -38,6 +38,7 @@
     "chai": "^5.1.2",
     "daisyui": "^4.12.10",
     "dotenv": "^16.4.7",
+    "immer": "^10.1.1",
     "jotai": "^2.9.3",
     "lucide-react": "^0.474.0",
     "node-stdlib-browser": "^1.2.0",
