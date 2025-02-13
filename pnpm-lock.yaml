@@ -19,7 +19,7 @@ dependencies:
     version: 2.2.0(react-dom@18.3.1)(react@18.3.1)
   '@privy-io/react-auth':
     specifier: ^2.0.0
-    version: 2.0.0(@solana/web3.js@1.98.0)(@types/react@19.0.4)(bs58@4.0.1)(react-dom@18.3.1)(react@18.3.1)(typescript@5.7.2)(zod@3.24.1)
+    version: 2.0.0(@solana/web3.js@1.98.0)(@types/react@19.0.4)(bs58@4.0.1)(immer@10.1.1)(react-dom@18.3.1)(react@18.3.1)(typescript@5.7.2)(zod@3.24.1)
   '@privy-io/server-auth':
     specifier: ^1.18.2
     version: 1.18.2
@@ -68,6 +68,9 @@ dependencies:
   dotenv:
     specifier: ^16.4.7
     version: 16.4.7
+  immer:
+    specifier: ^10.1.1
+    version: 10.1.1
   jotai:
     specifier: ^2.9.3
     version: 2.11.0(@types/react@19.0.4)(react@18.3.1)
@@ -103,7 +106,7 @@ dependencies:
     version: 3.4.17
   zustand:
     specifier: ^5.0.3
-    version: 5.0.3(@types/react@19.0.4)(react@18.3.1)
+    version: 5.0.3(@types/react@19.0.4)(immer@10.1.1)(react@18.3.1)
 
 devDependencies:
   '@esbuild-plugins/node-globals-polyfill':
@@ -3130,7 +3133,7 @@ packages:
       - utf-8-validate
     dev: false
 
-  /@privy-io/react-auth@2.0.0(@solana/web3.js@1.98.0)(@types/react@19.0.4)(bs58@4.0.1)(react-dom@18.3.1)(react@18.3.1)(typescript@5.7.2)(zod@3.24.1):
+  /@privy-io/react-auth@2.0.0(@solana/web3.js@1.98.0)(@types/react@19.0.4)(bs58@4.0.1)(immer@10.1.1)(react-dom@18.3.1)(react@18.3.1)(typescript@5.7.2)(zod@3.24.1):
     resolution: {integrity: sha512-HSscfU0blXtg1t4tpHe3+y8IAppjA7Rp7TY+B5ayCStiLCeE7blenbVmS1CrGIjnF5ksC1i4dVpPJUeIk7Gfbg==}
     peerDependencies:
       '@abstract-foundation/agw-client': ^0.1.0
@@ -3183,7 +3186,7 @@ packages:
       tinycolor2: 1.6.0
       uuid: 9.0.1
       viem: 2.22.6(typescript@5.7.2)(zod@3.24.1)
-      zustand: 5.0.3(@types/react@19.0.4)(react@18.3.1)
+      zustand: 5.0.3(@types/react@19.0.4)(immer@10.1.1)(react@18.3.1)
     transitivePeerDependencies:
       - '@azure/app-configuration'
       - '@azure/cosmos'
@@ -9294,6 +9297,10 @@ packages:
       queue: 6.0.2
     dev: false
 
+  /immer@10.1.1:
+    resolution: {integrity: sha512-s2MPrmjovJcoMaHtx6K11Ra7oD05NT97w1IC5zpMkT6Atjr7H8LjaDd81iIxUYpMKSRRNMJE703M1Fhr/TctHw==}
+    dev: false
+
   /import-fresh@2.0.0:
     resolution: {integrity: sha512-eZ5H8rcgYazHbKC3PG4ClHNykCSxtAhxSSEM+2mb+7evD2CKF5V7c0dNum7AdpDh0ZdICwZY9sRSn8f+KH96sg==}
     engines: {node: '>=4'}
@@ -13852,7 +13859,7 @@ packages:
     resolution: {integrity: sha512-muH7gBL9sI1nciMZV67X5fTKKBLtwpZ5VBp1vsOQzj1MhrBZ4wlVCm3gedKZWLp0Oyel8sIGfeiz54Su+OVT+A==}
     dev: false
 
-  /zustand@5.0.3(@types/react@19.0.4)(react@18.3.1):
+  /zustand@5.0.3(@types/react@19.0.4)(immer@10.1.1)(react@18.3.1):
     resolution: {integrity: sha512-14fwWQtU3pH4dE0dOpdMiWjddcH+QzKIgk1cl8epwSE7yag43k/AD/m4L6+K7DytAOr9gGBe3/EXj9g7cdostg==}
     engines: {node: '>=12.20.0'}
     peerDependencies:
@@ -13871,5 +13878,6 @@ packages:
         optional: true
     dependencies:
       '@types/react': 19.0.4
+      immer: 10.1.1
       react: 18.3.1
     dev: false

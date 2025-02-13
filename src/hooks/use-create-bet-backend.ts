@@ -8,6 +8,7 @@ interface CreateBetParams {
   upperBoundPrice: number;
   poolKey: string;
   competitionKey: string;
+  leverageMultiplier: number;
 }
 
 interface CancelBetParams {
@@ -38,6 +39,7 @@ export function useCreateBetBackend() {
           upperBoundPrice: params.upperBoundPrice,
           poolKey: params.poolKey,
           competitionKey: params.competitionKey,
+          leverageMultiplier: params.leverageMultiplier,
         }),
       });
 

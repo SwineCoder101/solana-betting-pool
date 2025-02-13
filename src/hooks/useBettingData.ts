@@ -8,8 +8,9 @@ export const useBettingData = (competitionKey: string) => {
   const [currentPool, setCurrentPool] = useState<Pool | null>(null)
 
   // TODO: Replace mock data with real data
+  // hard coded to 16 pools for now
   useEffect(() => {
-    const mockPools: Pool[] = Array.from({ length: 15 }, (_, i) => ({
+    const mockPools: Pool[] = Array.from({ length: 16 }, (_, i) => ({
       ...MockData.pool,
       poolKey: generateRandomId(),
       poolHash: generateRandomId(),

@@ -8,13 +8,23 @@ import PoolDisplay from "./pool-display";
 import PriceFeedDisplay from "./price-feed-display";
 import CompetitionForm from "./competition-form";
 import SettlementForm from "./settlement-form";
+import TreasuryDisplay from "./treasury-display";
 
 const AdminFeatures: React.FC = () => {
   return (
     <div className="p-4 bg-white">
       <h1 className="text-2xl font-bold mb-4">Admin Features</h1>
 
+
+
       <div className="grid gap-4">
+        <ErrorBoundary>
+          <div className="border p-4 bg-gray-50">
+            <TreasuryDisplay />
+          </div>
+        </ErrorBoundary>
+
+
         <ErrorBoundary>
           <div className="border p-4 bg-gray-50">
             <PriceFeedDisplay />
