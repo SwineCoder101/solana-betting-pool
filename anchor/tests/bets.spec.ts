@@ -15,7 +15,7 @@ describe("Bets", () => {
   let numberOfBetsForSigner: number; 
 
   beforeAll(async () => {
-    setupDto = await setupCompetitionWithPools();
+    setupDto = await setupCompetitionWithPools(true);
     program = setupDto.program;
     poolKeys = setupDto.poolKeys ?? [Keypair.generate().publicKey];
     competitionPubkey = setupDto.competitionPubkey;

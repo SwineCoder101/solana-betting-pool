@@ -16,7 +16,9 @@ import {
     VersionedTransaction
 } from "@solana/web3.js";
 import { createBet } from "../sdk/src/instructions/user/create-bet";
-import { HorseRace } from "../sdk/src";
+import { getVersionTxFromInstructions, HorseRace } from "../sdk/src";
+import { createTreasury } from "../sdk/src/instructions/admin/create-treasury";
+import { TreasuryAccount } from "../sdk/src/states/treasury-account";
 
 export const loggingOn = true; //Enable / disable logging
 // const program = anchor.workspace.MemePrice as Program<MemePrice>;
@@ -121,6 +123,20 @@ export async function signAndSendVTx(
     throw new Error(`Submission failed: ${error.message}`);
   }
 }
+
+  export async function createTreasuryUtil(program: Program<HorseRace>, adminKp: Keypair): Promise<PublicKey> {
+    const ix = await createTreasury(program, {
+      maxAdmins: 1,
+      minSignatures: 1,
+      initialAdmins: [adminKp.publicKey],
+    })
+
+    const vtx = await getVersionTxFromInstructions(program.provider.connection, [ix]);
+    await signAndSendVTx(vtx, adminKp, program.provider.connection);
+    const [treasuryKey] = await TreasuryAccount.getPda(program);
+
+    return treasuryKey;
+  }
   
   export async function waitAndConfirmSignature(
     connection: Connection,
@@ -180,5 +196,31 @@ export async function executeCreateBet(
     await program.provider.connection.confirmTransaction(signature, 'confirmed');
   }
 
+export async function setupTreasury(program: Program<HorseRace>): Promise<{
+  treasuryKey: PublicKey
+  adminWallet: web3.Keypair
+}> {
+  const adminWallet = web3.Keypair.generate()
+  
+  // Fund admin wallet
+  const signature = await program.provider.connection.requestAirdrop(
+    adminWallet.publicKey,
+    2 * web3.LAMPORTS_PER_SOL
+  )
+  await program.provider.connection.confirmTransaction(signature)
 
+  // Create treasury with admin
+  const ix =await createTreasury(program, {
+    maxAdmins: 1,
+    minSignatures: 1,
+    initialAdmins: [adminWallet.publicKey],
+  })
+
+  const vtx = await getVersionTxFromInstructions(program.provider.connection, [ix]);
+  await signAndSendVTx(vtx, adminWallet, program.provider.connection);
+
+  const [treasuryKey] = await TreasuryAccount.getPda(program);
+
+  return { treasuryKey, adminWallet }
+}
   

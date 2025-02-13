@@ -379,6 +379,122 @@
       ]
     },
     {
+      "name": "run_create_treasury",
+      "discriminator": [
+        82,
+        98,
+        53,
+        241,
+        26,
+        97,
+        130,
+        101
+      ],
+      "accounts": [
+        {
+          "name": "treasury",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  114,
+                  101,
+                  97,
+                  115,
+                  117,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "payer",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "max_admins",
+          "type": "u8"
+        },
+        {
+          "name": "min_signatures",
+          "type": "u8"
+        },
+        {
+          "name": "initial_admins",
+          "type": {
+            "vec": "pubkey"
+          }
+        }
+      ]
+    },
+    {
+      "name": "run_deposit_to_treasury",
+      "discriminator": [
+        196,
+        198,
+        205,
+        187,
+        190,
+        132,
+        4,
+        182
+      ],
+      "accounts": [
+        {
+          "name": "treasury",
+          "writable": true
+        },
+        {
+          "name": "treasury_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  114,
+                  101,
+                  97,
+                  115,
+                  117,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "depositor",
+          "writable": true,
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
+    },
+    {
       "name": "run_settle_pool_by_price",
       "docs": [
         "Settle a Pool"
@@ -401,6 +517,10 @@
         },
         {
           "name": "pool",
+          "writable": true
+        },
+        {
+          "name": "pool_treasury",
           "writable": true
         },
         {
@@ -546,6 +666,68 @@
         }
       ],
       "args": []
+    },
+    {
+      "name": "run_withdraw_from_treasury",
+      "discriminator": [
+        91,
+        83,
+        58,
+        157,
+        170,
+        173,
+        109,
+        130
+      ],
+      "accounts": [
+        {
+          "name": "treasury",
+          "writable": true
+        },
+        {
+          "name": "treasury_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  114,
+                  101,
+                  97,
+                  115,
+                  117,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "recipient",
+          "writable": true
+        },
+        {
+          "name": "pool",
+          "writable": true
+        },
+        {
+          "name": "authority",
+          "signer": true
+        },
+        {
+          "name": "system_program",
+          "address": "11111111111111111111111111111111"
+        }
+      ],
+      "args": [
+        {
+          "name": "amount",
+          "type": "u64"
+        }
+      ]
     }
   ],
   "accounts": [
@@ -612,6 +794,19 @@
         126,
         244,
         205
+      ]
+    },
+    {
+      "name": "Treasury",
+      "discriminator": [
+        238,
+        239,
+        123,
+        238,
+        89,
+        1,
+        168,
+        253
       ]
     }
   ],
@@ -859,6 +1054,10 @@
           {
             "name": "amount",
             "type": "i64"
+          },
+          {
+            "name": "leverage_multiplier",
+            "type": "u64"
           },
           {
             "name": "lower_bound_price",
@@ -1240,6 +1439,36 @@
           {
             "name": "posted_slot",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Treasury",
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "admin_authorities",
+            "type": {
+              "vec": "pubkey"
+            }
+          },
+          {
+            "name": "min_signatures",
+            "type": "u8"
+          },
+          {
+            "name": "total_deposits",
+            "type": "u64"
+          },
+          {
+            "name": "total_withdrawals",
+            "type": "u64"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
           }
         ]
       }

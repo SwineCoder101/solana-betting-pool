@@ -3,7 +3,7 @@ import { Program } from "@coral-xyz/anchor";
 import { AccountMeta, PublicKey, VersionedTransaction } from "@solana/web3.js";
 import { getVersionTxFromInstructions, HorseRace } from "../../utils";
 import { BetStatus, getBetAccountsForPool } from "../../states";
-
+import { TreasuryAccount } from "../../states/treasury-account";
 export async function settlePoolByPrice(
   program: Program<HorseRace>,
   admin: PublicKey,
@@ -14,6 +14,8 @@ export async function settlePoolByPrice(
 
   const poolAccount = await program.account.pool.fetch(poolKey);
   const treasuryKey = poolAccount.treasury;
+
+  const [poolTreasury] = await TreasuryAccount.getPda(program);
 
   const betAccounts = (await getBetAccountsForPool(program, poolKey)).filter((betAccount) => betAccount.status === BetStatus.Active);
   const userAccounts = betAccounts.map((betAccount) => betAccount.user);
@@ -33,6 +35,7 @@ export async function settlePoolByPrice(
     .accountsStrict({
       authority: admin,
       pool: poolKey,
+      poolTreasury,
       competition: poolAccount.competitionKey,
       treasury: treasuryKey,
       systemProgram: anchor.web3.SystemProgram.programId,

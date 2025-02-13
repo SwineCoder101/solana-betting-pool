@@ -4,7 +4,7 @@ describe("Competition with Pools", () => {
   let setupDto: SetupDTO;
 
   beforeAll(async () => {
-    setupDto = await setupCompetitionWithPools();
+    setupDto = await setupCompetitionWithPools(false);
   });
 
   it("Create competition with pools successfully", async () => {
