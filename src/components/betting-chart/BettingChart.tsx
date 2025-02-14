@@ -3,7 +3,7 @@ import { Line, LineChart, ReferenceArea, XAxis, YAxis } from 'recharts'
 import { CHART_CONFIGS, MULTIPLIER_CONFIG, PADDING, SECONDS_PER_CELL_BLOCK } from '../../config'
 import { useBettingData } from '../../hooks/useBettingData'
 import { MockData } from '../../mockdata'
-import { BettingChartSize, UserBet } from '../../types'
+import { BettingChartSize, ColumnData, UserBet } from '../../types'
 import { generateRandomId, getCurrentTime, timeToMinutes } from '../../utils'
 import { ConfirmationDialog } from '../dialog/ConfirmationDialog'
 import './BettingChart.css'
@@ -17,6 +17,7 @@ import bananaSmiling from '/assets/images/banana-smiling.png'
 import fullCellPool from '/assets/svg/full-cell-pool.svg'
 import { useColumnData } from '../../hooks/useColumnData'
 import { useCreateBetBackend } from '@/hooks/use-create-bet-backend'
+import { useSolanaPrivyWallet } from '@/hooks/use-solana-privy-wallet'
 
 export interface Props {
   tokenCode: string
@@ -151,7 +152,10 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
   const latestPriceRef = useRef<number | null>(null)
   const gameStartTimeRef = useRef<number>(Date.now())
 
-  const { createBet } = useCreateBetBackend(); //createBet
+
+
+  const { createBet, cancelBet } = useCreateBetBackend();
+  const {embeddedWallet} = useSolanaPrivyWallet();
 
   const [gridState, dispatch] = useReducer(rectangleReducer, {
     cells: {},
@@ -169,6 +173,8 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
   const [rowHeightPriceValue, setRowHeightPriceValue] = useState(0)
   const [removingBetId, setRemovingBetId] = useState<string | null>(null)
   const [betToCancel, setBetToCancel] = useState<UserBet | null>(null)
+
+  const [colData, setColData] = useState<ColumnData | null>(null)
 
   const { bettingPools, placeBet } = useBettingData(competitionKey)
   const { columnData, isLoading: isColumnDataLoading } = useColumnData(competitionKey)
@@ -425,7 +431,7 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
   const handleCellClick = async (col: number, row: number, isBettingDisabled: boolean, multiplier: string, isFull: boolean) => {
     if (isBettingDisabled || isFull) return
 
-    const colData = columnData[col]
+    setColData(columnData[col])
     if (!colData) {
       console.error('No column data found for column:', col)
       return
@@ -932,6 +938,12 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
         description="Are you sure you want to cancel this bet? A small fee will be charged."
         onConfirm={() => {
           if (betToCancel) {
+            
+            cancelBet.mutateAsync({
+              userKey: embeddedWallet?.address || '',
+              poolKey: colData?.poolKey || '',
+            })
+
             // Remove the bet from userBets state
             setUserBets(userBets.filter((bet) => bet.id !== betToCancel.id))
             // Remove the bet from grid state
