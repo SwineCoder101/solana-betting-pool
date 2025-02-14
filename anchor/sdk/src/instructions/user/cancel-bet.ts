@@ -9,16 +9,17 @@ export type CancelBetParams = {
   poolKey: PublicKey,
 }
 
-export async function cancelBetEntry(program: Program<HorseRace>, params: CancelBetParams): Promise<VersionedTransaction> {
+export async function cancelBetEntry(program: Program<HorseRace>, params: CancelBetParams): Promise<VersionedTransaction[]> {
   const { user, poolKey } = params;
   const bets = await getBetsForUserAndPool(program, user, poolKey);
-  const betKey = bets[0].publicKey;
 
-  if (!betKey) {
+  if (!bets) {
     throw new Error('No bet found');
   }
 
-  return  await cancelBetByKey(program, new PublicKey(betKey), user, poolKey);
+  return Promise.all(bets.map(async (bet) => {
+    return await cancelBetByKey(program, new PublicKey(bet.publicKey), user, poolKey);
+  }));
 }
 
 export async function cancelBetByKey(program: Program<HorseRace>, betKey: PublicKey, user: PublicKey, poolKey: PublicKey): Promise<VersionedTransaction> {

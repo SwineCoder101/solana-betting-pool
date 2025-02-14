@@ -3,7 +3,7 @@ import { Line, LineChart, ReferenceArea, XAxis, YAxis } from 'recharts'
 import { CHART_CONFIGS, MULTIPLIER_CONFIG, PADDING, SECONDS_PER_CELL_BLOCK } from '../../config'
 import { useBettingData } from '../../hooks/useBettingData'
 import { MockData } from '../../mockdata'
-import { BettingChartSize, UserBet } from '../../types'
+import { BettingChartSize, ColumnData, UserBet } from '../../types'
 import { generateRandomId, getCurrentTime, timeToMinutes } from '../../utils'
 import { ConfirmationDialog } from '../dialog/ConfirmationDialog'
 import './BettingChart.css'
@@ -166,6 +166,8 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
   const [rowHeightPriceValue, setRowHeightPriceValue] = useState(0)
   const [removingBetId, setRemovingBetId] = useState<string | null>(null)
   const [betToCancel, setBetToCancel] = useState<UserBet | null>(null)
+
+  const [colData, setColData] = useState<ColumnData | null>(null)
 
   const { bettingPools, placeBet } = useBettingData(competitionKey)
   const { columnData, isLoading: isColumnDataLoading } = useColumnData(competitionKey)
@@ -422,7 +424,8 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
   const handleCellClick = (col: number, row: number, isBettingDisabled: boolean, multiplier: string, isFull: boolean) => {
     if (isBettingDisabled || isFull) return
 
-    const colData = columnData[col]
+    setColData(columnData[col])
+    
     if (!colData) {
       console.error('No column data found for column:', col)
       return

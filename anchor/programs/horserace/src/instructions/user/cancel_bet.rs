@@ -1,7 +1,6 @@
 use anchor_lang::prelude::*;
 use crate::{
-    states::{Bet, BetStatus},
-    errors::BettingError,
+    errors::BettingError, states::{Bet, BetStatus, Pool}
 };
 
 #[derive(Accounts)]
@@ -17,7 +16,7 @@ pub struct CancelBet<'info> {
     pub bet: Account<'info, Bet>,
 
     #[account(mut)]
-    pub pool: SystemAccount<'info>, // or Account<'info, Pool>
+    pub pool: Account<'info, Pool>, // or Account<'info, Pool>
 
     pub system_program: Program<'info, System>,
 }

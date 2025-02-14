@@ -1,9 +1,9 @@
 import * as anchor from '@coral-xyz/anchor';
 import NodeWallet from '@coral-xyz/anchor/dist/cjs/nodewallet';
-import { Connection, Keypair } from '@solana/web3.js';
+import { Connection, Keypair, PublicKey } from '@solana/web3.js';
 import dotenv from 'dotenv';
 import fs from 'fs';
-import { getAllBetAccounts, HorseRace } from '../src';
+import { getAllBetAccounts, getBetsForUserAndPool, HorseRace } from '../src';
 
 dotenv.config();
 
@@ -42,6 +42,7 @@ anchor.setProvider(provider);
 const program = anchor.workspace.HorseRace as anchor.Program<HorseRace>;
 
 
+
 async function main() {
   try {
 
@@ -50,7 +51,24 @@ async function main() {
     const bets = await getAllBetAccounts(program);
 
     console.log(bets);
-    
+
+    //-----------------------------------------------------
+    // test user bet
+    const poolKey = new PublicKey('HnFL3JgLiMdVKxdFdyhBmMV7WQ9P4Gw1GEA1xNKUueoY');
+    const userKey = new PublicKey('4mJu71BVy5zUBVPaL6JW8XWm22WgkuSjst1YXLWSPGqi');
+
+
+
+    const allbets = await program.account.bet.all();
+
+    const filteredBets = allbets.filter((bet) => bet.account.user.toBase58() === userKey.toBase58() && bet.account.poolKey.toBase58() === poolKey.toBase58());
+
+    console.log(filteredBets);
+
+    const userBets = await getBetsForUserAndPool(program, userKey, poolKey);
+
+    console.log(userBets);
+
   } catch (error) {
     console.error('Error creating competition:', error);
     throw error;
