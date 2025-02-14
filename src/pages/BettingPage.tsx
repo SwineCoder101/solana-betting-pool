@@ -1,21 +1,23 @@
 import BettingChart from '../components/betting-chart/BettingChart'
-import { MockData } from '../mockdata'
 import { UserBet } from '../types'
 
 const tokenPairs = [
   {
     code: 'ethusdt',
     name: 'Ethereum',
+    competitionKey: '2CGu5SqefkCCMjfXKiJVXdmDni7AdL2qwFVuVxA954gH',
     showLogo: true,
   },
   {
     code: 'btcusdt',
     name: 'Bitcoin',
+    competitionKey: 'GThEtjbFVPQFU8cZwU3839vSCpXK8WKrSnTuP6DzSgJR',
     showLogo: false,
   },
   {
     code: 'solusdt',
     name: 'Solana',
+    competitionKey: 'CnW86qW2P9TEuMNHXq4ad7ZHw4xe2znSBcpC3RrrpiJ7',
     showLogo: false,
   },
 ]
@@ -35,7 +37,7 @@ export default function BettingPage({ userBets, setUserBets }: Props) {
               key={tokenPair.code}
               tokenCode={tokenPair.code}
               tokenName={tokenPair.name}
-              competitionKey={MockData.competition.competitionKey}
+              competitionKey={tokenPair.competitionKey}
               userBets={userBets}
               setUserBets={setUserBets}
               showLogo={tokenPair.showLogo}
