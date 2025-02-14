@@ -1,14 +1,27 @@
+import { CompetitionPools } from '@/competition-pools'
+import { competitionsData } from '@/mockdata'
+import { ColumnData } from '@/types'
+import WebSocketManager from '@/websocketManager'
 import { useEffect, useState } from 'react'
-import { ColumnData } from '../types'
-import WebSocketManager from '../websocketManager'
 
 export const useColumnData = (competitionKey: string) => {
   const [columnData, setColumnData] = useState<Record<number, ColumnData>>({})
   const [isLoading, setIsLoading] = useState(true)
 
+
+
   useEffect(() => {
     const fetchColumnData = async () => {
       try {
+
+        const competitionPools = new CompetitionPools(competitionsData);
+        const pools = competitionPools.getPools(competitionKey);
+    
+        if (!pools) {
+          console.error('❌ No pools found for competition:', competitionKey)
+          return { columnData: {}, isLoading: false }
+        }
+        
         console.log('🔄 Fetching initial column data for competition:', competitionKey)
         // TODO: Replace with actual API call
         // const response = await fetch(`/api/competitions/${competitionKey}/columns`)
@@ -18,8 +31,9 @@ export const useColumnData = (competitionKey: string) => {
         const initialData: Record<number, ColumnData> = {}
         for (let i = 0; i < 16; i++) {
           // Use your TOTAL_COLUMNS constant if available
+          // Repeats pool keys every 8 entries by calculating the index modulo pools.length
           initialData[i] = {
-            poolKey: `pool-${i}`, // Temporary mock data
+            poolKey: pools[i % pools.length].poolKey, // Temporary mock data
             poolHash: '11111111111111111111111111111111',
             competitionKey,
             startTime: Math.floor(Date.now() / 1000) + i * 30,

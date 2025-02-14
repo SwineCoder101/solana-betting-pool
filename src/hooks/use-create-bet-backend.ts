@@ -13,7 +13,7 @@ interface CreateBetParams {
 
 interface CancelBetParams {
   poolKey: string;
-  betHash: string;
+  userKey: string;
 }
 
 export function useCreateBetBackend() {
@@ -81,7 +81,7 @@ export function useCreateBetBackend() {
         body: JSON.stringify({
           userId: user.id,
           poolKey: params.poolKey,
-          betHash: params.betHash,
+          userKey: params.userKey,
         }),
       });
 
