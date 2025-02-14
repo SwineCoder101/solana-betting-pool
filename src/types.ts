@@ -48,6 +48,7 @@ export interface UserBet {
     col: number
     row: number
   }
+  userAvatar?: string
 }
 
 export interface ColumnData {
