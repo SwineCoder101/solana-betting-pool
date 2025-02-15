@@ -1,5 +1,4 @@
-import { useSolanaWallets } from '@privy-io/react-auth/solana'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { RouterProvider } from 'react-router-dom'
 import { ConfirmationDialog } from './components/dialog/ConfirmationDialog'
 import { OnboardingFlow } from './components/onboarding/OnboardingFlow'
@@ -7,16 +6,14 @@ import { router } from './routes'
 import { useConfirmationStore } from './stores/useConfirmationStore'
 
 export function BananaApp() {
-  const { wallets } = useSolanaWallets();
-  const [appReady, setAppReady] = useState(false);
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false)
   const { isOpen, title, description, onConfirm, hideConfirmation } = useConfirmationStore()
 
-  useEffect(() => {
-    if (hasCompletedOnboarding && wallets.some(w => w.type === "solana")) {
-      setAppReady(true)
-    }
-  }, [hasCompletedOnboarding, wallets])
+  // useEffect(() => {
+  //   if (hasCompletedOnboarding && wallets.some(w => w.type === "solana")) {
+  //     setAppReady(true)
+  //   }
+  // }, [hasCompletedOnboarding, wallets])
 
   // if (!appReady && hasCompletedOnboarding) {
   //   return <div className="fixed inset-0 grid place-items-center bg-yellow-100">
