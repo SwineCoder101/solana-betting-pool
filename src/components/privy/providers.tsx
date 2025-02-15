@@ -14,7 +14,6 @@ export default function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <QueryClientProvider client={client}>
-    <React.StrictMode>
       <PrivyProvider
         appId={privyAppId}
         clientId={privyClientId}
@@ -35,7 +34,6 @@ export default function Providers({ children }: { children: React.ReactNode }) {
       >
         {children}
       </PrivyProvider>
-    </React.StrictMode>
     </QueryClientProvider>
   );
 }

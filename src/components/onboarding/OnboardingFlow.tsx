@@ -1,8 +1,8 @@
+import { useSolanaPrivyWallet } from '@/hooks/use-solana-privy-wallet'
 import { usePrivy } from '@privy-io/react-auth'
 import { useEffect, useState } from 'react'
 import { OldButton } from '../buttons/OldButton'
 import { LoginWalletButton } from '../privy/login-wallet-button'
-import { useSolanaPrivyWallet } from '@/hooks/use-solana-privy-wallet'
 import { WalletManager } from '../privy/wallet-manager'
 
 interface OnboardingFlowProps {
@@ -43,14 +43,15 @@ const DESKTOP_BANANA_POSITIONS = [
 ]
 
 export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
-  const [step, setStep] = useState(0)
+  const [step, setStep] = useState(1)
   const [isDesktop, setIsDesktop] = useState(window.innerWidth > 768)
   const [showWalletManager, setShowWalletManager] = useState(false)
   const { createWallet, wallets } = useSolanaPrivyWallet();
   const { embeddedWallet, refreshWalletState } = useSolanaPrivyWallet();
-
   const { authenticated } = usePrivy();
-  // const { login } = useLogin();
+
+  const [walletInitialized, setWalletInitialized] = useState(false)
+  const [isCompleting, setIsCompleting] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
@@ -62,22 +63,51 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
     // If user is authenticated and has an embedded wallet, move to step 2
     if (authenticated && embeddedWallet) {
       setStep(2);
+      setWalletInitialized(true);
+    } else {
+      console.log("not authenticated or embedded wallet")
     }
 
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
-  }, [authenticated, embeddedWallet])
+  }, [authenticated, embeddedWallet, walletInitialized, wallets])
+
+
+  useEffect(() => {
+    if (step === 2 && walletInitialized) {
+      const timer = setTimeout(() => setStep(3), 1500)
+      return () => clearTimeout(timer)
+    }
+  }, [step, walletInitialized])
 
   const handleCreateWallet = async () => {
     try {
       await createWallet();
+      await new Promise(resolve => setTimeout(resolve, 1000));
+      refreshWalletState();
+      setWalletInitialized(true);
       setStep(2);
     } catch (error) {
       console.error("Error creating wallet:", error);
       refreshWalletState();
-      setStep(2);
     }
   };
+
+  const handleCompleteOnboarding = async () => {
+    if (!walletInitialized) {
+      console.log("Wallet not initialized yet")
+      return
+    }
+    
+    setIsCompleting(true)
+    try {
+      // Additional initialization logic if needed
+      await new Promise(resolve => setTimeout(resolve, 200)) // Short delay for state propagation
+      onComplete()
+    } finally {
+      setIsCompleting(false)
+    }
+  }
 
   const navigateToWalletManager = () => {
     setShowWalletManager(true)
@@ -96,8 +126,14 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
               <p className="text-xl [text-shadow:2px_2px_5px_rgba(0,0,0,0.7)] -mb-6">TO</p>
               <p className="text-6xl [text-shadow:2px_2px_5px_rgba(0,0,0,0.7)]">BananaZone</p>
             </div>
-            <OldButton onClick={() => setStep(1)} className="w-48 h-12 bg-[#FFCF00] cursor-pointer" fullWidth style={{ fontFamily: 'Instrument Serif', fontSize: '24px' }}>
-              PLAY
+              <OldButton 
+              onClick={handleCompleteOnboarding} 
+              className="w-48 h-12 bg-[#F2FA02] cursor-pointer" 
+              disabled={isCompleting}
+              style={{ fontFamily: 'Instrument Serif', fontSize: '24px' }} 
+              fullWidth
+            >
+              {isCompleting ? 'LOADING...' : 'PLAY LIVE'}
             </OldButton>
           </div>
         </div>
@@ -124,6 +160,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
               >
                 Manage Wallets
               </button>
+              <LoginWalletButton className="text-2xl" />
             </>
           ) : (
             <div className="flex flex-col items-center gap-8">

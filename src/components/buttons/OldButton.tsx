@@ -8,12 +8,14 @@ type Props = {
   className?: string
   style?: React.CSSProperties
   hasBorder?: boolean
+  disabled?: boolean
 }
 
-export function OldButton({ children, onClick, active, fullWidth, className, style, hasBorder = true }: Props) {
+export function OldButton({ children, onClick, active, fullWidth, className, style, hasBorder = true, disabled = false }: Props) {
   return (
     <button
       onClick={onClick}
+      disabled={disabled}
       className={`text-3xl grid relative
         place-items-center ${hasBorder ? 'border-2 border-black border-t-[#FFFFFF] border-l-[#FFFFFF] border-r-[#818181] border-b-[#818181]' : ''}
        active:border-t-[#818181] active:border-l-[#818181] active:border-r-[#FFFFFF] active:border-b-[#FFFFFF]

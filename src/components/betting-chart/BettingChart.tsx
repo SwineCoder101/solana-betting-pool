@@ -1,7 +1,11 @@
+import { useCreateBetBackend } from '@/hooks/use-create-bet-backend'
+import { ConnectedSolanaWallet } from '@privy-io/react-auth'
+import { PriceServiceConnection } from '@pythnetwork/price-service-client'
 import React, { Dispatch, SetStateAction, useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { Line, LineChart, ReferenceArea, XAxis, YAxis } from 'recharts'
 import { CHART_CONFIGS, MULTIPLIER_CONFIG, PADDING, SECONDS_PER_CELL_BLOCK } from '../../config'
 import { useBettingData } from '../../hooks/useBettingData'
+import { useColumnData } from '../../hooks/useColumnData'
 import { MockData } from '../../mockdata'
 import { BettingChartSize, ColumnData, UserBet } from '../../types'
 import { generateRandomId, getCurrentTime, timeToMinutes } from '../../utils'
@@ -15,10 +19,6 @@ import { ChartBounds, Rectangle } from './types'
 import { getActiveColumnBounds, getStartTime } from './utils'
 import bananaSmiling from '/assets/images/banana-smiling.png'
 import fullCellPool from '/assets/svg/full-cell-pool.svg'
-import { useColumnData } from '../../hooks/useColumnData'
-import { useCreateBetBackend } from '@/hooks/use-create-bet-backend'
-import { useSolanaPrivyWallet } from '@/hooks/use-solana-privy-wallet'
-import { PriceServiceConnection } from '@pythnetwork/price-service-client'
 
 export interface Props {
   tokenCode: string
@@ -28,6 +28,7 @@ export interface Props {
   setUserBets: Dispatch<SetStateAction<UserBet[]>>
   showLogo?: boolean
   priceFeedId: string
+  embeddedWallet: ConnectedSolanaWallet | null
 }
 
 // Update the CustomLabel component to use chartSize instead of isCompactMode
@@ -148,16 +149,13 @@ const CustomLabel = (props: any) => {
   }
 }
 
-function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competition.competitionKey, userBets, setUserBets, showLogo = false, priceFeedId }: Props) {
+function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competition.competitionKey, userBets, setUserBets, showLogo = false, priceFeedId , embeddedWallet }: Props) {
   const priceRangeShiftRef = useRef(0)
   const basePriceRef = useRef<number | null>(null)
   const latestPriceRef = useRef<number | null>(null)
   const gameStartTimeRef = useRef<number>(Date.now())
-
-
-
   const { createBet, cancelBet } = useCreateBetBackend();
-  const {embeddedWallet} = useSolanaPrivyWallet();
+
 
   const [gridState, dispatch] = useReducer(rectangleReducer, {
     cells: {},

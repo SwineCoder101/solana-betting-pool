@@ -14,6 +14,8 @@ export function usePoolData(poolPubkey: PublicKey | null) {
       return getPoolData(program, poolPubkey);
     },
     enabled: !!program && !!poolPubkey,
+    retry: 3,
+    retryDelay: 1000,
   });
 }
 
@@ -27,6 +29,8 @@ export function useCompetitionPools(competitionPubkey: PublicKey | null) {
       return getAllPoolDataByCompetition(program ,competitionPubkey);
     },
     enabled: !!program && !!competitionPubkey,
+    retry: 3,
+    retryDelay: 1000,
   });
 }
 
@@ -55,6 +59,8 @@ export function useActivePools() {
         .filter(pool => pool.startTime <= now && pool.endTime >= now);
     },
     enabled: !!program,
+    retry: 3,
+    retryDelay: 1000,
   });
 }
 
@@ -77,6 +83,7 @@ export function useAllPools() {
       return results;
     },
     enabled: !!program,
-    retry: false,
+    retry: true,
+    retryDelay: 1000,
   });
 } 

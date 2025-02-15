@@ -20,6 +20,7 @@ export function LoginWalletButton({className = '' }: LoginWalletButtonProps) {
     const handleConnectWallet = async () => {
         if (authenticated) {
             await logout();
+            // Navigate to the onboarding page
         } else {
             await login({ loginMethods: ['wallet'] });
         }

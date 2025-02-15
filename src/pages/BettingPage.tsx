@@ -1,3 +1,4 @@
+import { useSolanaPrivyWallet } from '@/hooks/use-solana-privy-wallet'
 import BettingChart from '../components/betting-chart/BettingChart'
 import { UserBet } from '../types'
 
@@ -31,6 +32,8 @@ interface Props {
 }
 
 export default function BettingPage({ userBets, setUserBets }: Props) {
+  const { embeddedWallet } = useSolanaPrivyWallet();
+
   return (
     <div>
       <div className="flex gap-3.5 relative bg-[#2C2C2C]">
@@ -45,6 +48,7 @@ export default function BettingPage({ userBets, setUserBets }: Props) {
               setUserBets={setUserBets}
               showLogo={tokenPair.showLogo}
               priceFeedId={tokenPair.priceFeedId}
+              embeddedWallet={embeddedWallet}
             />
           ))}
         </div>

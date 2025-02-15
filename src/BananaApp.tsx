@@ -1,26 +1,28 @@
+import { useSolanaWallets } from '@privy-io/react-auth/solana'
+import { useEffect, useState } from 'react'
+import { RouterProvider } from 'react-router-dom'
 import { ConfirmationDialog } from './components/dialog/ConfirmationDialog'
 import { OnboardingFlow } from './components/onboarding/OnboardingFlow'
-import { useConfirmationStore } from './stores/useConfirmationStore'
-import PasswordProtection from './components/PasswordProtection'
-import { useState } from 'react'
-import { RouterProvider } from 'react-router-dom'
 import { router } from './routes'
+import { useConfirmationStore } from './stores/useConfirmationStore'
 
 export function BananaApp() {
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
+  const { wallets } = useSolanaWallets();
+  const [appReady, setAppReady] = useState(false);
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false)
   const { isOpen, title, description, onConfirm, hideConfirmation } = useConfirmationStore()
 
-  // Show password protection first
-  if (!isAuthenticated) {
-    return (
-      <PasswordProtection
-        onCorrectPassword={() => {
-          setIsAuthenticated(true)
-        }}
-      />
-    )
-  }
+  useEffect(() => {
+    if (hasCompletedOnboarding && wallets.some(w => w.type === "solana")) {
+      setAppReady(true)
+    }
+  }, [hasCompletedOnboarding, wallets])
+
+  // if (!appReady && hasCompletedOnboarding) {
+  //   return <div className="fixed inset-0 grid place-items-center bg-yellow-100">
+  //     <p className="text-2xl animate-pulse">Finalizing wallet setup...</p>
+  //   </div>
+  // }
 
   // Then show onboarding
   if (!hasCompletedOnboarding) {

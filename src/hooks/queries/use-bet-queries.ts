@@ -13,6 +13,8 @@ export function useBetData(betPubkey: PublicKey | null) {
       return getBetData(program, betPubkey);
     },
     enabled: !!program && !!betPubkey,
+    retry: 3,
+    retryDelay: 1000,
   });
 }
 
@@ -34,7 +36,8 @@ export function useAllBets() {
       return results;
     },
     enabled: !!program,
-    retry: false, // Don't retry if program is not available
+    retry: 3,
+    retryDelay: 1000,
   });
 }
 
@@ -48,5 +51,7 @@ export function useUserBets(userPubkey: PublicKey | null) {
       return getAllBetDataByUser(program, userPubkey);
     },
     enabled: !!program && !!userPubkey,
+    retry: 3,
+    retryDelay: 1000,
   });
 } 
