@@ -18,6 +18,7 @@ import fullCellPool from '/assets/svg/full-cell-pool.svg'
 import { useColumnData } from '../../hooks/useColumnData'
 import { useCreateBetBackend } from '@/hooks/use-create-bet-backend'
 import { useSolanaPrivyWallet } from '@/hooks/use-solana-privy-wallet'
+import { PriceServiceConnection } from '@pythnetwork/price-service-client'
 
 export interface Props {
   tokenCode: string
@@ -26,6 +27,7 @@ export interface Props {
   userBets: UserBet[]
   setUserBets: Dispatch<SetStateAction<UserBet[]>>
   showLogo?: boolean
+  priceFeedId: string
 }
 
 // Update the CustomLabel component to use chartSize instead of isCompactMode
@@ -146,7 +148,7 @@ const CustomLabel = (props: any) => {
   }
 }
 
-function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competition.competitionKey, userBets, setUserBets, showLogo = false }: Props) {
+function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competition.competitionKey, userBets, setUserBets, showLogo = false, priceFeedId }: Props) {
   const priceRangeShiftRef = useRef(0)
   const basePriceRef = useRef<number | null>(null)
   const latestPriceRef = useRef<number | null>(null)
@@ -319,70 +321,77 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
 
   // Connection to web socket on tokenCode update, which is only on initial render
   // This can be optimized by directly connecting to the socket on tokenCode update
-  useEffect(() => {
-    let socket: WebSocket | null = null
+   // Replace Binance WebSocket useEffect with Pyth connection
+   useEffect(() => {
+    let connection: PriceServiceConnection | null = null
+    let isFirstMessage = true
 
-    const connectWebSocket = () => {
-      socket = new WebSocket(`wss://stream.binance.com:9443/ws/${tokenCode}@kline_1m`)
-      let isFirstMessage = true
+    const connectPyth = async () => {
+      try {
+        connection = new PriceServiceConnection("https://hermes.pyth.network")
+        
+        const handlePriceUpdate = (priceFeed: any) => {
+          const priceData = priceFeed.getPriceUnchecked()
+          if (!priceData) return
+          
+          const price = parseFloat(priceData.price) / Math.pow(10, Math.abs(priceData.expo))
+          latestPriceRef.current = price
 
-      socket.onopen = () => {
-        setIsConnected(true)
-      }
+          if (isFirstMessage) {
+            gameStartTimeRef.current = Date.now()
+            dispatch({ type: 'UPDATE_PRICE', price })
+            basePriceRef.current = price
 
-      socket.onmessage = (event) => {
-        const data = JSON.parse(event.data)
-        const kline = data.k
-        const price = parseFloat(kline.c)
+            const totalRange = price * PADDING * 2
+            dispatch({ 
+              type: 'UPDATE_CHART_BOUNDS', 
+              lowest: price - totalRange/2, 
+              highest: price + totalRange/2 
+            })
 
-        latestPriceRef.current = price
+            const cellHeight = totalRange / CHART_CONFIGS[BettingChartSize.DESKTOP_EXPANDED].rows
+            setRowHeightPriceValue(cellHeight)
 
-        if (isFirstMessage) {
-          gameStartTimeRef.current = Date.now()
-          dispatch({ type: 'UPDATE_PRICE', price })
-          basePriceRef.current = price
-
-          // Set initial chart bounds on first message
-          const totalRange = price * PADDING * 2
-          dispatch({ type: 'UPDATE_CHART_BOUNDS', lowest: price - totalRange / 2, highest: price + totalRange / 2 })
-
-          // Set cell height value based on total range and number of rows
-          // Use desktop expanded rows as a base for all calculations
-          const cellHeight = totalRange / CHART_CONFIGS[BettingChartSize.DESKTOP_EXPANDED].rows
-
-          setRowHeightPriceValue(cellHeight)
-
-          dispatch({
-            type: 'ADD_LINE_DATA',
-            data: {
-              time: new Date(kline.t).toTimeString().slice(0, 8),
-              price,
-              index: 0,
-            },
-          })
-          setIsLoading(false)
-          isFirstMessage = false
+            dispatch({
+              type: 'ADD_LINE_DATA',
+              data: {
+                time: new Date().toTimeString().slice(0, 8),
+                price,
+                index: 0,
+              },
+            })
+            setIsLoading(false)
+            isFirstMessage = false
+          }
         }
-      }
 
-      socket.onerror = (err) => {
-        setIsConnected(false)
-        console.error('WebSocket connection error:', err)
-      }
+        // Initial price fetch
+        const currentPrices = await connection.getLatestPriceFeeds([priceFeedId])
+        if (currentPrices?.[0]) {
+          handlePriceUpdate(currentPrices[0])
+        }
 
-      socket.onclose = () => {
+        // Subscribe to updates
+        connection.subscribePriceFeedUpdates(
+          [priceFeedId], 
+          handlePriceUpdate
+        )
+
+        setIsConnected(true)
+      } catch (err) {
+        console.error('Pyth connection error:', err)
         setIsConnected(false)
       }
     }
 
-    connectWebSocket()
+    connectPyth()
 
     return () => {
-      if (socket) {
-        socket.close()
+      if (connection) {
+        connection.closeWebSocket()
       }
     }
-  }, [tokenCode])
+  }, [priceFeedId]) // Watch priceFeedId changes
 
   // First, let's modify the interval effect to properly track the active column
   useEffect(() => {
