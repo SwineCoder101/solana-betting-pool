@@ -17,6 +17,8 @@ export function useCompetitionData(competitionPubkey: PublicKey | null) {
       return getCompetitionData(competitionPubkey,program);
     },
     enabled: !!program && !!competitionPubkey,
+    retry: 3,
+    retryDelay: 1000,
   });
 }
 
@@ -26,8 +28,12 @@ export function useAllCompetitions() {
   console.log("useAllCompetitions hook called, program state:", !!program);
 
   if (!program) {
-    console.log("Program not available in useAllCompetitions");
-    throw new Error("Program not initialized");
+    console.log("Program not initialized yet in useAllCompetitions");
+    return useQuery({
+      queryKey: ['allCompetitions'],
+      queryFn: async () => [],
+      enabled: false,
+    });
   }
   
   return useQuery({
@@ -44,7 +50,8 @@ export function useAllCompetitions() {
       return results;
     },
     enabled: !!program,
-    retry: false,
+    retry: 3,
+    retryDelay: 1000,
   });
 }
 
@@ -63,6 +70,8 @@ export function useActiveCompetitions() {
       );
     },
     enabled: !!program,
+    retry: 3,
+    retryDelay: 1000,
   });
 }
 

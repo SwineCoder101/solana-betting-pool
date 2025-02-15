@@ -1,8 +1,8 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import BananaApp from './BananaApp.tsx'
-import Providers from './components/privy/privy-provider.tsx'
 import './index.css'
+import Providers from './components/privy/providers.tsx'
+import BananaApp from './BananaApp.tsx'
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

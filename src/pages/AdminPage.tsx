@@ -5,15 +5,19 @@ import { useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 export default function AdminPage() {
-  const { isAdmin, user } = useAdminCheck()
+  const { isAdmin, user, isLoading } = useAdminCheck()
   const navigate = useNavigate()
 
   useEffect(() => {
-    if (!isAdmin) {
+    if (!isAdmin && !isLoading) {
       console.log('Unauthorized access attempt to admin page')
       navigate(ROUTES.HOME)
     }
-  }, [isAdmin, navigate])
+  }, [isAdmin, navigate, isLoading])
+
+  if (isLoading) {
+    return <div>Loading...</div>
+  }
 
   return (
     <div className="min-h-screen bg-[#FDFAD1]">

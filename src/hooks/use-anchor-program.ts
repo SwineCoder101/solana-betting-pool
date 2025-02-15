@@ -1,7 +1,7 @@
 import { AnchorProvider, Program } from '@coral-xyz/anchor';
 import { IDL } from '../../anchor/sdk/src';
 import { HorseRace } from '../../anchor/target/types/horse_race';
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useSolanaWallets } from '@privy-io/react-auth';
 import { Connection, PublicKey, VersionedTransaction } from '@solana/web3.js';
 import { AnchorWallet } from '@solana/wallet-adapter-react';
@@ -17,8 +17,23 @@ const PROGRAM_IDL = JSON.parse(JSON.stringify(IDL));
 
 export function useAnchorProgram(): ProgramResult {
   const { wallets } = useSolanaWallets();
+  const [walletReady, setWalletReady] = useState(false);
 
-  const wallet = wallets.filter(wallet => wallet.type === "solana")[0];
+  console.log("showing solana wallets from anchor program hook", wallets);
+
+
+  useEffect(() => {
+    if (wallets.some(w => w.type === "solana")) {
+      setWalletReady(true);
+      // initialize the program
+    }
+
+    
+  }, [wallets]);
+
+  const wallet = useMemo(() => 
+    wallets.find(w => w.type === "solana"),
+  [wallets]);
 
   
   const connection = useMemo(() => new Connection(
@@ -43,6 +58,10 @@ export function useAnchorProgram(): ProgramResult {
   }, [wallet]);
 
   const provider = useMemo(() => {
+    if (!walletReady) {
+      console.log("Wallet not ready");
+      return null;
+    }
     if (!signer) {
       console.log("No signer available");
       return null;
@@ -52,7 +71,7 @@ export function useAnchorProgram(): ProgramResult {
       signer,
       { commitment: 'confirmed' }
     );
-  }, [connection, signer]);
+  }, [connection, signer, walletReady]);
 
   const program = useMemo(() => {
     if (!provider) {
