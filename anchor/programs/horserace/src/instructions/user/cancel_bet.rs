@@ -5,10 +5,9 @@ use crate::{
 
 #[derive(Accounts)]
 pub struct CancelBet<'info> {
-
     #[account(mut)]
     pub authority: Signer<'info>,
-    
+
     #[account(mut)]
     pub user: Signer<'info>,
 
@@ -22,19 +21,17 @@ pub struct CancelBet<'info> {
 
     /// CHECK: The pool_vault is mutable because the pool_vault is stored in the pool account.
     #[account(
-        init,
-        payer = authority,
+        mut,
         seeds = [
             POOL_VAULT_SEED,
             pool.key().as_ref(),
         ],
-        bump,
-        space = 0,
+        bump = pool.vault_bump,
         owner = system_program::ID
     )]
     pub pool_vault: AccountInfo<'info>,
 
-    /// CHECK: The pool_hash_acc is mutable because the pool_hash is stored in the pool account.
+    /// CHECK: The pool is mutable because the pool is stored in the pool account.
     #[account(
         mut,
         seeds = [
@@ -52,10 +49,11 @@ pub struct CancelBet<'info> {
 
 pub fn run_cancel_bet(ctx: Context<CancelBet>) -> Result<()> {
     let amount = ctx.accounts.bet.amount;
+
     let pool_key = ctx.accounts.pool.key();
 
     require_keys_eq!(
-        pool_key,
+        ctx.accounts.pool_vault.key(),
         ctx.accounts.pool.vault_key,
         BettingError::PoolVaultMismatch
     );
@@ -65,10 +63,10 @@ pub fn run_cancel_bet(ctx: Context<CancelBet>) -> Result<()> {
         &ctx.accounts.user.key(),
         amount,
     );
-
-    let seeds = [
-            POOL_VAULT_SEED,
-            pool_key.as_ref(),
+    let seeds = &[
+        POOL_VAULT_SEED,
+        pool_key.as_ref(),
+        &[ctx.accounts.pool.vault_bump],
     ];
 
     anchor_lang::solana_program::program::invoke_signed(
@@ -77,25 +75,26 @@ pub fn run_cancel_bet(ctx: Context<CancelBet>) -> Result<()> {
             ctx.accounts.pool_vault.to_account_info(),
             ctx.accounts.user.to_account_info(),
         ],
-        &[&seeds],
+        &[seeds],
     )?;
 
+
+    // Mark bet as cancelled
     ctx.accounts.bet.status = BetStatus::Cancelled;
+    ctx.accounts.bet.updated_at = Clock::get()?.unix_timestamp as u64;
 
     emit!(BetCancelled {
         bet_key: ctx.accounts.bet.key(),
         user: ctx.accounts.user.key(),
-        amount,
+        amount: ctx.accounts.bet.amount,
         lower_bound_price: ctx.accounts.bet.lower_bound_price,
         upper_bound_price: ctx.accounts.bet.upper_bound_price,
         pool_key: ctx.accounts.pool.key(),
-        competition: ctx.accounts.bet.competition,
-        cancelled_at: Clock::get()?.unix_timestamp as u64,
+        competition: ctx.accounts.pool.competition_key,
+        cancelled_at: Clock::get()?.unix_timestamp,
     });
-
     Ok(())
 }
-
 
 #[event]
 pub struct BetCancelled {
@@ -106,6 +105,6 @@ pub struct BetCancelled {
     pub upper_bound_price: u64,
     pub pool_key: Pubkey,
     pub competition: Pubkey,
-    pub cancelled_at: u64,
+    pub cancelled_at: i64,
 }
 

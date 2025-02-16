@@ -47,6 +47,33 @@ export type HorseRace = {
           "writable": true
         },
         {
+          "name": "poolVault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              }
+            ]
+          }
+        },
+        {
           "name": "pool",
           "writable": true,
           "pda": {
@@ -134,14 +161,38 @@ export type HorseRace = {
           }
         },
         {
+          "name": "poolVault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              }
+            ]
+          }
+        },
+        {
           "name": "pool",
           "writable": true
         },
         {
           "name": "systemProgram",
-          "docs": [
-            "System program"
-          ],
           "address": "11111111111111111111111111111111"
         }
       ],
@@ -314,6 +365,33 @@ export type HorseRace = {
               {
                 "kind": "account",
                 "path": "poolHashAcc"
+              }
+            ]
+          }
+        },
+        {
+          "name": "poolVault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
               }
             ]
           }
@@ -962,16 +1040,16 @@ export type HorseRace = {
             "type": "pubkey"
           },
           {
+            "name": "poolVaultKey",
+            "type": "pubkey"
+          },
+          {
             "name": "status",
             "type": {
               "defined": {
                 "name": "betStatus"
               }
             }
-          },
-          {
-            "name": "leverage",
-            "type": "u64"
           },
           {
             "name": "leverageMultiplier",
@@ -1023,7 +1101,7 @@ export type HorseRace = {
           },
           {
             "name": "cancelledAt",
-            "type": "u64"
+            "type": "i64"
           }
         ]
       }
@@ -1052,6 +1130,10 @@ export type HorseRace = {
           {
             "name": "upperBoundPrice",
             "type": "u64"
+          },
+          {
+            "name": "poolVaultKey",
+            "type": "pubkey"
           },
           {
             "name": "poolKey",
@@ -1253,6 +1335,14 @@ export type HorseRace = {
           {
             "name": "bump",
             "type": "u8"
+          },
+          {
+            "name": "vaultKey",
+            "type": "pubkey"
+          },
+          {
+            "name": "vaultBump",
+            "type": "u8"
           }
         ]
       }
@@ -1264,6 +1354,10 @@ export type HorseRace = {
         "fields": [
           {
             "name": "poolHash",
+            "type": "pubkey"
+          },
+          {
+            "name": "vaultKey",
             "type": "pubkey"
           },
           {

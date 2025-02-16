@@ -161,6 +161,33 @@ export type HorseRace = {
           }
         },
         {
+          "name": "poolVault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              }
+            ]
+          }
+        },
+        {
           "name": "pool",
           "writable": true
         },
@@ -1013,16 +1040,16 @@ export type HorseRace = {
             "type": "pubkey"
           },
           {
+            "name": "poolVaultKey",
+            "type": "pubkey"
+          },
+          {
             "name": "status",
             "type": {
               "defined": {
                 "name": "betStatus"
               }
             }
-          },
-          {
-            "name": "leverage",
-            "type": "u64"
           },
           {
             "name": "leverageMultiplier",
@@ -1074,7 +1101,7 @@ export type HorseRace = {
           },
           {
             "name": "cancelledAt",
-            "type": "u64"
+            "type": "i64"
           }
         ]
       }
@@ -1103,6 +1130,10 @@ export type HorseRace = {
           {
             "name": "upperBoundPrice",
             "type": "u64"
+          },
+          {
+            "name": "poolVaultKey",
+            "type": "pubkey"
           },
           {
             "name": "poolKey",
