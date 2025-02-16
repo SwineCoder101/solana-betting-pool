@@ -66,20 +66,11 @@ pub fn run_create_bet(
         return Err(BettingError::PoolEnded.into());
     }
 
-    // Transfer lamports from user to pool
-    let ix = anchor_lang::solana_program::system_instruction::transfer(
-        &ctx.accounts.user.key(),
-        &ctx.accounts.pool.vault_key,
+    transfer_from_user_to_vault(
+        &ctx.accounts.user,
+        &ctx.accounts.pool_vault,
+        &ctx.accounts.system_program,
         amount,
-    );
-
-    anchor_lang::solana_program::program::invoke(
-        &ix,
-        &[
-            ctx.accounts.user.to_account_info(),
-            ctx.accounts.pool_vault.to_account_info(),
-            ctx.accounts.system_program.to_account_info(),
-        ],
     )?;
 
     // Create the bet account data

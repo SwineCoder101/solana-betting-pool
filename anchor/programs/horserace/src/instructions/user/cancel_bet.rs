@@ -1,6 +1,6 @@
 use anchor_lang::{prelude::*, solana_program::system_program};
 use crate::{
-    constants::{POOL_SEED, POOL_VAULT_SEED}, errors::BettingError, states::{Bet, BetStatus, Pool}
+    constants::{POOL_SEED, POOL_VAULT_SEED}, errors::BettingError, states::{Bet, BetStatus, Pool}, utils::*
 };
 
 #[derive(Accounts)]
@@ -50,34 +50,18 @@ pub struct CancelBet<'info> {
 pub fn run_cancel_bet(ctx: Context<CancelBet>) -> Result<()> {
     let amount = ctx.accounts.bet.amount;
 
-    let pool_key = ctx.accounts.pool.key();
-
     require_keys_eq!(
         ctx.accounts.pool_vault.key(),
         ctx.accounts.pool.vault_key,
         BettingError::PoolVaultMismatch
     );
 
-    let ix = anchor_lang::solana_program::system_instruction::transfer(
-        &ctx.accounts.pool_vault.key(),
-        &ctx.accounts.user.key(),
+    transfer_from_vault_to_recipient(
+        &ctx.accounts.pool,
+        &ctx.accounts.pool_vault,
+        &ctx.accounts.user.to_account_info(),
         amount,
-    );
-    let seeds = &[
-        POOL_VAULT_SEED,
-        pool_key.as_ref(),
-        &[ctx.accounts.pool.vault_bump],
-    ];
-
-    anchor_lang::solana_program::program::invoke_signed(
-        &ix,
-        &[
-            ctx.accounts.pool_vault.to_account_info(),
-            ctx.accounts.user.to_account_info(),
-        ],
-        &[seeds],
     )?;
-
 
     // Mark bet as cancelled
     ctx.accounts.bet.status = BetStatus::Cancelled;
