@@ -1,4 +1,4 @@
-use anchor_lang::prelude::*;
+use anchor_lang::{prelude::*, solana_program::system_program};
 use crate::{
     errors::BettingError, states::{Bet, BetStatus, Pool}, utils::*
 };
@@ -25,7 +25,7 @@ pub struct CreateBet<'info> {
     #[account(mut)]
     pub pool: Account<'info, Pool>,
 
-    /// System program
+    #[account(address = system_program::ID)]
     pub system_program: Program<'info, System>,
 }
 
@@ -54,9 +54,10 @@ pub fn run_create_bet(
     // Transfer lamports from user to pool
     let ix = anchor_lang::solana_program::system_instruction::transfer(
         &ctx.accounts.user.key(),
-        &ctx.accounts.pool.key(),
+        &ctx.accounts.pool.vault_key,
         amount,
     );
+
     anchor_lang::solana_program::program::invoke(
         &ix,
         &[

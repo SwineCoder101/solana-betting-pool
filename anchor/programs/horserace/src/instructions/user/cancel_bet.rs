@@ -1,13 +1,18 @@
-use anchor_lang::prelude::*;
+use anchor_lang::{prelude::*, solana_program::system_program};
 use crate::{
-    errors::BettingError, states::{Bet, BetStatus, Pool}
+    constants::{POOL_SEED, POOL_VAULT_SEED}, errors::BettingError, states::{Bet, BetStatus, Pool}
 };
 
 #[derive(Accounts)]
 pub struct CancelBet<'info> {
+
+    #[account(mut)]
+    pub authority: Signer<'info>,
+    
     #[account(mut)]
     pub user: Signer<'info>,
 
+    /// CHECK: The bet_hash_acc is mutable because the bet_hash is stored in the bet account.
     #[account(
         mut,
         has_one = user @ BettingError::BetOwnershipMismatch,
@@ -15,26 +20,64 @@ pub struct CancelBet<'info> {
     )]
     pub bet: Account<'info, Bet>,
 
-    #[account(mut)]
-    pub pool: Account<'info, Pool>, // or Account<'info, Pool>
+    /// CHECK: The pool_vault is mutable because the pool_vault is stored in the pool account.
+    #[account(
+        init,
+        payer = authority,
+        seeds = [
+            POOL_VAULT_SEED,
+            pool.key().as_ref(),
+        ],
+        bump,
+        space = 0,
+        owner = system_program::ID
+    )]
+    pub pool_vault: AccountInfo<'info>,
 
+    /// CHECK: The pool_hash_acc is mutable because the pool_hash is stored in the pool account.
+    #[account(
+        mut,
+        seeds = [
+            POOL_SEED,
+            pool.competition_key.as_ref(),
+            pool.pool_hash.as_ref()
+        ],
+        bump = pool.bump
+    )]
+    pub pool: Account<'info, Pool>,
+
+    #[account(address = system_program::ID)]
     pub system_program: Program<'info, System>,
 }
 
 pub fn run_cancel_bet(ctx: Context<CancelBet>) -> Result<()> {
     let amount = ctx.accounts.bet.amount;
+    let pool_key = ctx.accounts.pool.key();
+
+    require_keys_eq!(
+        pool_key,
+        ctx.accounts.pool.vault_key,
+        BettingError::PoolVaultMismatch
+    );
 
     let ix = anchor_lang::solana_program::system_instruction::transfer(
-        &ctx.accounts.pool.key(),
+        &ctx.accounts.pool_vault.key(),
         &ctx.accounts.user.key(),
         amount,
     );
-    anchor_lang::solana_program::program::invoke(
+
+    let seeds = [
+            POOL_VAULT_SEED,
+            pool_key.as_ref(),
+    ];
+
+    anchor_lang::solana_program::program::invoke_signed(
         &ix,
         &[
-            ctx.accounts.pool.to_account_info(),
+            ctx.accounts.pool_vault.to_account_info(),
             ctx.accounts.user.to_account_info(),
         ],
+        &[&seeds],
     )?;
 
     ctx.accounts.bet.status = BetStatus::Cancelled;

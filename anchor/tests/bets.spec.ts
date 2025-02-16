@@ -2,7 +2,7 @@
 
 import { Keypair, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { BetStatus, getBetAccountsForPool, getBetAccountsForUser, getBetData } from "../sdk/src";
-import { cancelBet } from "../sdk/src/instructions/user/cancel-bet";
+import { cancelBetEntry } from "../sdk/src/instructions/user/cancel-bet";
 import { createBet } from "../sdk/src/instructions/user/create-bet";
 import { setupCompetitionWithPools, SetupDTO } from "./common-setup";
 import { createUserWithFunds } from "./test-utils";
@@ -156,8 +156,7 @@ describe("Bets", () => {
     expect(betAccounts.length).toEqual(initialUserBetCount + (numBetsPerPool * poolKeys.length));
   });
 
-  // TODO: Fix this test
-  it.skip("should cancel a bet after a bet is already created", async () => {
+  it("should cancel a bet after a bet is already created", async () => {
     const amount = LAMPORTS_PER_SOL;
     const lowerBoundPrice = 50;
     const upperBoundPrice = 150;
@@ -193,8 +192,27 @@ describe("Bets", () => {
 
     const beforeCancelTime = new Date();
 
-    const cancelBetTx = await cancelBet(program, signer.publicKey, poolKey, signature.signature);
-    await program.provider.connection.confirmTransaction(cancelBetTx, 'confirmed');
+    const cancelBetTxs = await cancelBetEntry(program, {
+      user: signer.publicKey,
+      poolKey: poolKey,
+    });
+
+
+    // simulate the cancel bet txs being sent in a batch
+
+    try{
+    const simResult = await program.provider.connection.simulateTransaction(cancelBetTxs[0],    {
+      sigVerify: false, // whether to verify signatures
+      replaceRecentBlockhash: false, // whether to override the blockhash
+    },);
+    console.log('Simulation result:', simResult);
+  } catch(e){
+    console.log('Simulation failed:', e);
+  }
+
+
+    const signatures = await Promise.all(cancelBetTxs.map(tx => program.provider.connection.sendTransaction(tx)));
+    await Promise.all(signatures.map(signature => program.provider.connection.confirmTransaction(signature, 'confirmed')));
 
     const afterCancelTime = new Date();
 

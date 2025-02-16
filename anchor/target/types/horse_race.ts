@@ -30,6 +30,11 @@ export type HorseRace = {
       ],
       "accounts": [
         {
+          "name": "authority",
+          "writable": true,
+          "signer": true
+        },
+        {
           "name": "user",
           "writable": true,
           "signer": true,
@@ -42,8 +47,58 @@ export type HorseRace = {
           "writable": true
         },
         {
+          "name": "poolVault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
+              }
+            ]
+          }
+        },
+        {
           "name": "pool",
-          "writable": true
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool.competition_key",
+                "account": "pool"
+              },
+              {
+                "kind": "account",
+                "path": "pool.pool_hash",
+                "account": "pool"
+              }
+            ]
+          }
         },
         {
           "name": "systemProgram",
@@ -111,9 +166,6 @@ export type HorseRace = {
         },
         {
           "name": "systemProgram",
-          "docs": [
-            "System program"
-          ],
           "address": "11111111111111111111111111111111"
         }
       ],
@@ -286,6 +338,33 @@ export type HorseRace = {
               {
                 "kind": "account",
                 "path": "poolHashAcc"
+              }
+            ]
+          }
+        },
+        {
+          "name": "poolVault",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  112,
+                  111,
+                  111,
+                  108,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
+                ]
+              },
+              {
+                "kind": "account",
+                "path": "pool"
               }
             ]
           }
@@ -1221,6 +1300,18 @@ export type HorseRace = {
           {
             "name": "treasury",
             "type": "pubkey"
+          },
+          {
+            "name": "bump",
+            "type": "u8"
+          },
+          {
+            "name": "vaultKey",
+            "type": "pubkey"
+          },
+          {
+            "name": "vaultBump",
+            "type": "u8"
           }
         ]
       }
@@ -1232,6 +1323,10 @@ export type HorseRace = {
         "fields": [
           {
             "name": "poolHash",
+            "type": "pubkey"
+          },
+          {
+            "name": "vaultKey",
             "type": "pubkey"
           },
           {

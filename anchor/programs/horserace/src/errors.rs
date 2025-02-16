@@ -6,7 +6,6 @@ pub enum BettingError {
     NotEligible,
     #[msg("User does not own this bet.")]
     BetOwnershipMismatch,
-
     #[msg("Unauthorized: Not the competition owner.")]
     Unauthorized,
     #[msg("Pool not finished yet.")]
@@ -17,6 +16,8 @@ pub enum BettingError {
     PoolEnded,
     #[msg("Invalid user account")]
     InvalidUserAccount,
+    #[msg("Pool vault key mismatch with pool account")]
+    PoolVaultMismatch,
 }
 
 #[error_code]

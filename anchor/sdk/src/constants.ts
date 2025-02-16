@@ -1,5 +1,6 @@
 export const COMPETITION_SEED = "competition";
 export const POOL_SEED = "pool";
+export const POOL_VAULT_SEED = "pool_vault";
 export const BET_SEED = "bet";
 export const TREASURY_SEED = "treasury";
 

@@ -8,6 +8,20 @@ export enum BetStatus {
   Settled,
 }
 
+// pub struct Bet {
+//   pub user: Pubkey,
+//   pub amount: u64,
+//   pub competition: Pubkey,
+//   pub lower_bound_price: u64,
+//   pub upper_bound_price: u64,
+//   pub pool_key: Pubkey,
+//   pub status: BetStatus,
+//   pub leverage: u64,
+//   pub leverage_multiplier: u64,
+//   pub created_at: u64,
+//   pub updated_at: u64,
+// }
+
 export interface BetData {
   publicKey: string;
   user: string;
@@ -15,6 +29,7 @@ export interface BetData {
   lowerBoundPrice: number;
   upperBoundPrice: number;
   poolKey: string;
+  poolVaultKey: string;
   competition: string;
   status: BetStatus;
   leverage: number;
@@ -31,7 +46,8 @@ export type BetProgramData = {
   upperBoundPrice: BN | number,
   poolKey: PublicKey,
   status: StatusEnumProgram,
-  
+  poolVaultKey: PublicKey,
+
 }
 
 /* eslint-disable @typescript-eslint/ban-types */

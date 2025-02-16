@@ -1,6 +1,6 @@
 use anchor_lang::{prelude::*, solana_program::system_program};
 use crate::{
-    constants::POOL_SEED, errors::PoolError, states::Pool
+    constants::{POOL_SEED, POOL_VAULT_SEED}, errors::PoolError, states::Pool
 };
 
 #[derive(Accounts)]
@@ -26,6 +26,20 @@ pub struct CreatePool<'info> {
     )]
     pub pool: Account<'info, Pool>,
 
+    /// CHECK: The pool_vault is mutable because the pool_vault is stored in the pool account.
+    #[account(
+        init,
+        payer = authority,
+        seeds = [
+            POOL_VAULT_SEED,
+            pool.key().as_ref(),
+        ],
+        bump,
+        space = 0,
+        owner = system_program::ID
+    )]
+    pub pool_vault: AccountInfo<'info>,
+
     #[account(address = system_program::ID)]
     pub system_program: Program<'info, System>,
 }
@@ -46,12 +60,17 @@ pub fn run_create_pool(
     pool_account.start_time = start_time;
     pool_account.end_time = end_time;
     pool_account.treasury = treasury;
+    pool_account.pool_hash = ctx.accounts.pool_hash_acc.key();
+    pool_account.bump = ctx.bumps.pool;
+    pool_account.vault_key = ctx.accounts.pool_vault.key();
+    pool_account.vault_bump = ctx.bumps.pool_vault;
 
     emit!(PoolCreated {
         pool_hash: ctx.accounts.pool_hash_acc.key(),
         competition_key: ctx.accounts.competition_acc.key(),
         start_time,
         end_time,
+        vault_key: ctx.accounts.pool_vault.key(),
     });
 
     Ok(())
@@ -60,6 +79,7 @@ pub fn run_create_pool(
 #[event]
 pub struct PoolCreated {
     pub pool_hash: Pubkey,
+    pub vault_key: Pubkey,
     pub competition_key: Pubkey,
     pub start_time: u64,
     pub end_time: u64,

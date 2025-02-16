@@ -11,6 +11,9 @@ export type PoolData = {
   startTime: number,
   endTime: number,
   treasury: string,
+  poolVaultKey: string,
+  poolVaultBump: number,
+  bump: number,
 }
 
 export type PoolProgramData = {
@@ -20,6 +23,9 @@ export type PoolProgramData = {
   startTime: BN | number,
   endTime: BN | number,
   treasury: PublicKey,
+  vaultKey: PublicKey,
+  vaultBump: number,
+  bump: number,
 }
 
 export function convertPoolToProgramData(poolData: PoolData): PoolProgramData {
@@ -30,7 +36,10 @@ export function convertPoolToProgramData(poolData: PoolData): PoolProgramData {
     endTime: new BN(poolData.endTime),
     treasury: new PublicKey(poolData.treasury),
     poolHash: new PublicKey(poolData.poolHash),
-};
+    vaultKey: new PublicKey(poolData.poolVaultKey),
+    vaultBump: poolData.poolVaultBump,
+    bump: poolData.bump,
+  };
 }
 
 export function convertProgramToPoolData(programData: ProgramAccount<PoolProgramData>): PoolData {
@@ -41,6 +50,9 @@ export function convertProgramToPoolData(programData: ProgramAccount<PoolProgram
     startTime: typeof programData.account.startTime === 'number' ? programData.account.startTime : programData.account.startTime.toNumber(),
     endTime: typeof programData.account.endTime === 'number' ? programData.account.endTime : programData.account.endTime.toNumber(),
     treasury: programData.account.treasury.toString(),
+    poolVaultKey: programData.account.vaultKey.toString(),
+    poolVaultBump: programData.account.vaultBump,
+    bump: programData.account.bump,
   };
 }
 
@@ -83,7 +95,14 @@ export async function getPoolBalance(poolPubkey: PublicKey, program: Program<Hor
 
 export async function getAllPools(program: Program<HorseRace>) {
   const pools = await program.account.pool.all();
-  return pools.map((pool) => convertProgramToPoolData(pool));
+  return pools.map((pool) => {
+    const poolData = {
+      ...pool.account,
+      poolVaultKey: pool.account.vaultKey,
+      poolVaultBump: pool.account.vaultBump,
+    };
+    return convertProgramToPoolData({publicKey: pool.publicKey, account: poolData});
+  });
 }
 
 export async function getFirstPool(program: Program<HorseRace>) {
@@ -98,12 +117,12 @@ export async function getPoolAccountsFromCompetition(program: Program<HorseRace>
 
 export async function getAllPoolDataByCompetition(program: Program<HorseRace>, competition: PublicKey): Promise<PoolData[]> {
   const pools = await program.account.pool.all();
-  return pools.filter((pool) => pool.account.competitionKey.toBase58() === competition.toBase58()).map((pool) => convertProgramToPoolData(pool));
+  return pools.filter((pool) => pool.account.competitionKey.toBase58() === competition.toBase58()).map((pool) => convertProgramToPoolData({publicKey: pool.publicKey, account: pool.account}));
 }
 
 export async function getAllPoolDataByUser(program: Program<HorseRace>, user: PublicKey): Promise<PoolData[]> {
   const pools = await program.account.pool.all();
-  return pools.filter((pool) => pool.account.treasury.toBase58() === user.toBase58()).map((pool) => convertProgramToPoolData(pool));
+  return pools.filter((pool) => pool.account.treasury.toBase58() === user.toBase58()).map((pool) => convertProgramToPoolData({publicKey: pool.publicKey, account: pool.account}));
 }
 
 export async function findPoolKeyFromStartEndTime(program: Program<HorseRace>, competitionKey: PublicKey, startTime: number, endTime: number): Promise<PublicKey> {
