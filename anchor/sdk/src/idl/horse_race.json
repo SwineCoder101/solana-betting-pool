@@ -68,6 +68,48 @@
           }
         },
         {
+          "name": "treasury",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  114,
+                  101,
+                  97,
+                  115,
+                  117,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "treasury_account",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  114,
+                  101,
+                  97,
+                  115,
+                  117,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
           "name": "pool",
           "writable": true,
           "pda": {
@@ -970,6 +1012,19 @@
       ]
     },
     {
+      "name": "InsufficientFunds",
+      "discriminator": [
+        1,
+        162,
+        237,
+        78,
+        144,
+        121,
+        44,
+        184
+      ]
+    },
+    {
       "name": "PoolCreated",
       "discriminator": [
         202,
@@ -993,6 +1048,19 @@
         185,
         90,
         47
+      ]
+    },
+    {
+      "name": "Withdrawal",
+      "discriminator": [
+        6,
+        187,
+        215,
+        71,
+        92,
+        85,
+        90,
+        83
       ]
     }
   ],
@@ -1297,6 +1365,33 @@
           {
             "name": "end_time",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "InsufficientFunds",
+      "docs": [
+        "Emitted when there aren’t enough funds in the treasury to withdraw."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "treasury_balance",
+            "type": "u64"
+          },
+          {
+            "name": "amount_requested",
+            "type": "u64"
+          },
+          {
+            "name": "recipient",
+            "type": "pubkey"
+          },
+          {
+            "name": "treasury",
+            "type": "pubkey"
           }
         ]
       }
@@ -1628,6 +1723,29 @@
           },
           {
             "name": "Full"
+          }
+        ]
+      }
+    },
+    {
+      "name": "Withdrawal",
+      "docs": [
+        "Emitted after a successful withdrawal."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "recipient",
+            "type": "pubkey"
+          },
+          {
+            "name": "treasury",
+            "type": "pubkey"
           }
         ]
       }

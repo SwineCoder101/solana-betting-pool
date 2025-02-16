@@ -74,6 +74,48 @@ export type HorseRace = {
           }
         },
         {
+          "name": "treasury",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  114,
+                  101,
+                  97,
+                  115,
+                  117,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
+          "name": "treasuryAccount",
+          "writable": true,
+          "pda": {
+            "seeds": [
+              {
+                "kind": "const",
+                "value": [
+                  116,
+                  114,
+                  101,
+                  97,
+                  115,
+                  117,
+                  114,
+                  121
+                ]
+              }
+            ]
+          }
+        },
+        {
           "name": "pool",
           "writable": true,
           "pda": {
@@ -976,6 +1018,19 @@ export type HorseRace = {
       ]
     },
     {
+      "name": "insufficientFunds",
+      "discriminator": [
+        1,
+        162,
+        237,
+        78,
+        144,
+        121,
+        44,
+        184
+      ]
+    },
+    {
       "name": "poolCreated",
       "discriminator": [
         202,
@@ -999,6 +1054,19 @@ export type HorseRace = {
         185,
         90,
         47
+      ]
+    },
+    {
+      "name": "withdrawal",
+      "discriminator": [
+        6,
+        187,
+        215,
+        71,
+        92,
+        85,
+        90,
+        83
       ]
     }
   ],
@@ -1303,6 +1371,33 @@ export type HorseRace = {
           {
             "name": "endTime",
             "type": "u64"
+          }
+        ]
+      }
+    },
+    {
+      "name": "insufficientFunds",
+      "docs": [
+        "Emitted when there aren’t enough funds in the treasury to withdraw."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "treasuryBalance",
+            "type": "u64"
+          },
+          {
+            "name": "amountRequested",
+            "type": "u64"
+          },
+          {
+            "name": "recipient",
+            "type": "pubkey"
+          },
+          {
+            "name": "treasury",
+            "type": "pubkey"
           }
         ]
       }
@@ -1634,6 +1729,29 @@ export type HorseRace = {
           },
           {
             "name": "full"
+          }
+        ]
+      }
+    },
+    {
+      "name": "withdrawal",
+      "docs": [
+        "Emitted after a successful withdrawal."
+      ],
+      "type": {
+        "kind": "struct",
+        "fields": [
+          {
+            "name": "amount",
+            "type": "u64"
+          },
+          {
+            "name": "recipient",
+            "type": "pubkey"
+          },
+          {
+            "name": "treasury",
+            "type": "pubkey"
           }
         ]
       }

@@ -1,6 +1,6 @@
 use anchor_lang::{prelude::*, solana_program::system_program};
 use crate::{
-    constants::{POOL_SEED, POOL_VAULT_SEED}, errors::BettingError, states::{Bet, BetStatus, Pool}, utils::*
+    constants::{POOL_SEED, POOL_VAULT_SEED, TREASURY_SEED}, errors::BettingError, states::{Bet, BetStatus, Pool, Treasury}, utils::*
 };
 
 #[derive(Accounts)]
@@ -8,6 +8,7 @@ pub struct CancelBet<'info> {
     #[account(mut)]
     pub authority: Signer<'info>,
 
+    /// CHECK: The pool_vault is mutable because the pool_vault is stored in the pool account.
     #[account(mut)]
     pub user: Signer<'info>,
 
@@ -30,6 +31,22 @@ pub struct CancelBet<'info> {
         owner = system_program::ID
     )]
     pub pool_vault: AccountInfo<'info>,
+
+    /// CHECK: The treasury is mutable because the treasury is stored in the treasury account.
+    #[account(
+        mut,
+        seeds = [TREASURY_SEED],
+        bump = treasury.bump
+    )]
+    pub treasury: Account<'info, Treasury>,
+
+    /// CHECK: The `treasury_account` is the PDA that physically holds lamports for the treasury.
+    #[account(
+        mut,
+        seeds = [TREASURY_SEED],
+        bump = treasury.bump
+    )]
+    pub treasury_account: UncheckedAccount<'info>,
 
     /// CHECK: The pool is mutable because the pool is stored in the pool account.
     #[account(
@@ -55,12 +72,24 @@ pub fn run_cancel_bet(ctx: Context<CancelBet>) -> Result<()> {
         ctx.accounts.pool.vault_key,
         BettingError::PoolVaultMismatch
     );
+    
+    //charge a fee to the amount
+    let fee = (amount as f64 * 0.01) as u64;
+    let amount_after_fee = amount - fee;
+
+    deposit_to_treasury(
+        &mut ctx.accounts.treasury,
+        &ctx.accounts.treasury_account.to_account_info(),
+        &ctx.accounts.user.to_account_info(),
+        &ctx.accounts.system_program,
+        fee,
+    )?;
 
     transfer_from_vault_to_recipient(
         &ctx.accounts.pool,
         &ctx.accounts.pool_vault,
         &ctx.accounts.user.to_account_info(),
-        amount,
+        amount_after_fee,
     )?;
 
     // Mark bet as cancelled

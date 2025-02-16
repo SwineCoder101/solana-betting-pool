@@ -20,7 +20,6 @@ export type SetupDTO = {
     program: Program<HorseRace>;
     sdkConfig: SdkConfig;
     treasury: PublicKey;
-    poolTreasuryPubkey: PublicKey;
 }
 
 export type EnvironmentSetupDTO = {
@@ -149,7 +148,6 @@ export const setupCompetition = async function (): Promise<SetupDTO> {
     fakeAdmin,
     program,
     sdkConfig,
-    poolTreasuryPubkey: Keypair.generate().publicKey,
   };
 };
 
@@ -168,6 +166,22 @@ export const setupCompetitionWithPools = async function (bypassTreasury: boolean
   const { fakeAdmin, program, sdkConfig, adminKeys, treasury, adminKp} = await setupEnvironment();
   const {tokenA, priceFeedId, houseCutFactor, minPayoutRatio, interval, startTime, endTime, competitionHash, competitionPubkey} = getCompetitionTestData(program);
 
+  let treasuryToUse = treasury;
+  // if treasury is not created, create it
+  const treasuryInitialized = await TreasuryAccount.isInitialized(program)
+  
+  if (!bypassTreasury) {
+    if (!treasuryInitialized) {
+      treasuryToUse =  await Util.createTreasuryUtil(program, adminKp);
+      console.log('poolTreasuryPubkey:', treasuryToUse.toBase58());
+    } else {
+      console.log('Treasury already initialized, using existing treasury');
+    }
+  } else {
+    console.log('Bypassing treasury creation');
+  }
+
+
   // Get versioned transaction and pool keys
   const { competitionTx, poolTxs, poolKeys } = await createCompetitionWithPools(
     program,
@@ -181,7 +195,7 @@ export const setupCompetitionWithPools = async function (bypassTreasury: boolean
     interval,
     startTime,
     endTime,
-    treasury
+    treasuryToUse
   );
 
   const compSig = await signAndSendVTx(competitionTx, adminKp, program.provider.connection);
@@ -193,31 +207,17 @@ export const setupCompetitionWithPools = async function (bypassTreasury: boolean
 
   const competitionData = await getCompetitionData(competitionHash, program);
 
-  // if treasury is not created, create it
-  const treasuryInitialized = await TreasuryAccount.isInitialized(program)
-  let poolTreasuryPubkey: PublicKey = Keypair.generate().publicKey;
-  
-  if (!bypassTreasury) {
-    if (!treasuryInitialized) {
-      poolTreasuryPubkey =  await Util.createTreasuryUtil(program, adminKp);
-      console.log('poolTreasuryPubkey:', poolTreasuryPubkey.toBase58());
-    } else {
-      console.log('Treasury already initialized, using existing treasury');
-    }
-  } else {
-    console.log('Bypassing treasury creation');
-  }
+
 
   return {
     adminKp,
     competitionPubkey,
     competitionData,
-    treasury,
+    treasury : treasuryToUse,
     fakeAdmin,
     program,
     sdkConfig,
     poolKeys: poolKeys ?? [Keypair.generate().publicKey],
-    poolTreasuryPubkey,
   };
 }
 

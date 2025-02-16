@@ -10,6 +10,21 @@ export interface CreateTreasuryParams {
   payer?: web3.PublicKey
 }
 
+export async function createTreasuryIfNotExists(
+  program: Program<HorseRace>,
+  params: CreateTreasuryParams,
+): Promise<TransactionInstruction | null> {
+  const [treasuryKey] = await TreasuryAccount.getPda(program)
+
+  const treasuryAccount = await program.account.treasury.fetch(treasuryKey);
+
+  if (treasuryAccount.totalDeposits > 0) {
+    return null;
+  }
+  
+  return await createTreasury(program, params);
+}
+
 export async function createTreasury(
   program: Program<HorseRace>,
   params: CreateTreasuryParams,

@@ -33,6 +33,11 @@ export class TreasuryAccount {
     )
   }
 
+  static async getTreasuryKey(program: Program<HorseRace>): Promise<PublicKey> {
+    const treasury = (await program.account.treasury.all());
+    return treasury[0].publicKey;
+  }
+
   static async getBalance(
     program: Program<HorseRace>,
     treasuryKey: PublicKey,
