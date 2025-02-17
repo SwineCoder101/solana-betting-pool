@@ -133,7 +133,7 @@ export async function signAndSendVTx(
 
     const vtx = await getVersionTxFromInstructions(program.provider.connection, [ix]);
     await signAndSendVTx(vtx, adminKp, program.provider.connection);
-    const [treasuryKey] = await TreasuryAccount.getPda(program);
+    const [treasuryKey] = await TreasuryAccount.getTreasuryPda(program);
 
     return treasuryKey;
   }
@@ -214,12 +214,13 @@ export async function setupTreasury(program: Program<HorseRace>): Promise<{
     maxAdmins: 1,
     minSignatures: 1,
     initialAdmins: [adminWallet.publicKey],
+    payer: adminWallet.publicKey,
   })
 
   const vtx = await getVersionTxFromInstructions(program.provider.connection, [ix]);
   await signAndSendVTx(vtx, adminWallet, program.provider.connection);
 
-  const [treasuryKey] = await TreasuryAccount.getPda(program);
+  const [treasuryKey] = await TreasuryAccount.getTreasuryPda(program);
 
   return { treasuryKey, adminWallet }
 }

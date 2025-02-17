@@ -45,7 +45,7 @@ describe("Pool", () => {
     console.log('Pool account:', poolAccount);
 
     // Verify the pool account data
-    expect(poolAccount.competitionKey.toString()).toEqual(competitionKey.toString());
+    expect(poolAccount.competition.toString()).toEqual(competitionKey.toString());
     expect(poolAccount.startTime.toNumber()).toEqual(startTime);
     expect(poolAccount.endTime.toNumber()).toEqual(endTime);
     expect(poolAccount.treasury.toString()).toEqual(treasury.toString());

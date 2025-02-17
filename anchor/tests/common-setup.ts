@@ -249,7 +249,7 @@ export async function setupTreasury(): Promise<CommonSetup> {
     await confirmTransaction(sig, program);
   }
 
-  const [treasuryKey] = await TreasuryAccount.getPda(program);
+  const [treasuryKey] = await TreasuryAccount.getTreasuryPda(program);
   return { 
     program,
     treasuryKey, 

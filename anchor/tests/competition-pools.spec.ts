@@ -36,7 +36,7 @@ describe("Competition with Pools", () => {
     if (poolKeys  && poolKeys.length > 0){
         for (let i = 0; i < poolKeys.length; i++) {
             const pool = await program.account.pool.fetch(poolKeys[i]);
-            expect(pool.competitionKey.toBase58()).toEqual(competitionPubkey.toBase58());
+            expect(pool.competition.toBase58()).toEqual(competitionPubkey.toBase58());
             expect(pool.startTime.toNumber()).toEqual(competitionData.startTime + i * competitionData.interval);
             expect(pool.endTime.toNumber()).toEqual(pool.startTime.toNumber() + competitionData.interval);
             expect(pool.treasury.toBase58()).toEqual(treasuryKey.toBase58());
@@ -74,7 +74,7 @@ describe("Competition with Pools", () => {
       if (poolKeys  && poolKeys.length > 0){
         for (let i = 0; i < poolKeys?.length; i++) {
             const pool = await program.account.pool.fetch(poolKeys[i]);
-            expect(pool.competitionKey.toString()).toEqual(competitionPubkey.toString());
+            expect(pool.competition.toString()).toEqual(competitionPubkey.toString());
             expect(pool.startTime.toNumber()).toEqual(competitionData.startTime + i * competitionData.interval);
             expect(pool.endTime.toNumber()).toEqual(pool.startTime.toNumber() + competitionData.interval);
             expect(pool.treasury.toString()).toEqual(treasury.toBase58());
