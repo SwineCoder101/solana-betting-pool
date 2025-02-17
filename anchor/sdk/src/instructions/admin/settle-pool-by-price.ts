@@ -4,6 +4,7 @@ import { AccountMeta, PublicKey, VersionedTransaction } from "@solana/web3.js";
 import { getVersionTxFromInstructions, HorseRace } from "../../utils";
 import { BetStatus, getBetAccountsForPool } from "../../states";
 import { TreasuryAccount } from "../../states/treasury-account";
+
 export async function settlePoolByPrice(
   program: Program<HorseRace>,
   admin: PublicKey,
@@ -13,9 +14,8 @@ export async function settlePoolByPrice(
 ): Promise<VersionedTransaction> {
 
   const poolAccount = await program.account.pool.fetch(poolKey);
-  const treasuryKey = poolAccount.treasury;
 
-  const [poolTreasury] = await TreasuryAccount.getPda(program);
+  const [poolTreasury] = await TreasuryAccount.getTreasuryPda(program);
 
   const betAccounts = (await getBetAccountsForPool(program, poolKey)).filter((betAccount) => betAccount.status === BetStatus.Active);
   const userAccounts = betAccounts.map((betAccount) => betAccount.user);
@@ -36,8 +36,9 @@ export async function settlePoolByPrice(
       authority: admin,
       pool: poolKey,
       poolTreasury,
-      competition: poolAccount.competitionKey,
-      treasury: treasuryKey,
+      competition: poolAccount.competition,
+      treasuryVault: poolAccount.vaultKey,
+      poolVault: poolAccount.vaultKey,
       systemProgram: anchor.web3.SystemProgram.programId,
     })
     .remainingAccounts(remainingAccounts)

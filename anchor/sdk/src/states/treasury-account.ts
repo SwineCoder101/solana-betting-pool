@@ -1,7 +1,7 @@
 import { PublicKey } from '@solana/web3.js'
 import { Program, BN } from '@coral-xyz/anchor'
 import { HorseRace } from '../types/horse_race'
-import { TREASURY_SEED } from '../constants'
+import { TREASURY_SEED, TREASURY_VAULT_SEED } from '../constants'
 
 export class TreasuryAccount {
   constructor(
@@ -10,6 +10,8 @@ export class TreasuryAccount {
     public totalDeposits: BN,
     public totalWithdrawals: BN,
     public bump: number,
+    public vaultKey: PublicKey,
+    public vaultBump: number,
   ) {}
 
   static async fetch(
@@ -23,12 +25,21 @@ export class TreasuryAccount {
       account.totalDeposits,
       account.totalWithdrawals,
       account.bump,
+      account.vaultKey,
+      account.vaultBump,
     )
   }
 
-  static async getPda(program: Program<HorseRace>): Promise<[PublicKey, number]> {
+  static async getTreasuryPda(program: Program<HorseRace>): Promise<[PublicKey, number]> {
     return PublicKey.findProgramAddressSync(
       [Buffer.from(TREASURY_SEED)],
+      program.programId,
+    )
+  }
+
+  static async getTreasuryVaultPda(program: Program<HorseRace>, treasuryKey: PublicKey): Promise<[PublicKey, number]> {
+    return PublicKey.findProgramAddressSync(
+      [Buffer.from(TREASURY_VAULT_SEED), treasuryKey.toBuffer()],
       program.programId,
     )
   }
@@ -49,7 +60,7 @@ export class TreasuryAccount {
 
   static async isInitialized(program: Program<HorseRace>): Promise<boolean> {
     try {
-      const [treasuryPda] = await TreasuryAccount.getPda(program)
+      const [treasuryPda] = await TreasuryAccount.getTreasuryPda(program)
       // Attempt to fetch the treasury account; if it does not exist, an error will be thrown.
       await program.account.treasury.fetch(treasuryPda)
       return true

@@ -15,13 +15,14 @@ export async function withdrawFromTreasury(
   params: WithdrawFromTreasuryParams,
 ): Promise<TransactionInstruction> {
   const { amount, recipient, pool, authority = program.provider.publicKey } = params
-  const [treasuryKey] = await TreasuryAccount.getPda(program)
+  const [treasuryKey] = await TreasuryAccount.getTreasuryPda(program)
+  const [treasuryVaultKey] = await TreasuryAccount.getTreasuryVaultPda(program, treasuryKey)
 
   return program.methods
     .runWithdrawFromTreasury(amount)
     .accountsStrict({
       treasury: treasuryKey,
-      treasuryAccount: treasuryKey,
+      treasuryAccount: treasuryVaultKey,
       recipient,
       pool,
       authority,

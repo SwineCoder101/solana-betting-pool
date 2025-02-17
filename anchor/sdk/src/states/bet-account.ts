@@ -38,9 +38,9 @@ export type BetProgramData = {
 
 /* eslint-disable @typescript-eslint/ban-types */
 export type StatusEnumProgram =
-  | { active: {} }
-  | { cancelled: {} }
-  | { settled: {} }
+  | { active: Record<string, never> }
+  | { cancelled: Record<string, never> }
+  | { settled: Record<string, never> }
 
 const ACCOUNT_DISCRIMINATOR_SIZE = 8;
 const PUBLIC_KEY_SIZE = 32;

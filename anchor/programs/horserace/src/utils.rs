@@ -192,9 +192,7 @@ pub fn withdraw_lamports_from_treasury<'info>(
     Ok(())
 }
 
-
-
-pub fn direct_transfer(
+pub fn direct_transfer_ref(
     from_info: &AccountInfo,
     to_info: &AccountInfo,
     amount: u64,

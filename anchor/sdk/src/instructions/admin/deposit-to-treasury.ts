@@ -1,7 +1,7 @@
 import { Program, web3, BN } from '@coral-xyz/anchor'
-import { HorseRace } from '../../types/horse_race'
 import { TreasuryAccount } from '../../states/treasury-account'
 import { TransactionInstruction } from '@solana/web3.js'
+import { HorseRace } from '../../types/horse_race'
 
 export interface DepositToTreasuryParams {
   amount: BN
@@ -13,15 +13,16 @@ export async function depositToTreasury(
   params: DepositToTreasuryParams,
 ): Promise<TransactionInstruction> {
   const { amount, depositor = program.provider.publicKey } = params
-  const [treasuryKey] = await TreasuryAccount.getPda(program)
-
+  const [treasuryKey] = await TreasuryAccount.getTreasuryPda(program)
+  const [treasuryVaultKey] = await TreasuryAccount.getTreasuryVaultPda(program, treasuryKey)
+  
   return program.methods
     .runDepositToTreasury(amount)
     .accountsStrict({
       treasury: treasuryKey,
-      treasuryAccount: treasuryKey,
       depositor,
       systemProgram: web3.SystemProgram.programId,
+      treasuryAccount: treasuryVaultKey,
     })
     .instruction()
 } 
