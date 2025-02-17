@@ -53,7 +53,7 @@ pub struct CancelBet<'info> {
         mut,
         seeds = [
             POOL_SEED,
-            pool.competition_key.as_ref(),
+            pool.competition.as_ref(),
             pool.pool_hash.as_ref()
         ],
         bump = pool.bump
@@ -103,7 +103,7 @@ pub fn run_cancel_bet(ctx: Context<CancelBet>) -> Result<()> {
         lower_bound_price: ctx.accounts.bet.lower_bound_price,
         upper_bound_price: ctx.accounts.bet.upper_bound_price,
         pool_key: ctx.accounts.pool.key(),
-        competition: ctx.accounts.pool.competition_key,
+        competition: ctx.accounts.pool.competition,
         cancelled_at: Clock::get()?.unix_timestamp,
     });
     Ok(())

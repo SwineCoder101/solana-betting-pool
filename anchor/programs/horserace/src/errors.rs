@@ -30,6 +30,12 @@ pub enum SettlementError {
     PoolNotEnded,
     #[msg("Invalid competition account, cannot settle pool")]
     InvalidCompetitionAccount,
+    #[msg("Arithmetic overflow")]
+    Overflow,
+    #[msg("Not enough funds in pool or treasury")]
+    NotEnoughFundsInPoolOrTreasury,
+    #[msg("Not enough funds")]
+    NotEnoughFunds,
 }
 
 #[error_code]

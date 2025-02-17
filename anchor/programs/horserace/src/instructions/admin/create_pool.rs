@@ -13,7 +13,7 @@ pub struct CreatePool<'info> {
     #[account(mut)]
     pub pool_hash_acc: UncheckedAccount<'info>,
 
-    /// CHECK: The competition_acc is mutable because the competition_key is stored in the pool account.
+    /// CHECK: The competition_acc is mutable because the competition is stored in the pool account.
     #[account(mut)]
     pub competition_acc: UncheckedAccount<'info>,
 
@@ -56,7 +56,7 @@ pub fn run_create_pool(
     }
 
     let pool_account = &mut ctx.accounts.pool;
-    pool_account.competition_key = ctx.accounts.competition_acc.key();
+    pool_account.competition = ctx.accounts.competition_acc.key();
     pool_account.start_time = start_time;
     pool_account.end_time = end_time;
     pool_account.treasury = treasury;
@@ -67,7 +67,7 @@ pub fn run_create_pool(
 
     emit!(PoolCreated {
         pool_hash: ctx.accounts.pool_hash_acc.key(),
-        competition_key: ctx.accounts.competition_acc.key(),
+        competition: ctx.accounts.competition_acc.key(),
         start_time,
         end_time,
         vault_key: ctx.accounts.pool_vault.key(),
@@ -80,7 +80,7 @@ pub fn run_create_pool(
 pub struct PoolCreated {
     pub pool_hash: Pubkey,
     pub vault_key: Pubkey,
-    pub competition_key: Pubkey,
+    pub competition: Pubkey,
     pub start_time: u64,
     pub end_time: u64,
 }

@@ -1,6 +1,8 @@
 use anchor_lang::{prelude::*, solana_program::system_program};
+use crate::constants::{POOL_VAULT_SEED, TREASURY_VAULT_SEED};
 use crate::errors::SettlementError;
 use crate::states::{BetStatus, Treasury};
+use crate::utils;
 use crate::{states::{Pool, Bet, Competition}, errors::BettingError};
 
 #[derive(Accounts)]
@@ -8,131 +10,148 @@ pub struct SettlePool<'info> {
     #[account(mut)]
     pub authority: Signer<'info>,
 
-    #[account(mut)]
-    pub pool: Account<'info, Pool>,
-
-    #[account(mut)]
-    pub pool_treasury: Account<'info, Treasury>,
-
+    // The Competition anchor account
     #[account(mut)]
     pub competition: Account<'info, Competition>,
 
-    #[account(mut, address = pool.treasury)]
-    pub treasury: SystemAccount<'info>,
+    // Anchor metadata account
+    #[account(
+        mut,
+        has_one = competition @ SettlementError::InvalidCompetitionAccount
+    )]
+    pub pool: Account<'info, Pool>,
+    
+
+    // The system account that physically holds the pool’s lamports
+    #[account(
+        seeds = [
+            POOL_VAULT_SEED,
+            pool.key().as_ref()
+        ],
+        bump = pool.vault_bump,
+        owner = system_program::ID
+    )]
+    pub pool_vault: SystemAccount<'info>,
+
+    // The Treasury anchor account
+    #[account(mut)]
+    pub pool_treasury: Account<'info, Treasury>,
+
+    // The system account that physically holds the treasury’s lamports
+    #[account(
+        mut,
+        seeds = [TREASURY_VAULT_SEED],
+        bump = pool_treasury.vault_bump,
+        owner = system_program::ID
+    )]
+    pub treasury_vault: SystemAccount<'info>,
+
+
 
     #[account(address = system_program::ID)]
     pub system_program: Program<'info, System>,
 }
 
+
 pub fn run_settle_pool_by_price<'info>(
-    ctx: Context<'_, '_, 'info, 'info, SettlePool<'info>>,
+    ctx: Context<'_, '_, '_, 'info, SettlePool<'info>>,
     lower_bound_price: u64,
     upper_bound_price: u64,
 ) -> Result<()> {
-    let pool = &mut ctx.accounts.pool;
-    let competition_admins = &ctx.accounts.competition.admin;
-    let competition_key = ctx.accounts.competition.key();
+    let pool = &ctx.accounts.pool;
+    let pool_vault_info = &ctx.accounts.pool_vault.to_account_info();
+    let treasury_vault_info = &ctx.accounts.treasury_vault.to_account_info();
+    let mut remaining_iter = ctx.remaining_accounts.iter();
 
-    // Store the pool balance before any modifications
-    let pool_info = pool.to_account_info();
-    let pool_balance = pool_info.to_account_info().lamports();
-
-    let mut number_of_winning_bets = 0;
-    let mut number_of_losing_bets = 0;
-
-    let mut winning_bets_balance = 0;
-    let mut losing_bets_balance = 0;
-
-    #[allow(unused_mut)]
-    let mut has_winning_range = false;
-
-    require_keys_eq!(
-        competition_key,
-        pool.competition_key,
-        SettlementError::InvalidCompetitionAccount
-    );
-
-    if !competition_admins.contains(&ctx.accounts.authority.key()) {
+    // 1) Check authority is in competition admins
+    if !ctx.accounts.competition.admin.contains(&ctx.accounts.authority.key()) {
         return err!(SettlementError::Unauthorized);
     }
 
-    let mut remaining_accounts_iter = ctx.remaining_accounts.iter();
-    let number_of_bets = (ctx.remaining_accounts.len() / 2) as u8;
-    
-    while let Some(bet_account_info) = remaining_accounts_iter.next() {
+    let mut has_any_bet_won = false;
+    let mut total_winnings = 0;
+    let mut total_losing_bets = 0;
+    let mut number_of_winning_bets = 0;
+    let mut number_of_losing_bets = 0;
+
+    // 2) Process each Bet + associated user
+    while let Some(bet_account_info) = remaining_iter.next() {
+        let user_account_info = remaining_iter
+            .next()
+            .ok_or(BettingError::InvalidUserAccount)?;
+
         let mut bet = Account::<Bet>::try_from(bet_account_info)?;
         if bet.status != BetStatus::Active {
             continue;
         }
 
-        let user_account_info = remaining_accounts_iter.next()
-            .ok_or(BettingError::InvalidUserAccount)?;
-
-        let winnings = get_winnings(bet.amount, bet.leverage_multiplier);
         let won = has_won(&bet, lower_bound_price, upper_bound_price);
+        let winnings = get_winnings(bet.amount, bet.leverage_multiplier);
 
         if won {
-            require_keys_eq!(
-                *user_account_info.key,
-                bet.user,
-                BettingError::InvalidUserAccount
-            );
-
+            total_winnings += winnings;
             number_of_winning_bets += 1;
-            winning_bets_balance += winnings;
-
-            // if sufficient funds are in the pool, send the winnings to the user account
-            if **pool.to_account_info().try_borrow_mut_lamports()? >= winnings {
-                **pool.to_account_info().try_borrow_mut_lamports()? -= winnings as u64;
-                **user_account_info.try_borrow_mut_lamports()? += winnings;
-            } else {
-                // if there are not enough funds in the pool, borrow from the pool treasury
-                **ctx.accounts.pool_treasury.to_account_info().try_borrow_mut_lamports()? -= winnings;
-                **user_account_info.try_borrow_mut_lamports()? += winnings;
+            // If pool vault can’t cover it, pull from treasury
+            let pool_vault_balance = pool_vault_info.lamports();
+            if pool_vault_balance < winnings {
+                // top up from treasury vault
+                let shortfall = winnings - pool_vault_balance;
+                require!(
+                    treasury_vault_info.lamports() >= shortfall,
+                    SettlementError::NotEnoughFundsInPoolOrTreasury
+                );
+                utils::direct_transfer(
+                    treasury_vault_info,
+                    pool_vault_info,
+                    shortfall
+                )?;
             }
-        } else {
-            number_of_losing_bets += 1;
-            losing_bets_balance += bet.amount;
 
-            // Deduct winnings from the pool and send them to the treasury
-            **pool.to_account_info().try_borrow_mut_lamports()? -= winnings;
-            **ctx.accounts.treasury.to_account_info().try_borrow_mut_lamports()? += winnings;
+            // now pay user from pool vault
+            utils::direct_transfer(pool_vault_info, user_account_info, winnings)?;
+        } else {
+            total_losing_bets += bet.amount;
+            number_of_losing_bets += 1;
+            // user lost → add their "amount * multiplier" to treasury 
+            utils::direct_transfer(pool_vault_info, treasury_vault_info, winnings)?;
         }
 
+        // Mark bet as settled
         bet.status = BetStatus::Settled;
-        bet.serialize(&mut *bet_account_info.try_borrow_mut_data()?)?;
+        bet.serialize(&mut &mut bet_account_info.try_borrow_mut_data()?[..])?;
 
-        emit!(BetSettled {
-            bet_key: bet_account_info.key(),
+        has_any_bet_won = has_any_bet_won || won;
+
+        // Emit
+        emit!(BetSettled { 
+            bet_key: bet.key(),
             user: bet.user,
-            amount: if won { winnings as i64 } else { -(bet.amount as i64) },
+            amount: bet.amount,
+            leverage_multiplier: bet.leverage_multiplier,
             lower_bound_price: bet.lower_bound_price,
             upper_bound_price: bet.upper_bound_price,
             has_winning_range: won,
             winning_lower_bound_price: lower_bound_price,
             winning_upper_bound_price: upper_bound_price,
-            leverage_multiplier: bet.leverage_multiplier,
         });
     }
 
-    has_winning_range = number_of_winning_bets > 0;
-
     emit!(PoolSettled {
         pool_key: pool.key(),
-        competition: competition_key,
-        lower_bound_price,
-        upper_bound_price,
-        has_winning_range,
-        pool_balance_before: pool_balance,
-        winning_bets_balance,
-        losing_bets_balance,
-        number_of_bets,
-        number_of_winning_bets,
-        number_of_losing_bets,
+        competition: ctx.accounts.competition.key(),
+        lower_bound_price: lower_bound_price,
+        upper_bound_price: upper_bound_price,
+        has_winning_range: has_any_bet_won,
+        pool_balance_before: pool_vault_info.lamports(),
+        winning_bets_balance: total_winnings,
+        losing_bets_balance: total_losing_bets,
+        number_of_bets: number_of_losing_bets + number_of_winning_bets,
+        number_of_winning_bets: number_of_winning_bets,
+        number_of_losing_bets: number_of_losing_bets,
     });
-
     Ok(())
 }
+
 
 fn has_won(bet: &Bet, lower_bound_price: u64, upper_bound_price: u64) -> bool {
     bet.lower_bound_price >= lower_bound_price && bet.upper_bound_price <= upper_bound_price
@@ -146,7 +165,7 @@ fn get_winnings(amount: u64, leverage_multiplier: u64) -> u64 {
 pub struct BetSettled {
     pub bet_key: Pubkey,
     pub user: Pubkey,
-    pub amount: i64,
+    pub amount: u64,
     pub leverage_multiplier: u64,
     pub lower_bound_price: u64,
     pub upper_bound_price: u64,

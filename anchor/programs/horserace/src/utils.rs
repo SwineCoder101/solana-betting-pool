@@ -4,7 +4,7 @@ use anchor_lang::solana_program::system_instruction;
 use anchor_lang::solana_program::program::invoke;
 
 use crate::constants::POOL_VAULT_SEED;
-use crate::errors::TreasuryError;
+use crate::errors::{SettlementError, TreasuryError};
 use crate::states::Treasury;
 
 /// Mocked function to determine if user is eligible
@@ -188,6 +188,28 @@ pub fn withdraw_lamports_from_treasury<'info>(
         recipient: recipient.key(),
         treasury: treasury.key(),
     });
+
+    Ok(())
+}
+
+
+
+pub fn direct_transfer(
+    from_info: &AccountInfo,
+    to_info: &AccountInfo,
+    amount: u64,
+) -> Result<()> {
+    let from_balance = from_info.lamports();
+    require!(from_balance >= amount, SettlementError::NotEnoughFunds);
+
+    **from_info.try_borrow_mut_lamports()? = from_balance
+        .checked_sub(amount)
+        .ok_or(SettlementError::Overflow)?;
+
+    **to_info.try_borrow_mut_lamports()? = to_info
+        .lamports()
+        .checked_add(amount)
+        .ok_or(SettlementError::Overflow)?;
 
     Ok(())
 }

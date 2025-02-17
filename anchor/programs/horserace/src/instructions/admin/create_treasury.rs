@@ -1,8 +1,7 @@
-use anchor_lang::prelude::*;
+use anchor_lang::{prelude::*, system_program};
 use crate::errors::TreasuryError;
 use crate::states::Treasury;
-use crate::constants::TREASURY_SEED;
-
+use crate::constants::{TREASURY_SEED, TREASURY_VAULT_SEED};
 #[derive(Accounts)]
 #[instruction(max_admins: u8, min_signatures: u8)]
 pub struct CreateTreasury<'info> {
@@ -17,7 +16,19 @@ pub struct CreateTreasury<'info> {
     
     #[account(mut)]
     pub payer: Signer<'info>,
+
+    #[account(address = system_program::ID)]
     pub system_program: Program<'info, System>,
+
+    #[account(
+        init,
+        payer = payer,
+        seeds = [TREASURY_VAULT_SEED],
+        bump,
+        space = 0,
+        owner = system_program::ID
+      )]
+      pub treasury_account: SystemAccount<'info>,
 }
 
 pub fn create_treasury(
@@ -41,6 +52,8 @@ pub fn create_treasury(
     treasury.total_deposits = 0;
     treasury.total_withdrawals = 0;
     treasury.bump = ctx.bumps.treasury;
+    treasury.vault_key = ctx.accounts.treasury_account.key();
+    treasury.vault_bump = ctx.bumps.treasury_account;
 
     Ok(())
 } 

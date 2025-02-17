@@ -5,3 +5,4 @@ pub const POOL_ID_COUNTER_SEED: &[u8] = b"id_counter";
 pub const TREASURY_SEED: &[u8] = b"treasury";
 pub const POOL_TREASURY_SEED: &[u8] = b"pool_treasury";
 pub const POOL_VAULT_SEED: &[u8] = b"pool_vault";
+pub const TREASURY_VAULT_SEED: &[u8] = b"treasury_vault";

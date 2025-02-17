@@ -49,7 +49,7 @@ pub fn run_create_competition(
     let num_of_pools = ((end_time - start_time) / interval) as u8;
 
     emit!(CompetitionCreated {
-        competition_key: competition.key(),
+        competition: competition.key(),
         token_a: competition.token_a,
         price_feed_id: competition.price_feed_id.clone(),
         admin: competition.admin.clone(),
@@ -66,7 +66,7 @@ pub fn run_create_competition(
 
 #[event]
 pub struct CompetitionCreated {
-    pub competition_key: Pubkey,
+    pub competition: Pubkey,
     pub token_a: Pubkey,
     pub price_feed_id: String,
     pub admin: Vec<Pubkey>,

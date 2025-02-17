@@ -6,6 +6,8 @@ pub struct Treasury {
     pub min_signatures: u8,
     pub total_deposits: u64,
     pub total_withdrawals: u64,
+    pub vault_key: Pubkey,
+    pub vault_bump: u8,
     pub bump: u8,
 }
 
