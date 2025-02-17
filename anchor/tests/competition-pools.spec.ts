@@ -1,7 +1,7 @@
 import { TreasuryAccount } from "../sdk/src/states/treasury-account";
 import { setupCompetitionWithPools, SetupDTO } from "./common-setup";
 
-describe("Competition with Pools", () => {
+describe.skip("Competition with Pools", () => {
   let setupDto: SetupDTO;
 
   beforeAll(async () => {

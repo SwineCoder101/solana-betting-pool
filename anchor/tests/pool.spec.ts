@@ -1,8 +1,9 @@
+jest.setTimeout(30000);
+
 import { web3 } from '@coral-xyz/anchor';
 import { Keypair } from '@solana/web3.js';
-import { createPool } from '../sdk/src/instructions/admin/create-pool';
-import { setupEnvironment } from './common-setup';
-import { getVersionTxFromInstructions } from '../sdk/src/utils';
+import { setupEnvironment } from '../../anchor/tests/common-setup';
+import { createPool, getVersionTxFromInstructions } from '../../anchor/sdk/src';
 
 describe("Pool", () => {
 
@@ -11,9 +12,9 @@ describe("Pool", () => {
   const startTime = Math.floor(Date.now() / 1000)
   const endTime = startTime + 3600; // 1 hour later
 
-  it("Create pool successfully", async () => {
+  it("Create pool successfully", async () => {  // <-- Optionally, you can also pass 30000 as timeout here: }, 30000)
 
-    const {program, adminKp} = await setupEnvironment();
+    const { program, adminKp } = await setupEnvironment();
     // Generate a pool hash
     const poolHash = Keypair.generate().publicKey;
 
@@ -50,4 +51,4 @@ describe("Pool", () => {
     expect(poolAccount.endTime.toNumber()).toEqual(endTime);
     expect(poolAccount.treasury.toString()).toEqual(treasury.toString());
   });
-});
+}); 

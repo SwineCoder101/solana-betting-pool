@@ -12,7 +12,8 @@
     "build": "npm run update:idl && npm run clean && tsc",
     "watch": "tsc -w",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "update:idl" : "cp ../target/idl/horse_race.json ./src/idl/horse_race.json && cp ../target/types/horse_race.ts ./src/types/horse_race.ts"
+    "update:idl" : "cp ../target/idl/horse_race.json ./src/idl/horse_race.json && cp ../target/types/horse_race.ts ./src/types/horse_race.ts",
+    "update:idl:target" : "cp ../target/idl/horse_race.json ./target/idl/horse_race.json && cp ../target/types/horse_race.ts ./target/types/horse_race.ts"
   },
   "keywords": [],
   "author": "",

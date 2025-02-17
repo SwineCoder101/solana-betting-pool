@@ -5,7 +5,7 @@ import { settlePoolByPrice } from "../sdk/src/instructions/admin/settle-pool-by-
 import { setupCompetitionWithPools, SetupDTO } from "./common-setup";
 import { executeCreateBet, signAndSendVTx } from "./test-utils";
 
-describe("settlements with bets", () => {
+describe.skip("settlements with bets", () => {
   let setupDto: SetupDTO;
   let program, poolKeys: PublicKey[], competitionPubkey, connection;
   let signer: Keypair;

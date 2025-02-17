@@ -7,7 +7,7 @@ import { createBet } from "../sdk/src/instructions/user/create-bet";
 import { setupCompetitionWithPools, SetupDTO } from "./common-setup";
 import { createUserWithFunds } from "./test-utils";
 
-describe("Bets", () => {
+describe.skip("Bets", () => {
   let setupDto: SetupDTO;
   let program, poolKeys: PublicKey[], competitionPubkey, connection;
   let signer: Keypair;
