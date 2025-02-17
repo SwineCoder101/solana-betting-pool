@@ -6,7 +6,7 @@ import {
   withdrawFromTreasury
 } from '../sdk/src'
 import { TreasuryAccount } from '../sdk/src/states/treasury-account'
-import { CommonSetup, setupTreasury } from './common-setup'
+import { CommonSetup, setupTreasury, confirmTransaction } from './common-setup'
 import { createUserWithFunds, signAndSendVTx } from './test-utils'
 import { SystemProgram } from '@solana/web3.js'
 
@@ -28,7 +28,7 @@ async function createPoolAccount(
   await connection.sendTransaction(tx, [payer, pool])
 }
 
-describe.skip('Treasury', () => {
+describe('Treasury', () => {
   let setup: CommonSetup
   let depositor: anchor.web3.Keypair
 
@@ -52,7 +52,8 @@ describe.skip('Treasury', () => {
       depositor: depositor.publicKey,
     })
     const vtx = await getVersionTxFromInstructions(setup.program.provider.connection, [tx])
-    await signAndSendVTx(vtx, depositor, setup.program.provider.connection)
+    const sig = await signAndSendVTx(vtx, depositor, setup.program.provider.connection)
+    await confirmTransaction(sig, setup.program)
 
     const newBalance = await TreasuryAccount.getBalance(setup.program, setup.treasuryKey)
     // Use BigInt arithmetic for BN values.
@@ -89,7 +90,8 @@ describe.skip('Treasury', () => {
         depositor: depositor.publicKey,
       })
       const vtxDeposit = await getVersionTxFromInstructions(setup.program.provider.connection, [txDeposit])
-      await signAndSendVTx(vtxDeposit, depositor, setup.program.provider.connection)
+      const sigDeposit = await signAndSendVTx(vtxDeposit, depositor, setup.program.provider.connection)
+      await confirmTransaction(sigDeposit, setup.program)
     }
 
     const withdrawAmount = new BN(anchor.web3.LAMPORTS_PER_SOL / 2)
@@ -108,8 +110,9 @@ describe.skip('Treasury', () => {
       pool: pool.publicKey,
       authority: setup.adminWallet.publicKey,
     })
-    const vtx = await getVersionTxFromInstructions(setup.program.provider.connection, [tx])
-    await signAndSendVTx(vtx, setup.adminWallet, setup.program.provider.connection)
+    const vtxWithdraw = await getVersionTxFromInstructions(setup.program.provider.connection, [tx])
+    const sigWithdraw = await signAndSendVTx(vtxWithdraw, setup.adminWallet, setup.program.provider.connection)
+    await confirmTransaction(sigWithdraw, setup.program)
 
     const newBalance = await TreasuryAccount.getBalance(setup.program, setup.treasuryKey)
     const newRecipientBalance = await setup.program.provider.connection.getBalance(recipient.publicKey)

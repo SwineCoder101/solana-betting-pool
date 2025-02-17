@@ -22,7 +22,7 @@ export async function depositToTreasury(
       treasury: treasuryKey,
       depositor,
       systemProgram: web3.SystemProgram.programId,
-      treasuryAccount: treasuryVaultKey,
+      treasuryVault: treasuryVaultKey,
     })
     .instruction()
 } 

@@ -638,7 +638,7 @@ export type HorseRace = {
           "writable": true
         },
         {
-          "name": "treasuryAccount",
+          "name": "treasuryVault",
           "writable": true,
           "pda": {
             "seeds": [
@@ -652,7 +652,13 @@ export type HorseRace = {
                   115,
                   117,
                   114,
-                  121
+                  121,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
                 ]
               }
             ]
@@ -918,7 +924,7 @@ export type HorseRace = {
           "writable": true
         },
         {
-          "name": "treasuryAccount",
+          "name": "treasuryVault",
           "writable": true,
           "pda": {
             "seeds": [
@@ -932,7 +938,13 @@ export type HorseRace = {
                   115,
                   117,
                   114,
-                  121
+                  121,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
                 ]
               }
             ]

@@ -15,11 +15,13 @@ impl Treasury {
     
     pub fn space(max_admins: usize) -> usize {
         8 +  // discriminator
-        4 + (32 * max_admins) + // Vec<Pubkey> for admin_authorities
-        1 + // min_signatures
-        8 + // total_deposits
-        8 + // total_withdrawals
-        1   // bump
+        4 + (32 * max_admins) + // admin_authorities: Vec<Pubkey> (4 for length + 32 per key)
+        1 +  // min_signatures
+        8 +  // total_deposits
+        8 +  // total_withdrawals
+        32 + // vault_key: Pubkey
+        1 +  // vault_bump: u8
+        1    // bump: u8
     }
 
     pub fn is_admin(&self, authority: &Pubkey) -> bool {

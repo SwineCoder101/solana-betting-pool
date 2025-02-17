@@ -22,7 +22,7 @@ export async function withdrawFromTreasury(
     .runWithdrawFromTreasury(amount)
     .accountsStrict({
       treasury: treasuryKey,
-      treasuryAccount: treasuryVaultKey,
+      treasuryVault: treasuryVaultKey,
       recipient,
       pool,
       authority,
