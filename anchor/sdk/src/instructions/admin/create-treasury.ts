@@ -31,7 +31,7 @@ export async function createTreasury(
 ): Promise<TransactionInstruction> {
   const { maxAdmins, minSignatures, initialAdmins, payer = program.provider.publicKey } = params
   const [treasuryKey] = await TreasuryAccount.getTreasuryPda(program)
-  const [treasuryVaultKey] = await TreasuryAccount.getTreasuryVaultPda(program, treasuryKey)
+  const [treasuryVaultKey] = await TreasuryAccount.getTreasuryVaultPda(program)
 
   return await program.methods
     .runCreateTreasury(maxAdmins, minSignatures, initialAdmins)

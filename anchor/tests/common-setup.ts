@@ -34,24 +34,25 @@ export type EnvironmentSetupDTO = {
 
 export const setupEnvironment = async function (): Promise<EnvironmentSetupDTO> {
   const provider = anchor.AnchorProvider.env();
-  const treasury = Keypair.generate().publicKey;
   anchor.setProvider(provider);
+  
+  // Retrieve the program from the workspace
+  const program = anchor.workspace.HorseRace as anchor.Program<HorseRace>;
+
+  const [treasury] = await TreasuryAccount.getTreasuryPda(program);
   
   // @ts-expect-error-ignore
   const adminPayer = provider.wallet.payer;
   const adminKp = Keypair.fromSecretKey(adminPayer.secretKey);
   
-  const program = anchor.workspace.HorseRace as anchor.Program<HorseRace>;
+  // Airdrop SOL to the admin account
+  await provider.connection.requestAirdrop(adminKp.publicKey, LAMPORTS_PER_SOL);
+  await Util.logSolBalance("Admin balance", adminPayer.publicKey);
   
-    // Airdrop SOL to the admin account
-    await provider.connection.requestAirdrop(adminKp.publicKey, LAMPORTS_PER_SOL);
-    await Util.logSolBalance("Admin balance", adminPayer.publicKey);
-  //   await Util.waitAndConfirmSignature(provider.connection, airTx);
-  
-    // Create a fake admin keypair
-    const fakeAdmin = Keypair.generate();
+  // Create a fake admin keypair
+  const fakeAdmin = Keypair.generate();
 
-    const sdkConfig: SdkConfig = {
+  const sdkConfig: SdkConfig = {
       connection: provider.connection,
       provider: provider,
       program,
@@ -59,18 +60,18 @@ export const setupEnvironment = async function (): Promise<EnvironmentSetupDTO> 
       idl: IDL,
       signer: adminKp.publicKey.toString(),
       debug: true,
-    }
+  }
 
-    const adminKeys = [adminKp.publicKey];
+  const adminKeys = [adminKp.publicKey];
 
-    return {
+  return {
       provider,
       fakeAdmin,
       adminKp,
       adminKeys,
       program,
       sdkConfig,
-      treasury,
+      treasury, // now the correct PDA treasury
   }
 }
 

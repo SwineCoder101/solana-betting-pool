@@ -14,7 +14,7 @@ export async function depositToTreasury(
 ): Promise<TransactionInstruction> {
   const { amount, depositor = program.provider.publicKey } = params
   const [treasuryKey] = await TreasuryAccount.getTreasuryPda(program)
-  const [treasuryVaultKey] = await TreasuryAccount.getTreasuryVaultPda(program, treasuryKey)
+  const [treasuryVaultKey] = await TreasuryAccount.getTreasuryVaultPda(program)
   
   return program.methods
     .runDepositToTreasury(amount)

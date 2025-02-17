@@ -37,9 +37,9 @@ export class TreasuryAccount {
     )
   }
 
-  static async getTreasuryVaultPda(program: Program<HorseRace>, treasuryKey: PublicKey): Promise<[PublicKey, number]> {
+  static async getTreasuryVaultPda(program: Program<HorseRace>): Promise<[PublicKey, number]> {
     return PublicKey.findProgramAddressSync(
-      [Buffer.from(TREASURY_VAULT_SEED), treasuryKey.toBuffer()],
+      [Buffer.from(TREASURY_VAULT_SEED)],
       program.programId,
     )
   }

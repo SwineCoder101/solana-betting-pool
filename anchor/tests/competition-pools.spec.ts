@@ -1,10 +1,14 @@
 import { TreasuryAccount } from "../sdk/src/states/treasury-account";
 import { setupCompetitionWithPools, SetupDTO } from "./common-setup";
 
+// Increase timeout (if needed) for slower test environments
+jest.setTimeout(30000);
+
 describe.skip("Competition with Pools", () => {
   let setupDto: SetupDTO;
 
   beforeAll(async () => {
+    // Allow treasury creation to run so that an on-chain treasury with correct PDA exists
     setupDto = await setupCompetitionWithPools(false);
   });
 
@@ -49,7 +53,8 @@ describe.skip("Competition with Pools", () => {
     const competitions: SetupDTO[] = [];
 
     for (let i = 0; i < numCompetitions; i++) {
-      const setupDto = await setupCompetitionWithPools();
+      // Allow treasury creation (if not already initialized) so that each competition uses the on-chain treasury
+      const setupDto = await setupCompetitionWithPools(false);
       competitions.push(setupDto);
     }
 
