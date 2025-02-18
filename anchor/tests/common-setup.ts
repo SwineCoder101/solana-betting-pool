@@ -182,7 +182,7 @@ export const setupCompetitionWithPools = async function (bypassTreasury: boolean
   
   if (!bypassTreasury) {
     if (!treasuryInitialized) {
-      const setup = await setupTreasury();
+      const setup = await setupTreasury(testAdmin);
       treasuryToUse = setup.treasuryKey;
       console.log('poolTreasuryPubkey:', treasuryToUse.toBase58());
     } else {
@@ -292,18 +292,14 @@ export async function setupUsers(connection: Connection) : Promise<UserSetup> {
 }
 
 
-
-export async function setupTreasury(): Promise<TreasurySetup> {
+export async function setupTreasury(adminWallet: Keypair): Promise<TreasurySetup> {
   const program = anchor.workspace.HorseRace as Program<HorseRace>;
-  const adminWallet = await createUserWithFunds(program.provider.connection);
-
-  // Create treasury with admin
   const treasuryInitialized = await TreasuryAccount.isInitialized(program)
 
   if (!treasuryInitialized) {
     const ix = await createTreasury(program, {
-      maxAdmins: 2,
-      minSignatures: 2,
+      maxAdmins: 1,
+      minSignatures: 1,
       initialAdmins: [adminWallet.publicKey],
       payer: adminWallet.publicKey,
     });

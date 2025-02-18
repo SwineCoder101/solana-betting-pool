@@ -7,7 +7,7 @@ import {
   withdrawFromTreasury
 } from '../sdk/src'
 import { TreasuryAccount } from '../sdk/src/states/treasury-account'
-import {confirmTransaction, setupTreasury, TreasurySetup } from './common-setup'
+import {confirmTransaction, setupEnvironment, setupTreasury, TreasurySetup } from './common-setup'
 import { createUserWithFunds, signAndSendVTx } from './test-utils'
 
 // Helper to create an empty pool account so that the mutable account exists.
@@ -28,12 +28,13 @@ async function createPoolAccount(
   await connection.sendTransaction(tx, [payer, pool])
 }
 
-describe.skip('Treasury', () => {
+describe('Treasury', () => {
   let setup: TreasurySetup
   let depositor: anchor.web3.Keypair
-
+  
   beforeAll(async () => {
-    setup = await setupTreasury()
+    const {testAdmin} = await setupEnvironment();
+    setup = await setupTreasury(testAdmin);
     depositor = setup.adminWallet
   }, 100000)
 
