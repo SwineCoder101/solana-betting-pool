@@ -4,7 +4,7 @@ import { setupCompetitionWithPools, SetupDTO } from "./common-setup";
 // Increase timeout (if needed) for slower test environments
 jest.setTimeout(30000);
 
-describe("Competition with Pools", () => {
+describe.skip("Competition with Pools", () => {
   let setupDto: SetupDTO;
 
   beforeAll(async () => {

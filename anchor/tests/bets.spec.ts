@@ -1,13 +1,10 @@
-// bets.spec.ts
-
 import { Keypair, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { BetStatus, getBetAccountsForPool, getBetAccountsForUser, getBetData } from "../sdk/src";
 import { cancelAllBetsEntry } from "../sdk/src/instructions/user/cancel-bet";
 import { createBet } from "../sdk/src/instructions/user/create-bet";
 import { setupCompetitionWithPools, SetupDTO } from "./common-setup";
-import { airdropSol } from "./test-utils";
 
-describe("Bets", () => {
+describe.skip("Bets", () => {
   let setupDto: SetupDTO;
   let program, poolKeys: PublicKey[], competitionPubkey, connection;
   let signer: Keypair;

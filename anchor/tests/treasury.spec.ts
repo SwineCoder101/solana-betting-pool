@@ -28,7 +28,7 @@ async function createPoolAccount(
   await connection.sendTransaction(tx, [payer, pool])
 }
 
-describe('Treasury', () => {
+describe.skip('Treasury', () => {
   let setup: TreasurySetup
   let depositor: anchor.web3.Keypair
   

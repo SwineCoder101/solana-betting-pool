@@ -101,8 +101,6 @@ export async function signAndSendVTx(
   newTx.sign([signer]);
 
   try {
-    console.log('simulating transaction....')
-    
     const simResult = await connection.simulateTransaction(newTx, {
       replaceRecentBlockhash: true,
       sigVerify: false,
@@ -112,8 +110,6 @@ export async function signAndSendVTx(
       const errorLogs = simResult.value.logs?.join('\n') || 'No logs available';
       throw new Error(`Simulation failed: ${errorLogs}`);
     }
-
-    console.log('sending transaction....')
 
     const signature = await connection.sendTransaction(newTx);
     await connection.confirmTransaction({

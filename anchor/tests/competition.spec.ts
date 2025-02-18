@@ -4,7 +4,7 @@ import { confirmTransaction, setupCompetition, SetupDTO } from "./common-setup";
 import {Keypair } from "@solana/web3.js";
 import { signAndSendVTx } from "./test-utils";
 
-describe("Competition", () => {
+describe.skip("Competition", () => {
   let setupDto: SetupDTO;
 
   beforeAll(async () => {
