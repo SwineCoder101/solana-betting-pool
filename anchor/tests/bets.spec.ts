@@ -22,7 +22,7 @@ describe.skip("Bets", () => {
     connection = setupDto.sdkConfig.connection;
     numberOfBetsForSigner = 0;
 
-    signer = await createUserWithFunds(connection);
+    signer = setupDto.testPlayerOne;
 
     // Initialize bet counts for each pool
     for (const poolKey of poolKeys) {

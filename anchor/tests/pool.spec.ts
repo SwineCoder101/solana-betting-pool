@@ -5,7 +5,7 @@ import { Keypair } from '@solana/web3.js';
 import { setupEnvironment } from '../../anchor/tests/common-setup';
 import { createPool, getVersionTxFromInstructions } from '../../anchor/sdk/src';
 
-describe.skip("Pool", () => {
+describe("Pool", () => {
 
   const competitionKey = Keypair.generate().publicKey;
   const treasury = Keypair.generate().publicKey;
@@ -14,14 +14,14 @@ describe.skip("Pool", () => {
 
   it("Create pool successfully", async () => {  // <-- Optionally, you can also pass 30000 as timeout here: }, 30000)
 
-    const { program, adminKp } = await setupEnvironment();
+    const { program, testAdmin } = await setupEnvironment();
     // Generate a pool hash
     const poolHash = Keypair.generate().publicKey;
 
     // Create the pool
     const { ix } = await createPool(
       program,
-      adminKp.publicKey,
+      testAdmin.publicKey,
       competitionKey,
       startTime,
       endTime,
@@ -31,7 +31,7 @@ describe.skip("Pool", () => {
 
     // Create and send transaction
     const tx = await getVersionTxFromInstructions(program.provider.connection, [ix]);
-    tx.sign([adminKp]);
+    tx.sign([testAdmin]);
     const signature = await program.provider.connection.sendTransaction(tx);
     await program.provider.connection.confirmTransaction(signature, 'confirmed');
 

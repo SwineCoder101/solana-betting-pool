@@ -42,7 +42,7 @@ describe.skip("Bets, Settlements and Treasury", () => {
     competitionPubkey = setupDto.competitionPubkey
     connection = setupDto.sdkConfig.connection
     treasuryKey = setupDto.treasury // treasury is set in the setup DTO
-    signer = setupDto.adminKp
+    signer = setupDto.testAdmin
 
     // Initialize bet counts for each pool
     for (const poolKey of poolKeys) {

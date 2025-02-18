@@ -1,30 +1,31 @@
 import * as anchor from "@coral-xyz/anchor";
-import { Keypair, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
-import * as Util from "./test-utils";
-import { SdkConfig } from "../sdk/src/types";
-import { CompetitionData, createCompetition, IDL, getCompetitionData, findCompetitonAddress } from "../sdk/src";
-import { createCompetitionWithPools } from "../sdk/src/instructions/admin/create-competition-with-pools";
-import { getVersionTxFromInstructions, HorseRace } from "../sdk/src/utils";
-import { signAndSendVTx } from "./test-utils";
 import { Program, web3 } from "@coral-xyz/anchor";
-import { createTreasury } from "../sdk/src";
+import { Connection, Keypair, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
+import fs from "fs";
+import { CompetitionData, createCompetition, createTreasury, findCompetitonAddress, getCompetitionData, IDL } from "../sdk/src";
+import { createCompetitionWithPools } from "../sdk/src/instructions/admin/create-competition-with-pools";
 import { TreasuryAccount } from "../sdk/src/states/treasury-account";
-import { createUserWithFunds } from "./test-utils";
+import { SdkConfig } from "../sdk/src/types";
+import { getVersionTxFromInstructions, HorseRace } from "../sdk/src/utils";
+import { createUserWithFunds, signAndSendVTx } from "./test-utils";
+import path from "path";
 
 export type SetupDTO = {
-    adminKp: Keypair;
+    testAdmin: Keypair;
+    testPlayerOne: Keypair;
+    testPlayerTwo: Keypair;
     competitionPubkey: PublicKey;
     competitionData: CompetitionData;
     poolKeys?: PublicKey[];
-    fakeAdmin: Keypair;
     program: Program<HorseRace>;
     sdkConfig: SdkConfig;
     treasury: PublicKey;
 }
 
-export type EnvironmentSetupDTO = {
-  fakeAdmin: Keypair;
-  adminKp: Keypair;
+export type EnvironmentSetup = {
+  testAdmin: Keypair;
+  testPlayerOne: Keypair;
+  testPlayerTwo: Keypair;
   adminKeys: PublicKey[];
   program: anchor.Program<HorseRace>;
   sdkConfig: SdkConfig;
@@ -32,7 +33,21 @@ export type EnvironmentSetupDTO = {
   treasury: PublicKey;
 }
 
-export const setupEnvironment = async function (): Promise<EnvironmentSetupDTO> {
+export interface TreasurySetup {
+  program: Program<HorseRace>;
+  treasuryKey: web3.PublicKey;
+  adminWallet: web3.Keypair;
+  treasuryAccount?: TreasuryAccount;
+}
+
+export type UserSetup = {
+  testAdmin: Keypair;
+  testPlayerOne: Keypair;
+  testPlayerTwo: Keypair;
+}
+
+
+export const setupEnvironment = async function (): Promise<EnvironmentSetup> {
   const provider = anchor.AnchorProvider.env();
   anchor.setProvider(provider);
   
@@ -41,16 +56,8 @@ export const setupEnvironment = async function (): Promise<EnvironmentSetupDTO> 
 
   const [treasury] = await TreasuryAccount.getTreasuryPda(program);
   
-  // @ts-expect-error-ignore
-  const adminPayer = provider.wallet.payer;
-  const adminKp = Keypair.fromSecretKey(adminPayer.secretKey);
-  
-  // Airdrop SOL to the admin account
-  await provider.connection.requestAirdrop(adminKp.publicKey, LAMPORTS_PER_SOL);
-  await Util.logSolBalance("Admin balance", adminPayer.publicKey);
-  
-  // Create a fake admin keypair
-  const fakeAdmin = Keypair.generate();
+  const {testAdmin, testPlayerOne, testPlayerTwo} = await setupUsers(provider.connection);
+
 
   const sdkConfig: SdkConfig = {
       connection: provider.connection,
@@ -58,16 +65,17 @@ export const setupEnvironment = async function (): Promise<EnvironmentSetupDTO> 
       program,
       url: '',
       idl: IDL,
-      signer: adminKp.publicKey.toString(),
+      signer: testAdmin.publicKey.toString(),
       debug: true,
   }
 
-  const adminKeys = [adminKp.publicKey];
+  const adminKeys = [testAdmin.publicKey];
 
   return {
       provider,
-      fakeAdmin,
-      adminKp,
+      testAdmin,
+      testPlayerOne,
+      testPlayerTwo,
       adminKeys,
       program,
       sdkConfig,
@@ -100,13 +108,13 @@ export const getCompetitionTestData = (program) => {
 }
 
 export const setupCompetition = async function (): Promise<SetupDTO> {
-  const {fakeAdmin, program, adminKp, sdkConfig, adminKeys, treasury} = await setupEnvironment();
+  const { testAdmin, program, sdkConfig, adminKeys, treasury, testPlayerOne, testPlayerTwo} = await setupEnvironment();
   const {tokenA, priceFeedId, houseCutFactor, minPayoutRatio, interval, startTime, endTime, competitionHash, competitionPubkey} = getCompetitionTestData(program);
 
   // Get competition creation instruction
   const ix = await createCompetition(
     program,
-    adminKp.publicKey,
+    testAdmin.publicKey,
     competitionHash,
     competitionPubkey,
     tokenA,
@@ -123,7 +131,7 @@ export const setupCompetition = async function (): Promise<SetupDTO> {
 
   // Create and send versioned transaction
   const vtx = await getVersionTxFromInstructions(program.provider.connection, [ix]);
-  vtx.sign([adminKp]);
+  vtx.sign([testAdmin]);
 
   const signature = await program.provider.connection.sendTransaction(vtx);
 
@@ -142,11 +150,12 @@ export const setupCompetition = async function (): Promise<SetupDTO> {
   const competitionData = await getCompetitionData(competitionHash, program);
 
   return {
-    adminKp,
+    testAdmin,
+    testPlayerOne,
+    testPlayerTwo,
     competitionPubkey,
     competitionData,
     treasury,
-    fakeAdmin,
     program,
     sdkConfig,
   };
@@ -164,7 +173,7 @@ export const confirmTransaction = async function (signature: string, program: an
 }
 
 export const setupCompetitionWithPools = async function (bypassTreasury: boolean = false): Promise<SetupDTO> {
-  const { fakeAdmin, program, sdkConfig, adminKeys, treasury, adminKp} = await setupEnvironment();
+  const { testAdmin, program, sdkConfig, adminKeys, treasury, testPlayerOne, testPlayerTwo} = await setupEnvironment();
   const {tokenA, priceFeedId, houseCutFactor, minPayoutRatio, interval, startTime, endTime, competitionHash, competitionPubkey} = getCompetitionTestData(program);
 
   let treasuryToUse = treasury;
@@ -173,7 +182,8 @@ export const setupCompetitionWithPools = async function (bypassTreasury: boolean
   
   if (!bypassTreasury) {
     if (!treasuryInitialized) {
-      treasuryToUse =  await Util.createTreasuryUtil(program, adminKp);
+      const setup = await setupTreasury();
+      treasuryToUse = setup.treasuryKey;
       console.log('poolTreasuryPubkey:', treasuryToUse.toBase58());
     } else {
       console.log('Treasury already initialized, using existing treasury');
@@ -186,7 +196,7 @@ export const setupCompetitionWithPools = async function (bypassTreasury: boolean
   // Get versioned transaction and pool keys
   const { competitionTx, poolTxs, poolKeys } = await createCompetitionWithPools(
     program,
-    adminKp.publicKey,
+    testAdmin.publicKey,
     competitionHash,
     tokenA,
     priceFeedId,
@@ -199,10 +209,10 @@ export const setupCompetitionWithPools = async function (bypassTreasury: boolean
     treasuryToUse
   );
 
-  const compSig = await signAndSendVTx(competitionTx, adminKp, program.provider.connection);
+  const compSig = await signAndSendVTx(competitionTx, testAdmin, program.provider.connection);
   await confirmTransaction(compSig, program);
 
-  const poolSigs = await Promise.all(poolTxs.map(async (tx) => signAndSendVTx(tx, adminKp, program.provider.connection)));
+  const poolSigs = await Promise.all(poolTxs.map(async (tx) => signAndSendVTx(tx, testAdmin, program.provider.connection)));
   await Promise.all(poolSigs.map(async (sig) => confirmTransaction(sig, program)));
 
 
@@ -211,28 +221,80 @@ export const setupCompetitionWithPools = async function (bypassTreasury: boolean
 
 
   return {
-    adminKp,
+    testAdmin,
+    testPlayerOne,
+    testPlayerTwo,
     competitionPubkey,
     competitionData,
     treasury : treasuryToUse,
-    fakeAdmin,
     program,
     sdkConfig,
     poolKeys: poolKeys ?? [Keypair.generate().publicKey],
   };
 }
 
-export interface CommonSetup {
-  program: Program<HorseRace>;
-  treasuryKey: web3.PublicKey;
-  adminWallet: web3.Keypair;
-  payer: web3.Keypair;
-  treasuryAccount?: TreasuryAccount;
+export async function airdropSOLIfNeeded(
+  keypair: Keypair,
+  connection: Connection,
+  minBalance: number = LAMPORTS_PER_SOL
+): Promise<void> {
+  const balance = await connection.getBalance(keypair.publicKey);
+  if (balance < minBalance) {
+    const amountToAirdrop = (minBalance - balance) * 3;
+    const signature = await connection.requestAirdrop(keypair.publicKey, amountToAirdrop);
+    const latestBlockhash = await connection.getLatestBlockhash();
+    await connection.confirmTransaction({
+      signature,
+      blockhash: latestBlockhash.blockhash,
+      lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
+    });
+  }
 }
 
-export async function setupTreasury(): Promise<CommonSetup> {
+function loadKeypair(filePath: string): Keypair {
+  const secretKeyString = fs.readFileSync(filePath, "utf8");
+  const secretKeyArray = JSON.parse(secretKeyString);
+  if (secretKeyArray.length !== 64) {
+    throw new Error(`Expected secret key length to be 64, but got ${secretKeyArray.length}`);
+  }
+  return Keypair.fromSecretKey(Uint8Array.from(secretKeyArray));
+}
+
+export async function setupUsers(connection: Connection) : Promise<UserSetup> {
+
+  const adminKeyPath = path.join(__dirname, "config/test-admin.json");
+  const playerOneKeyPath = path.join(__dirname, "config/test-player-one.json");
+  const playerTwoKeyPath = path.join(__dirname, "config/test-player-two.json");
+
+  // load keypair from file
+  const testAdmin = loadKeypair(adminKeyPath);
+  const testPlayerOne = loadKeypair(playerOneKeyPath);
+  const testPlayerTwo = loadKeypair(playerTwoKeyPath);
+
+  // Airdrop SOL if needed
+  await airdropSOLIfNeeded(testAdmin, connection);
+  await airdropSOLIfNeeded(testPlayerOne, connection);
+  await airdropSOLIfNeeded(testPlayerTwo, connection);
+
+  // show balances
+  console.log('--------------------------------');
+  console.log('testadmin Address: ', testAdmin.publicKey.toBase58(), 'testAdmin balance:', await connection.getBalance(testAdmin.publicKey));
+  console.log('testPlayerOne Address: ', testPlayerOne.publicKey.toBase58(), 'testPlayerOne balance:', await connection.getBalance(testPlayerOne.publicKey));
+  console.log('testPlayerTwo Address: ', testPlayerTwo.publicKey.toBase58(), 'testPlayerTwo balance:', await connection.getBalance(testPlayerTwo.publicKey));
+  console.log('--------------------------------');
+
+
+  return {
+    testAdmin,
+    testPlayerOne,
+    testPlayerTwo,
+  }
+}
+
+
+
+export async function setupTreasury(): Promise<TreasurySetup> {
   const program = anchor.workspace.HorseRace as Program<HorseRace>;
-  const payer = await createUserWithFunds(program.provider.connection);
   const adminWallet = await createUserWithFunds(program.provider.connection);
 
   // Create treasury with admin
@@ -242,12 +304,12 @@ export async function setupTreasury(): Promise<CommonSetup> {
     const ix = await createTreasury(program, {
       maxAdmins: 2,
       minSignatures: 2,
-      initialAdmins: [adminWallet.publicKey, payer.publicKey],
-      payer: payer.publicKey,
+      initialAdmins: [adminWallet.publicKey],
+      payer: adminWallet.publicKey,
     });
 
-    const vtx = await getVersionTxFromInstructions(program.provider.connection, [ix], payer.publicKey);
-    const sig = await signAndSendVTx(vtx, payer, program.provider.connection);
+    const vtx = await getVersionTxFromInstructions(program.provider.connection, [ix], adminWallet.publicKey);
+    const sig = await signAndSendVTx(vtx, adminWallet, program.provider.connection);
     await confirmTransaction(sig, program);
   }
 
@@ -258,7 +320,6 @@ export async function setupTreasury(): Promise<CommonSetup> {
     program,
     treasuryKey, 
     adminWallet,
-    payer,
     treasuryAccount,
   };
 }

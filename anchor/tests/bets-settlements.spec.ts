@@ -22,7 +22,7 @@ describe.skip("settlements with bets", () => {
     connection = setupDto.sdkConfig.connection;
     numberOfBetsForSigner = 0;
     treasuryKey = setupDto.treasury;
-    signer = setupDto.adminKp;
+    signer = setupDto.testAdmin;
     // signer = await createUserWithFunds(connection);
 
     // Initialize bet counts for each pool
