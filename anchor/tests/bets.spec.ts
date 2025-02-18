@@ -5,9 +5,9 @@ import { BetStatus, getBetAccountsForPool, getBetAccountsForUser, getBetData } f
 import { cancelAllBetsEntry } from "../sdk/src/instructions/user/cancel-bet";
 import { createBet } from "../sdk/src/instructions/user/create-bet";
 import { setupCompetitionWithPools, SetupDTO } from "./common-setup";
-import { createUserWithFunds } from "./test-utils";
+import { airdropSol } from "./test-utils";
 
-describe.skip("Bets", () => {
+describe("Bets", () => {
   let setupDto: SetupDTO;
   let program, poolKeys: PublicKey[], competitionPubkey, connection;
   let signer: Keypair;

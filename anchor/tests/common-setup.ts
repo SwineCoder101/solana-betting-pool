@@ -240,7 +240,7 @@ export async function airdropSOLIfNeeded(
 ): Promise<void> {
   const balance = await connection.getBalance(keypair.publicKey);
   if (balance < minBalance) {
-    const amountToAirdrop = (minBalance - balance) * 3;
+    const amountToAirdrop = (minBalance - balance) * 40;
     const signature = await connection.requestAirdrop(keypair.publicKey, amountToAirdrop);
     const latestBlockhash = await connection.getLatestBlockhash();
     await connection.confirmTransaction({

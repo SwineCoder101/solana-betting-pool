@@ -16,7 +16,7 @@ import {
     VersionedTransaction
 } from "@solana/web3.js";
 import { createBet } from "../sdk/src/instructions/user/create-bet";
-import { getVersionTxFromInstructions, HorseRace } from "../sdk/src";
+import { getPoolAccount, getVersionTxFromInstructions, HorseRace } from "../sdk/src";
 import { createTreasury } from "../sdk/src/instructions/admin/create-treasury";
 import { TreasuryAccount } from "../sdk/src/states/treasury-account";
 
@@ -228,4 +228,19 @@ export async function setupTreasury(program: Program<HorseRace>): Promise<{
 
   return { treasuryKey, adminWallet }
 }
-  
+
+export const getPoolVaultKey = async (program: Program<HorseRace>, poolKey: PublicKey) => {
+  const poolAccount = await getPoolAccount(program, poolKey);
+  return poolAccount.account.vaultKey;
+}
+
+export const airdropSol = async (connection: Connection, keypair: Keypair, amountToAirdrop: number) => {
+
+  const signature = await connection.requestAirdrop(keypair.publicKey, amountToAirdrop);
+  const latestBlockhash = await connection.getLatestBlockhash();
+  await connection.confirmTransaction({
+    signature,
+    blockhash: latestBlockhash.blockhash,
+    lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
+  });
+}
