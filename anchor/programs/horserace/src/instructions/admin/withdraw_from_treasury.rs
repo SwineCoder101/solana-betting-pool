@@ -1,7 +1,7 @@
 use anchor_lang::prelude::*;
 use crate::states::Treasury;
 use crate::errors::TreasuryError;
-use crate::constants::{TREASURY_VAULT_SEED};
+use crate::constants::TREASURY_VAULT_SEED;
 use crate::utils;
 
 #[derive(Accounts)]
@@ -12,7 +12,7 @@ pub struct WithdrawFromTreasury<'info> {
     #[account(
         mut,
         seeds = [TREASURY_VAULT_SEED],
-        bump = treasury.bump
+        bump = treasury.vault_bump
     )]
     /// CHECK: This is the PDA that holds the funds
     pub treasury_vault: UncheckedAccount<'info>,
@@ -36,14 +36,12 @@ pub struct WithdrawFromTreasury<'info> {
 
 pub fn withdraw_from_treasury(ctx: Context<WithdrawFromTreasury>, amount: u64) -> Result<()> {
     let treasury = &mut ctx.accounts.treasury;
-
     utils::withdraw_lamports_from_treasury(
         treasury,
         &ctx.accounts.treasury_vault.to_account_info(),
         &ctx.accounts.recipient.to_account_info(),
         amount,
     )?;
-
     Ok(())
 }
 

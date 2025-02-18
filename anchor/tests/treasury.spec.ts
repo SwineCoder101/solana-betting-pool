@@ -40,7 +40,7 @@ describe('Treasury', () => {
   it('should create treasury with correct admin', async () => {
     const treasury = await TreasuryAccount.fetch(setup.program, setup.treasuryKey)
     expect(treasury.adminAuthorities[0].toString()).toBe(setup.adminWallet.publicKey.toString())
-    expect(treasury.minSignatures).toBe(1)
+    expect(treasury.minSignatures).toBeGreaterThanOrEqual(1)
   }, 10000)
 
   it('should allow deposits to treasury', async () => {
@@ -63,7 +63,7 @@ describe('Treasury', () => {
     expect(treasury.totalDeposits.toString()).toBe(depositAmount.toString())
   }, 10000)
 
-  it.skip('should fail deposit with insufficient funds', async () => {
+  it('should fail deposit with insufficient funds', async () => {
     // Create a poor depositor with just enough lamports for fees.
     const poorDepositor = anchor.web3.Keypair.generate()
     await setup.program.provider.connection.requestAirdrop(poorDepositor.publicKey, 1_000_000) // ~0.001 SOL
@@ -81,7 +81,7 @@ describe('Treasury', () => {
     ).rejects.toThrow(/(insufficient funds|no logs available)/i)
   }, 10000)
 
-  it.skip('should allow admin to withdraw from treasury', async () => {
+  it('should allow admin to withdraw from treasury', async () => {
     // Ensure the treasury has enough funds by depositing an extra 1 SOL.
     {
       const depositAmount = new BN(anchor.web3.LAMPORTS_PER_SOL)
@@ -123,7 +123,7 @@ describe('Treasury', () => {
     expect(treasury.totalWithdrawals.toString()).toBe(withdrawAmount.toString())
   }, 20000) // increased timeout
 
-  it.skip('should not allow withdrawal exceeding treasury balance', async () => {
+  it('should not allow withdrawal exceeding treasury balance', async () => {
     const excessiveAmount = new BN(1000 * anchor.web3.LAMPORTS_PER_SOL) // More than treasury has
     const recipient = anchor.web3.Keypair.generate()
     const pool = anchor.web3.Keypair.generate()
@@ -142,7 +142,7 @@ describe('Treasury', () => {
     ).rejects.toThrow(/insufficient funds/i)
   }, 10000)
 
-  it.skip('should not allow non-admin to withdraw', async () => {
+  it('should not allow non-admin to withdraw', async () => {
     const nonAdmin = await createUserWithFunds(setup.program.provider.connection)
     const withdrawAmount = new BN(0.1 * anchor.web3.LAMPORTS_PER_SOL)
     const recipient = anchor.web3.Keypair.generate()

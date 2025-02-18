@@ -108,8 +108,6 @@ export async function signAndSendVTx(
       sigVerify: false,
     });
 
-    console.log('simulation result:', simResult)
-
     if (simResult.value.err) {
       const errorLogs = simResult.value.logs?.join('\n') || 'No logs available';
       throw new Error(`Simulation failed: ${errorLogs}`);

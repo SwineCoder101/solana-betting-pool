@@ -240,9 +240,9 @@ export async function setupTreasury(): Promise<CommonSetup> {
 
   if (!treasuryInitialized) {
     const ix = await createTreasury(program, {
-      maxAdmins: 1,
-      minSignatures: 1,
-      initialAdmins: [adminWallet.publicKey],
+      maxAdmins: 2,
+      minSignatures: 2,
+      initialAdmins: [adminWallet.publicKey, payer.publicKey],
       payer: payer.publicKey,
     });
 

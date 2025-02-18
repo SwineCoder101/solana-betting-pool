@@ -1,9 +1,9 @@
 use anchor_lang::{prelude::*, system_program};
 use anchor_lang::solana_program::system_instruction::transfer;
 use anchor_lang::solana_program::system_instruction;
-use anchor_lang::solana_program::program::invoke;
+use anchor_lang::solana_program::program::{invoke, invoke_signed};
 
-use crate::constants::POOL_VAULT_SEED;
+use crate::constants::{POOL_VAULT_SEED, TREASURY_VAULT_SEED};
 use crate::errors::{SettlementError, TreasuryError};
 use crate::states::Treasury;
 
@@ -158,26 +158,25 @@ pub fn withdraw_lamports_from_treasury<'info>(
     recipient: &AccountInfo<'info>,
     amount: u64,
 ) -> Result<()> {
-    let treasury_balance = treasury_account.lamports();
+    // Ensure there are enough lamports in the treasury vault.
+    let vault_balance = treasury_account.lamports();
+    require!(vault_balance >= amount, TreasuryError::InsufficientFunds);
 
-    if treasury_balance < amount {
-        emit!(InsufficientFunds {
-            treasury_balance,
-            amount_requested: amount,
-            recipient: recipient.key(),
-            treasury: treasury.key(),
-        });
-    }
-    require!(treasury_balance >= amount, TreasuryError::InsufficientFunds);
+    // Build a system transfer instruction.
+    let ix = system_instruction::transfer(
+        &treasury_account.key(),
+        &recipient.key(),
+        amount,
+    );
 
-    **treasury_account.try_borrow_mut_lamports()? = treasury_balance
-        .checked_sub(amount)
-        .ok_or(TreasuryError::Overflow)?;
+    // The treasury vault PDA was derived using [TREASURY_VAULT_SEED] and the bump stored in treasury.vault_bump.
+    let seeds: &[&[u8]] = &[TREASURY_VAULT_SEED, &[treasury.vault_bump]];
 
-    **recipient.try_borrow_mut_lamports()? = recipient
-        .lamports()
-        .checked_add(amount)
-        .ok_or(TreasuryError::Overflow)?;
+    invoke_signed(
+        &ix,
+        &[treasury_account.clone(), recipient.clone()],
+        &[seeds],
+    )?;
 
     treasury.total_withdrawals = treasury.total_withdrawals
         .checked_add(amount)
