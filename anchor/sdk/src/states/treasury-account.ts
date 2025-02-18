@@ -3,7 +3,19 @@ import { Program, BN } from '@coral-xyz/anchor'
 import { HorseRace } from '../types/horse_race'
 import { TREASURY_SEED, TREASURY_VAULT_SEED } from '../constants'
 
+
+export interface TreasuryData {
+  adminAuthorities: string[];
+  minSignatures: number;
+  totalDeposits: number;
+  totalWithdrawals: number;
+  bump: number;
+  vaultKey: string;
+  vaultBump: number;
+  treasuryKey: string;
+}
 export class TreasuryAccount {
+
   constructor(
     public adminAuthorities: PublicKey[],
     public minSignatures: number,
@@ -12,7 +24,31 @@ export class TreasuryAccount {
     public bump: number,
     public vaultKey: PublicKey,
     public vaultBump: number,
-  ) {}
+    public treasuryKey: PublicKey,
+  ) {
+    this.adminAuthorities = adminAuthorities
+    this.minSignatures = minSignatures
+    this.totalDeposits = totalDeposits
+    this.totalWithdrawals = totalWithdrawals
+    this.bump = bump
+    this.vaultKey = vaultKey
+    this.vaultBump = vaultBump
+    this.treasuryKey = treasuryKey
+  }
+
+
+  static async toTreasuryData(treasury: TreasuryAccount): Promise<TreasuryData> {
+    return {
+      adminAuthorities: treasury.adminAuthorities.map(a => a.toString()),
+      minSignatures: treasury.minSignatures,
+      totalDeposits: treasury.totalDeposits.toString(),
+      totalWithdrawals: treasury.totalWithdrawals.toString(),
+      bump: treasury.bump,
+      vaultKey: treasury.vaultKey.toString(),
+      vaultBump: treasury.vaultBump,
+      treasuryKey: treasury.treasuryKey.toString(),
+    }
+  }
 
   static async fetch(
     program: Program<HorseRace>,
@@ -27,6 +63,7 @@ export class TreasuryAccount {
       account.bump,
       account.vaultKey,
       account.vaultBump,
+      treasuryKey,
     )
   }
 
@@ -44,17 +81,36 @@ export class TreasuryAccount {
     )
   }
 
+  static async getInstance(program: Program<HorseRace>): Promise<TreasuryAccount> {
+    const treasury = await program.account.treasury.all();
+    return treasury.map(t => new TreasuryAccount(
+      t.account.adminAuthorities,
+      t.account.minSignatures,
+      t.account.totalDeposits,
+      t.account.totalWithdrawals,
+      t.account.bump,
+      t.account.vaultKey,
+      t.account.vaultBump,
+      t.publicKey,
+    ))[0];
+  }
+
+  static async getTreasuryData(program: Program<HorseRace>): Promise<TreasuryData> {
+    const treasury = await TreasuryAccount.getInstance(program);
+    return TreasuryAccount.toTreasuryData(treasury);
+  }
+
   static async getTreasuryKey(program: Program<HorseRace>): Promise<PublicKey> {
-    const treasury = (await program.account.treasury.all());
+    const treasury = await program.account.treasury.all();
     return treasury[0].publicKey;
   }
 
   static async getBalance(
-    program: Program<HorseRace>,
-    treasuryKey: PublicKey,
+    program: Program<HorseRace>
   ): Promise<bigint> {
     const connection = program.provider.connection
-    const balance = await connection.getBalance(treasuryKey)
+    const [treasuryVaultKey] = await TreasuryAccount.getTreasuryVaultPda(program);
+    const balance = await connection.getBalance(treasuryVaultKey)
     return BigInt(balance)
   }
 

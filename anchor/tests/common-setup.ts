@@ -227,6 +227,7 @@ export interface CommonSetup {
   treasuryKey: web3.PublicKey;
   adminWallet: web3.Keypair;
   payer: web3.Keypair;
+  treasuryAccount?: TreasuryAccount;
 }
 
 export async function setupTreasury(): Promise<CommonSetup> {
@@ -251,10 +252,13 @@ export async function setupTreasury(): Promise<CommonSetup> {
   }
 
   const [treasuryKey] = await TreasuryAccount.getTreasuryPda(program);
+  const treasuryAccount = await TreasuryAccount.getInstance(program);
+
   return { 
     program,
     treasuryKey, 
     adminWallet,
     payer,
+    treasuryAccount,
   };
 }

@@ -14,15 +14,15 @@ export async function depositToTreasury(
 ): Promise<TransactionInstruction> {
   const { amount, depositor = program.provider.publicKey } = params
   const [treasuryKey] = await TreasuryAccount.getTreasuryPda(program)
-  const [treasuryVaultKey] = await TreasuryAccount.getTreasuryVaultPda(program)
-  
+  const treasury = await TreasuryAccount.getInstance(program)
+
   return program.methods
     .runDepositToTreasury(amount)
     .accountsStrict({
       treasury: treasuryKey,
       depositor,
       systemProgram: web3.SystemProgram.programId,
-      treasuryVault: treasuryVaultKey,
+      treasuryVault: treasury.vaultKey,
     })
     .instruction()
 } 

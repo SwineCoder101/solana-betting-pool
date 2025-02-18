@@ -11,7 +11,7 @@ pub struct DepositToTreasury<'info> {
     #[account(
         mut,
         seeds = [TREASURY_VAULT_SEED],
-        bump = treasury.bump
+        bump = treasury.vault_bump
     )]
     /// CHECK: This is the PDA that will receive the funds
     pub treasury_vault: UncheckedAccount<'info>,

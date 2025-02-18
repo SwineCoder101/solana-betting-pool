@@ -55,7 +55,7 @@ describe.skip("Bets, Settlements and Treasury", () => {
   describe("Treasury Operations", () => {
     it("should allow deposits to treasury", async () => {
       const depositAmount = new BN(anchor.web3.LAMPORTS_PER_SOL)
-      const initialBalance = await TreasuryAccount.getBalance(program, treasuryKey)
+      const initialBalance = await TreasuryAccount.getBalance(program)
 
       const tx = await depositToTreasury(program, {
         amount: depositAmount,
@@ -64,7 +64,7 @@ describe.skip("Bets, Settlements and Treasury", () => {
       const vtx = await getVersionTxFromInstructions(connection, [tx])
       await signAndSendVTx(vtx, signer, connection)
 
-      const newBalance = await TreasuryAccount.getBalance(program, treasuryKey)
+      const newBalance = await TreasuryAccount.getBalance(program)
       expect(newBalance.toString()).toBe(
         (BigInt(initialBalance) + BigInt(depositAmount)).toString()
       )
@@ -108,7 +108,7 @@ describe.skip("Bets, Settlements and Treasury", () => {
       // Create a dummy pool account (as required by the instruction)
       await createPoolAccount(connection, signer, pool)
 
-      const initialBalance = await TreasuryAccount.getBalance(program, treasuryKey)
+      const initialBalance = await TreasuryAccount.getBalance(program)
       const initialRecipientBalance = await connection.getBalance(recipient.publicKey)
 
       const tx = await withdrawFromTreasury(program, {
@@ -120,7 +120,7 @@ describe.skip("Bets, Settlements and Treasury", () => {
       const vtx = await getVersionTxFromInstructions(connection, [tx])
       await signAndSendVTx(vtx, signer, connection)
 
-      const newBalance = await TreasuryAccount.getBalance(program, treasuryKey)
+      const newBalance = await TreasuryAccount.getBalance(program)
       const newRecipientBalance = await connection.getBalance(recipient.publicKey)
       expect(newBalance.toString()).toBe(
         (BigInt(initialBalance) - BigInt(withdrawAmount)).toString()
