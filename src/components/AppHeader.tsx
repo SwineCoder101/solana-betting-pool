@@ -2,7 +2,7 @@ import { useNavigate, useLocation } from 'react-router-dom'
 import { ROUTES } from '../routes'
 import { OldButtonV2 } from './buttons/OldButtonV2'
 
-export default function AppHeader() {
+export default function AppHeaderOld() {
   const navigate = useNavigate()
   const location = useLocation()
 
