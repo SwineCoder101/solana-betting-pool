@@ -38,7 +38,7 @@ export default function BettingPage({ userBets, setUserBets }: Props) {
     <div>
       <div className="flex gap-3.5 relative bg-[#2C2C2C]">
         <div className="flex flex-col w-full pb-20">
-          {tokenPairs.map((tokenPair) => (
+          {tokenPairs.map((tokenPair, index) => (
             <BettingChart
               key={tokenPair.code}
               tokenCode={tokenPair.code}
@@ -49,6 +49,7 @@ export default function BettingPage({ userBets, setUserBets }: Props) {
               showLogo={tokenPair.showLogo}
               priceFeedId={tokenPair.priceFeedId}
               embeddedWallet={embeddedWallet}
+              idx={index}
             />
           ))}
         </div>

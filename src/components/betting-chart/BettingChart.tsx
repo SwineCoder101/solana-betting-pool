@@ -29,6 +29,7 @@ export interface Props {
   showLogo?: boolean
   priceFeedId: string
   embeddedWallet: ConnectedSolanaWallet | null
+  idx: number
 }
 
 // Update the CustomLabel component to use chartSize instead of isCompactMode
@@ -149,7 +150,7 @@ const CustomLabel = (props: any) => {
   }
 }
 
-function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competition.competitionKey, userBets, setUserBets, showLogo = false, priceFeedId , embeddedWallet }: Props) {
+function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competition.competitionKey, userBets, setUserBets, showLogo = false, priceFeedId , embeddedWallet, idx }: Props) {
   const priceRangeShiftRef = useRef(0)
   const basePriceRef = useRef<number | null>(null)
   const latestPriceRef = useRef<number | null>(null)
@@ -779,7 +780,7 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
             </div>
           </div>
         </div>
-        <ChartFooter tokenName={tokenName} />
+        <ChartFooter tokenName={tokenName}  idx={idx}/>
       </div>
     )
   }
@@ -940,7 +941,7 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
           </div>
         </div>
       </div>
-      <ChartFooter tokenName={tokenName} />
+      <ChartFooter tokenName={tokenName} idx={idx}/>
       <ConfirmationDialog
         isOpen={!!betToCancel}
         title="Cancel Bet"
