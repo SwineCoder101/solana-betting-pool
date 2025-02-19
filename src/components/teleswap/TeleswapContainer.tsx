@@ -1,4 +1,4 @@
-import { TeleswapWidget } from 'teleswap-widget'
+import { TeleswapWidget } from "teleswap-widget"
 
 interface Props {
   width?: number

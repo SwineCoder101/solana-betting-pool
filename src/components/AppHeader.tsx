@@ -1,10 +1,15 @@
 import { useNavigate, useLocation } from 'react-router-dom'
 import { ROUTES } from '../routes'
 import { OldButtonV2 } from './buttons/OldButtonV2'
+import { LoginWalletButton } from './privy/login-wallet-button'
+import { useAdminCheck } from '@/hooks/use-admin-check'
+import { usePrivy } from '@privy-io/react-auth'
 
 export default function AppHeaderOld() {
   const navigate = useNavigate()
   const location = useLocation()
+  const { isAdmin } = useAdminCheck()
+  const { authenticated } = usePrivy()
 
   return (
     <div className="flex justify-between items-center w-full bg-gradient-to-r from-[#FFA163] to-[#FFCF00] px-2.5 sticky top-0 z-10">
@@ -78,6 +83,21 @@ export default function AppHeaderOld() {
             <img src="/assets/images/penguin.png" alt="Profile icon" className="w-6 h-6 rounded-full border-2 border-white" />
           </div>
         </OldButtonV2>
+
+        <LoginWalletButton />
+
+        {isAdmin && (
+          <button
+            onClick={() => navigate(ROUTES.ADMIN)}
+            className={`px-4 py-2 rounded font-medium transition-colors ${
+              authenticated 
+                ? 'bg-yellow-500 hover:bg-yellow-600 text-white'
+                : 'bg-blue-500 hover:bg-blue-600 text-white'
+            }`}
+          >
+            Admin
+          </button>
+        )}
       </div>
     </div>
   )
