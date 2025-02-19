@@ -1,0 +1,169 @@
+.yellow-shadow {
+  color: #222;
+  text-shadow: 0 4px 4px rgba(0, 0, 0, 0.25);
+  -webkit-text-stroke-color: #fcff3f;
+  -webkit-text-stroke-width: 2px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 900;
+  font-size: 2.3rem;
+  max-width: 300px;
+  display: inline-block;
+  line-height: 1;
+  z-index: 6;
+  position: relative;
+}
+
+.banana-img {
+  display: block;
+  position: absolute;
+  left: -30px;
+  bottom: 0;
+  z-index: 3;
+  height: 170%;
+}
+
+@media screen and (max-width: 1024) {
+  .banana-img {
+    left: -20px;
+    height: 140%;
+  }
+}
+
+.banana-star {
+  display: block;
+  position: absolute;
+  right: -13px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 3;
+  height: 170%;
+  animation: scalePulse 1.5s steps(6) infinite;
+}
+
+@media screen and (max-width: 1024) {
+  .banana-star {
+    right: -8px;
+    height: 140%;
+  }
+}
+
+.banana-more-bananas {
+  display: block;
+  position: absolute;
+  right: 40px;
+  top: 60%;
+  width: 60%;
+  z-index: 3;
+  animation: rotateUpDown 1s steps(4) infinite;
+}
+
+@media screen and (max-width: 1024) {
+  .banana-more-bananas {
+    right: 25px;
+    width: 60%;
+  }
+}
+
+@keyframes scalePulse {
+  0% {
+    transform: translateY(-50%) scale(0.9);
+  }
+  50% {
+    transform: translateY(-50%) scale(1.1);
+  }
+  100% {
+    transform: translateY(-50%) scale(0.9);
+  }
+}
+
+@keyframes rotateUpDown {
+  0% {
+    transform: translateY(-50%) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-50%) rotate(-5deg);
+  }
+  100% {
+    transform: translateY(-50%) rotate(0deg);
+  }
+}
+
+@media screen and (max-width: 1024px) {
+  .yellow-shadow {
+    font-size: 1.8rem;
+    max-width: 240px;
+  }
+
+  .banana-img {
+    left: -20px;
+    height: 140%;
+  }
+
+  .banana-star {
+    right: -8px;
+    height: 140%;
+  }
+
+  .banana-more-bananas {
+    right: 25px;
+    height: 120%;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .yellow-shadow {
+    font-size: 1.4rem;
+    max-width: 200px;
+  }
+
+  .banana-img {
+    left: -15px;
+    height: 120%;
+  }
+
+  .banana-star {
+    right: -6px;
+    height: 120%;
+  }
+
+  .banana-more-bananas {
+    right: 20px;
+    height: 100%;
+  }
+}
+
+@media screen and (max-width: 480px) {
+  .yellow-shadow {
+    font-size: 1.2rem;
+    max-width: 160px;
+  }
+
+  .banana-img {
+    left: -10px;
+    height: 100%;
+  }
+
+  .banana-star {
+    right: -4px;
+    height: 100%;
+  }
+
+  .banana-more-bananas {
+    right: 15px;
+    height: 80%;
+  }
+}
+
+.claim-banner-text {
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+.banana-hover {
+  transform-origin: top left;
+  transition: transform 0.3s ease;
+}
+
+.banana-hover:hover {
+  transform: rotate(5deg);
+}

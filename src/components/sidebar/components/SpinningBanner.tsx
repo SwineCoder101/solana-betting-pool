@@ -1,4 +1,6 @@
-export default function SpinningBanner({}) {
+import Marquee from 'react-fast-marquee'
+
+export default function SpinningBanner({ text }: { text: string }) {
   return (
     <div
       className="w-full bg-gradient-to-t from-[#BDF55A] to-[#FFF369] text-[18px] text-black"
@@ -7,8 +9,9 @@ export default function SpinningBanner({}) {
         overflow: 'hidden',
       }}
     >
-      {/* TODO: Add animation */}
-      <span className="text-nowrap">new winner! @panchain won $120 new winner! @panchain won $120</span>
+      <Marquee speed={50} gradient={false}>
+        <span className="text-nowrap">{text}</span>
+      </Marquee>
     </div>
   )
 }

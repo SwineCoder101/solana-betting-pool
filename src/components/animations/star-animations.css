@@ -1,0 +1,29 @@
+@keyframes twinkle {
+  0%,
+  100% {
+    opacity: 0;
+    transform: scale(0);
+  }
+  25% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.5);
+  }
+}
+
+.star-animate {
+  animation: twinkle 2s ease-in-out infinite;
+}
+
+.star-animate-delay-1 {
+  animation: twinkle 2s ease-in-out infinite;
+  animation-delay: 0.6s;
+}
+
+.star-animate-delay-2 {
+  animation: twinkle 2s ease-in-out infinite;
+  animation-delay: 1.2s;
+}
