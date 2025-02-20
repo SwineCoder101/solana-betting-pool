@@ -199,6 +199,9 @@ pub fn direct_transfer_ref(
     let from_balance = from_info.lamports();
     require!(from_balance >= amount, SettlementError::NotEnoughFunds);
 
+    require!(*from_info.owner == system_program::ID, SettlementError::InvalidFromAccount);
+    require!(*to_info.owner == system_program::ID, SettlementError::InvalidToAccount);
+
     **from_info.try_borrow_mut_lamports()? = from_balance
         .checked_sub(amount)
         .ok_or(SettlementError::Overflow)?;
@@ -209,4 +212,18 @@ pub fn direct_transfer_ref(
         .ok_or(SettlementError::Overflow)?;
 
     Ok(())
+}
+
+pub fn cpi_transfer<'info>(
+    from_info: &AccountInfo<'info>,
+    to_info: &AccountInfo<'info>,
+    amount: u64,
+    seeds: &[&[u8]],
+) -> Result<()> {
+    let ix = system_instruction::transfer(&from_info.key(), &to_info.key(), amount);
+    invoke_signed(
+        &ix,
+        &[from_info.clone(), to_info.clone()],
+        &[seeds],
+    ).map_err(Into::into)
 }

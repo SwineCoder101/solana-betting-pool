@@ -89,7 +89,7 @@
           }
         },
         {
-          "name": "treasury_account",
+          "name": "treasury_vault",
           "writable": true,
           "pda": {
             "seeds": [
@@ -103,7 +103,13 @@
                   115,
                   117,
                   114,
-                  121
+                  121,
+                  95,
+                  118,
+                  97,
+                  117,
+                  108,
+                  116
                 ]
               }
             ]
@@ -709,6 +715,7 @@
         },
         {
           "name": "pool_vault",
+          "writable": true,
           "pda": {
             "seeds": [
               {
@@ -734,7 +741,7 @@
           }
         },
         {
-          "name": "pool_treasury",
+          "name": "treasury",
           "writable": true
         },
         {

@@ -21,8 +21,8 @@ pub struct SettlePool<'info> {
     )]
     pub pool: Account<'info, Pool>,
     
-    // The system account that physically holds the pool's lamports
-    #[account(
+    /// CHECK: The pool_vault is mutable because the pool_vault is stored in the pool account.
+    #[account( mut,
         seeds = [
             POOL_VAULT_SEED,
             pool.key().as_ref()
@@ -30,20 +30,20 @@ pub struct SettlePool<'info> {
         bump = pool.vault_bump,
         owner = system_program::ID
     )]
-    pub pool_vault: SystemAccount<'info>,
+    pub pool_vault: AccountInfo<'info>,
 
     // The Treasury anchor account
     #[account(mut)]
-    pub pool_treasury: Account<'info, Treasury>,
+    pub treasury: Account<'info, Treasury>,
 
-    // The system account that physically holds the treasury’s lamports
+    /// CHECK: The treasury_vault is mutable because the treasury_vault is stored in the treasury account.
     #[account(
         mut,
         seeds = [TREASURY_VAULT_SEED],
-        bump = pool_treasury.vault_bump,
+        bump = treasury.vault_bump,
         owner = system_program::ID
     )]
-    pub treasury_vault: SystemAccount<'info>,
+    pub treasury_vault: AccountInfo<'info>,
 
     #[account(address = system_program::ID)]
     pub system_program: Program<'info, System>,
@@ -73,14 +73,17 @@ pub fn run_settle_pool_by_price<'a, 'b, 'c, 'info>(
 
     // 2) Process each Bet + associated user
     while let Some(bet_account_info) = remaining_iter.next() {
-        let user_account_info = remaining_iter
-            .next()
-            .ok_or(BettingError::InvalidUserAccount)?;
+
+
 
         let mut bet = Account::<Bet>::try_from(bet_account_info)?;
         if bet.status != BetStatus::Active {
             continue;
         }
+
+
+        let user_account_info = remaining_iter.next()
+        .ok_or(SettlementError::InvalidUserAccount)?;
 
         let won = has_won(&bet, lower_bound_price, upper_bound_price);
         let winnings = get_winnings(bet.amount, bet.leverage_multiplier);
@@ -107,14 +110,23 @@ pub fn run_settle_pool_by_price<'a, 'b, 'c, 'info>(
             }
             
             // Now pay user from pool vault
-            utils::direct_transfer_ref(&pool_vault_info, &user_account_info, winnings)?;
+            utils::transfer_from_vault_to_recipient(
+                &ctx.accounts.pool, 
+                &ctx.accounts.pool_vault,
+     &user_account_info, 
+            winnings)?;
+
         } else {
             total_losing_bets += bet.amount;
             number_of_losing_bets = number_of_losing_bets
                 .checked_add(1)
-                .ok_or(SettlementError::NotEnoughFundsInPoolOrTreasury)?; // Adjust error as needed
-            // User lost → add their "amount * multiplier" to treasury 
-            utils::direct_transfer_ref(&pool_vault_info, &treasury_vault_info, winnings)?;
+                .ok_or(SettlementError::NotEnoughFundsInPoolOrTreasury)?;
+            utils::transfer_from_vault_to_recipient(
+                &ctx.accounts.pool,
+                &ctx.accounts.pool_vault,
+                &ctx.accounts.treasury_vault,
+                bet.amount,
+            )?;
         }
 
         // Mark bet as settled

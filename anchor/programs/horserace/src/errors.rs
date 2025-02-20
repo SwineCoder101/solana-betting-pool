@@ -36,6 +36,12 @@ pub enum SettlementError {
     NotEnoughFundsInPoolOrTreasury,
     #[msg("Not enough funds")]
     NotEnoughFunds,
+    #[msg("Invalid from account")]
+    InvalidFromAccount,
+    #[msg("Invalid to account")]
+    InvalidToAccount,
+    #[msg("Invalid user account")]
+    InvalidUserAccount,
 }
 
 #[error_code]

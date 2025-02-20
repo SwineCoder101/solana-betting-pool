@@ -1,6 +1,6 @@
 use anchor_lang::{prelude::*, solana_program::system_program};
 use crate::{
-    constants::{POOL_SEED, POOL_VAULT_SEED, TREASURY_SEED}, errors::BettingError, states::{Bet, BetStatus, Pool, Treasury}, utils::*
+    constants::{POOL_SEED, POOL_VAULT_SEED, TREASURY_SEED, TREASURY_VAULT_SEED}, errors::BettingError, states::{Bet, BetStatus, Pool, Treasury}, utils::*
 };
 
 #[derive(Accounts)]
@@ -40,13 +40,13 @@ pub struct CancelBet<'info> {
     )]
     pub treasury: Account<'info, Treasury>,
 
-    /// CHECK: The `treasury_account` is the PDA that physically holds lamports for the treasury.
+    /// CHECK: The `treasury_vault` is the PDA that physically holds lamports for the treasury.
     #[account(
         mut,
-        seeds = [TREASURY_SEED],
-        bump = treasury.bump
+        seeds = [TREASURY_VAULT_SEED],
+        bump = treasury.vault_bump
     )]
-    pub treasury_account: UncheckedAccount<'info>,
+    pub treasury_vault: UncheckedAccount<'info>,
 
     /// CHECK: The pool is mutable because the pool is stored in the pool account.
     #[account(
@@ -79,7 +79,7 @@ pub fn run_cancel_bet(ctx: Context<CancelBet>) -> Result<()> {
 
     deposit_to_treasury(
         &mut ctx.accounts.treasury,
-        &ctx.accounts.treasury_account.to_account_info(),
+        &ctx.accounts.treasury_vault.to_account_info(),
         &ctx.accounts.user.to_account_info(),
         &ctx.accounts.system_program,
         fee,

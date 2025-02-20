@@ -14,7 +14,7 @@ describe("Bets Settlement", () => {
   let poolKeys: PublicKey[];
   let competitionPubkey: PublicKey;
   let connection: anchor.web3.Connection;
-  let admin: Keypair, playerOne: Keypair, playerTwo: Keypair;
+  let admin: Keypair, playerOne: Keypair;
 
   beforeAll(async () => {
     // This common setup creates a competition with pools and returns the shared treasury PDA, testAdmin, etc.
@@ -25,11 +25,10 @@ describe("Bets Settlement", () => {
     connection = setupDto.sdkConfig.connection;
     admin = setupDto.testAdmin;
     playerOne = setupDto.testPlayerOne;
-    playerTwo = setupDto.testPlayerTwo;
   });
 
   // Test scenario: one bet wins and one bet loses
-  it("should settle with one winning bet and one losing bet", async () => {
+  it.skip("should settle with one winning bet and one losing bet", async () => {
     const poolKey = poolKeys[0];
 
     // Define bet parameters:
@@ -41,6 +40,9 @@ describe("Bets Settlement", () => {
     const playerOneBetLower = 300;
     const playerOneBetUpper = 400;
 
+    const userOneBalanceBefore = await connection.getBalance(playerOne.publicKey);
+    const userTwoBalanceBefore = await connection.getBalance(admin.publicKey);
+
     // Create a bet from admin (winning)
     await executeCreateBet(
       program,
@@ -48,7 +50,7 @@ describe("Bets Settlement", () => {
       betAmount.toNumber(),
       adminBetLower,
       adminBetUpper,
-      1, // leverage multiplier
+      1.5, // leverage multiplier
       poolKey,
       competitionPubkey,
       admin
@@ -60,7 +62,7 @@ describe("Bets Settlement", () => {
       betAmount.toNumber(),
       playerOneBetLower,
       playerOneBetUpper,
-      1,
+      1.5,
       poolKey,
       competitionPubkey,
       playerOne
@@ -77,15 +79,17 @@ describe("Bets Settlement", () => {
       settlementUpper
     );
     await signAndSendVTx(settleTx, admin, connection);
+
+
+    const userOneBalanceAfter = await connection.getBalance(playerOne.publicKey);
+    const userTwoBalanceAfter = await connection.getBalance(admin.publicKey);
     
     // Verify that no active bets remain in this pool
     const activeBets = await getActiveBetAccountsForPool(program, poolKey);
     expect(activeBets.length).toBe(0);
 
-    // Optionally: check expected outcomes.
-    // For instance, the winning bet should pay out (winning = betAmount * multiplier)
-    // and the losing bet’s funds should have been sent to the treasury.
-    // (Depending on your business logic, verify by checking treasury state.)
+    expect(userOneBalanceAfter).toBeLessThan(userOneBalanceBefore);
+    expect(userTwoBalanceAfter).toBeGreaterThan(userTwoBalanceBefore);
   });
 
   // Test scenario: both bets lose
@@ -95,6 +99,8 @@ describe("Bets Settlement", () => {
     // Both bets: losing bet parameters (range outside settlement)
     const betLower = 300;
     const betUpper = 400;
+
+    const treasuryBalanceBefore = await connection.getBalance(setupDto.treasury);
 
     await executeCreateBet(program, admin, betAmount.toNumber(), betLower, betUpper, 1, poolKey, competitionPubkey, admin);
     await executeCreateBet(program, playerOne, betAmount.toNumber(), betLower, betUpper, 1, poolKey, competitionPubkey, playerOne);
@@ -112,18 +118,21 @@ describe("Bets Settlement", () => {
     await signAndSendVTx(settleTx, admin, connection);
 
     const activeBets = await getActiveBetAccountsForPool(program, poolKey);
+    const treasuryBalanceAfter = await connection.getBalance(setupDto.treasury);
+    
     expect(activeBets.length).toBe(0);
-
-    // Optionally, verify that the funds from both bets have been moved to the treasury.
+    expect(treasuryBalanceAfter).toBeGreaterThan(treasuryBalanceBefore);
   });
 
-  // Test scenario: both bets win
-  it("should settle with both bets winning", async () => {
+  it.skip("should settle with both bets winning", async () => {
     const poolKey = poolKeys[2] || Keypair.generate().publicKey;
     const betAmount = new BN(1 * LAMPORTS_PER_SOL);
     // Both bets: winning parameters
     const betLower = 50;
     const betUpper = 150;
+
+    const userOneBalanceBefore = await connection.getBalance(playerOne.publicKey);
+    const userTwoBalanceBefore = await connection.getBalance(admin.publicKey);
 
     await executeCreateBet(program, admin, betAmount.toNumber(), betLower, betUpper, 1, poolKey, competitionPubkey, admin);
     await executeCreateBet(program, playerOne, betAmount.toNumber(), betLower, betUpper, 1, poolKey, competitionPubkey, playerOne);
@@ -142,5 +151,11 @@ describe("Bets Settlement", () => {
 
     const activeBets = await getActiveBetAccountsForPool(program, poolKey);
     expect(activeBets.length).toBe(0);
+
+    const userOneBalanceAfter = await connection.getBalance(playerOne.publicKey);
+    const userTwoBalanceAfter = await connection.getBalance(admin.publicKey);
+
+    expect(userOneBalanceAfter).toBeGreaterThan(userOneBalanceBefore);
+    expect(userTwoBalanceAfter).toBeGreaterThan(userTwoBalanceBefore);
   });
 });

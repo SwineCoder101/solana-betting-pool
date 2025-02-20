@@ -183,7 +183,12 @@ export const setupCompetitionWithPools = async function (bypassTreasury: boolean
   if (!bypassTreasury) {
     if (!treasuryInitialized) {
       const setup = await setupTreasury(testAdmin);
-      treasuryToUse = setup.treasuryKey;
+
+      if (!setup.treasuryAccount?.vaultKey) {
+        throw new Error('Treasury vault key not found');
+      }
+
+      treasuryToUse = setup.treasuryAccount?.vaultKey;
       console.log('poolTreasuryPubkey:', treasuryToUse.toBase58());
     } else {
       console.log('Treasury already initialized, using existing treasury');
@@ -217,6 +222,13 @@ export const setupCompetitionWithPools = async function (bypassTreasury: boolean
 
 
   const competitionData = await getCompetitionData(competitionHash, program);
+
+
+  console.log('===========================')
+  console.log('competitionData:', competitionData);
+  console.log('poolKeys:', poolKeys);
+  console.log('treasuryToUse:', treasuryToUse.toBase58());
+  console.log('===========================')
 
 
 

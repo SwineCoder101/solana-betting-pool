@@ -1,7 +1,7 @@
 import { Program, web3, BN } from '@coral-xyz/anchor';
 import { AccountMeta, PublicKey, VersionedTransaction } from '@solana/web3.js';
 import { getVersionTxFromInstructions, HorseRace } from '../../utils';
-import { BetStatus, getBetAccountsForPool } from '../../states';
+import { BetData, BetStatus, getBetAccountsForPool } from '../../states';
 import { TreasuryAccount } from '../../states/treasury-account';
 
 export async function settlePoolByPrice(
@@ -20,20 +20,26 @@ export async function settlePoolByPrice(
   const [treasuryVault] = await TreasuryAccount.getTreasuryVaultPda(program);
 
   // Get the active bets.
-  const betAccounts = (await getBetAccountsForPool(program, poolKey))
+  const betAccounts : BetData[] = (await getBetAccountsForPool(program, poolKey))
     .filter((betAccount) => betAccount.status === BetStatus.Active);
-  const userAccounts = betAccounts.map((betAccount) => betAccount.user);
+  const userAccounts: string[] = betAccounts.map((betAccount) => betAccount.user);
+
   if (betAccounts.length !== userAccounts.length) {
     throw new Error("Number of bet accounts must match the number of user accounts");
   }
 
-  const remainingAccounts: AccountMeta[] = betAccounts.flatMap((betAccount, index) => [
-    { pubkey: new PublicKey(betAccount.publicKey), isWritable: true, isSigner: false },
-    { pubkey: new PublicKey(userAccounts[index]), isWritable: true, isSigner: false },
-  ]);
+  if (betAccounts.length === 0) {
+    throw new Error("No active bets found");
+  }
 
-  // IMPORTANT: Use the field name from your Pool state.
-  // If your pool state is defined with `competition_key: Pubkey`, then use that.
+  console.log('betAccounts : ', betAccounts);
+  console.log('userAccounts : ', userAccounts);
+
+  const remainingAccounts: AccountMeta[] = ([] as AccountMeta[]).concat(...betAccounts.map((betAccount) => [
+    { pubkey: new PublicKey(betAccount.publicKey), isWritable: true, isSigner: false },
+    { pubkey: new PublicKey(betAccount.user), isWritable: true, isSigner: false },
+  ]));
+
   const ix = await program.methods.runSettlePoolByPrice(
       new BN(lowerBoundPrice),
       new BN(upperBoundPrice)
@@ -41,7 +47,7 @@ export async function settlePoolByPrice(
     .accountsStrict({
       authority: admin,
       pool: poolKey,
-      poolTreasury,
+      treasury: poolTreasury,
       competition: poolAccount.competition,
       treasuryVault: treasuryVault,
       poolVault: poolAccount.vaultKey,

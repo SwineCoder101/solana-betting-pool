@@ -42,7 +42,7 @@ export async function cancelBetByKey(program: Program<HorseRace>, betKey: Public
       systemProgram: SystemProgram.programId,
       poolVault: poolAccount.vaultKey,
       treasury: poolAccount.treasury,
-      treasuryAccount: poolAccount.treasury,
+      treasuryVault: poolAccount.treasury,
     }).instruction();
 
 
@@ -79,7 +79,7 @@ export async function cancelBet(
       systemProgram: SystemProgram.programId,
       poolVault: poolAccount.vaultKey,
       treasury: poolAccount.treasury,
-      treasuryAccount: poolAccount.treasury,
+      treasuryVault: poolAccount.treasury,
     }).instruction();
 
 
