@@ -19,6 +19,7 @@ import { createBet } from "../sdk/src/instructions/user/create-bet";
 import { getPoolAccount, getVersionTxFromInstructions, HorseRace } from "../sdk/src";
 import { createTreasury } from "../sdk/src/instructions/admin/create-treasury";
 import { TreasuryAccount } from "../sdk/src/states/treasury-account";
+import { SCALE } from "../sdk/src/constants";
 
 export const loggingOn = true; //Enable / disable logging
 // const program = anchor.workspace.MemePrice as Program<MemePrice>;
@@ -190,7 +191,7 @@ export async function executeCreateBet(
   poolKey: PublicKey,
   competitionPubkey: PublicKey,
   signer: Signer) {
-    const vtx = await createBet(program, user.publicKey, amount, lowerBoundPrice, upperBoundPrice, leverageMultiplier, poolKey, competitionPubkey);
+    const vtx = await createBet(program, user.publicKey, amount, lowerBoundPrice, upperBoundPrice, leverageMultiplier * SCALE, poolKey, competitionPubkey);
     vtx.sign([signer]);
     const signature = await program.provider.connection.sendTransaction(vtx);
     await program.provider.connection.confirmTransaction(signature, 'confirmed');
@@ -239,4 +240,60 @@ export const airdropSol = async (connection: Connection, keypair: Keypair, amoun
     blockhash: latestBlockhash.blockhash,
     lastValidBlockHeight: latestBlockhash.lastValidBlockHeight,
   });
+}
+
+
+/**
+ * Registers listeners for all settlement events (BetSettled and PoolSettled) and logs them.
+ * Returns a function that, when called, removes all registered listeners.
+ */
+export async function addSettlementEventListeners(program: Program<HorseRace>): Promise<() => Promise<void>> {
+  const listenerIds: number[] = [];
+
+  const betSettledListener = await program.addEventListener("betSettled", (event) => {
+    const betSettledEvent = {
+      betKey: event.betKey.toBase58(),
+      userBalanceBefore: event.userBalanceBefore.toString(),
+      userBalanceAfter: event.userBalanceAfter.toString(),
+      user: event.user.toBase58(),
+      amount: event.amount.toString(),
+      leverageMultiplier: event.leverageMultiplier.toString(),
+      lowerBoundPrice: event.lowerBoundPrice.toString(),
+      upperBoundPrice: event.upperBoundPrice.toString(),
+      hasWinningRange: event.hasWinningRange,
+      winningLowerBoundPrice: event.winningLowerBoundPrice.toString(),
+      winningUpperBoundPrice: event.winningUpperBoundPrice.toString(),
+    }
+
+    console.log("BetSettled event received:", betSettledEvent);
+  });
+  listenerIds.push(betSettledListener);
+
+  const poolSettledListener = await program.addEventListener("poolSettled", (event) => {
+
+    const poolSettledEvent = {
+      poolKey: event.poolKey.toBase58(),
+      competition: event.competition.toBase58(),
+      lowerBoundPrice: event.lowerBoundPrice.toString(),
+      upperBoundPrice: event.upperBoundPrice.toString(),
+      hasWinningRange: event.hasWinningRange,
+      poolBalanceBefore: event.poolBalanceBefore.toString(),
+      winningBetsBalance: event.winningBetsBalance.toString(),
+      losingBetsBalance: event.losingBetsBalance.toString(),
+      numberOfBets: event.numberOfBets.toString(),
+      numberOfWinningBets: event.numberOfWinningBets.toString(),
+      numberOfLosingBets: event.numberOfLosingBets.toString(),
+    }
+
+
+    console.log("PoolSettled event received:", poolSettledEvent);
+  });
+  listenerIds.push(poolSettledListener);
+
+  // Return a cleanup function to remove all listeners when they're no longer needed.
+  return async () => {
+    for (const listenerId of listenerIds) {
+      await program.removeEventListener(listenerId);
+    }
+  };
 }

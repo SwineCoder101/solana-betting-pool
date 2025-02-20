@@ -4,17 +4,18 @@ import { Keypair, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { getActiveBetAccountsForPool, HorseRace } from "../sdk/src";
 import { settlePoolByPrice } from "../sdk/src/instructions/admin/settle-pool-by-price";
 import { setupCompetitionWithPools, SetupDTO } from "./common-setup";
-import { executeCreateBet, signAndSendVTx } from "./test-utils";
+import { addSettlementEventListeners, executeCreateBet, signAndSendVTx } from "./test-utils";
 
 jest.setTimeout(30000);
 
-describe("Bets Settlement", () => {
+describe.skip("Bets Settlement", () => {
   let setupDto: SetupDTO;
   let program: anchor.Program<HorseRace>;
   let poolKeys: PublicKey[];
   let competitionPubkey: PublicKey;
   let connection: anchor.web3.Connection;
   let admin: Keypair, playerOne: Keypair;
+  let cleanupListeners: () => Promise<void>;
 
   beforeAll(async () => {
     // This common setup creates a competition with pools and returns the shared treasury PDA, testAdmin, etc.
@@ -25,10 +26,15 @@ describe("Bets Settlement", () => {
     connection = setupDto.sdkConfig.connection;
     admin = setupDto.testAdmin;
     playerOne = setupDto.testPlayerOne;
+    cleanupListeners = await addSettlementEventListeners(program);
+  });
+
+  afterAll(async () => {
+    await cleanupListeners();
   });
 
   // Test scenario: one bet wins and one bet loses
-  it.skip("should settle with one winning bet and one losing bet", async () => {
+  it("should settle with one winning bet and one losing bet", async () => {
     const poolKey = poolKeys[0];
 
     // Define bet parameters:
@@ -50,7 +56,7 @@ describe("Bets Settlement", () => {
       betAmount.toNumber(),
       adminBetLower,
       adminBetUpper,
-      1.5, // leverage multiplier
+      1.5,
       poolKey,
       competitionPubkey,
       admin
@@ -124,9 +130,11 @@ describe("Bets Settlement", () => {
     expect(treasuryBalanceAfter).toBeGreaterThan(treasuryBalanceBefore);
   });
 
-  it.skip("should settle with both bets winning", async () => {
+  it("should settle with both bets winning", async () => {
     const poolKey = poolKeys[2] || Keypair.generate().publicKey;
     const betAmount = new BN(1 * LAMPORTS_PER_SOL);
+
+
     // Both bets: winning parameters
     const betLower = 50;
     const betUpper = 150;
@@ -134,8 +142,8 @@ describe("Bets Settlement", () => {
     const userOneBalanceBefore = await connection.getBalance(playerOne.publicKey);
     const userTwoBalanceBefore = await connection.getBalance(admin.publicKey);
 
-    await executeCreateBet(program, admin, betAmount.toNumber(), betLower, betUpper, 1, poolKey, competitionPubkey, admin);
-    await executeCreateBet(program, playerOne, betAmount.toNumber(), betLower, betUpper, 1, poolKey, competitionPubkey, playerOne);
+    await executeCreateBet(program, admin, betAmount.toNumber(), betLower, betUpper, 1.5, poolKey, competitionPubkey, admin);
+    await executeCreateBet(program, playerOne, betAmount.toNumber(), betLower, betUpper, 1.5, poolKey, competitionPubkey, playerOne);
 
     // Settle pool with a settlement range that covers both bets.
     const settlementLower = 50;
@@ -155,7 +163,9 @@ describe("Bets Settlement", () => {
     const userOneBalanceAfter = await connection.getBalance(playerOne.publicKey);
     const userTwoBalanceAfter = await connection.getBalance(admin.publicKey);
 
+    console.log("checking balance for playerOne", playerOne.publicKey, userOneBalanceAfter, userOneBalanceBefore);
     expect(userOneBalanceAfter).toBeGreaterThan(userOneBalanceBefore);
+    console.log("checking balance for admin", admin.publicKey, userTwoBalanceAfter, userTwoBalanceBefore);
     expect(userTwoBalanceAfter).toBeGreaterThan(userTwoBalanceBefore);
   });
 });

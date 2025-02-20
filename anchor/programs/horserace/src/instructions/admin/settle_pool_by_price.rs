@@ -1,5 +1,5 @@
 use anchor_lang::{prelude::*, solana_program::system_program};
-use crate::constants::{POOL_VAULT_SEED, TREASURY_VAULT_SEED};
+use crate::constants::{POOL_VAULT_SEED, SCALE, TREASURY_VAULT_SEED};
 use crate::errors::SettlementError;
 use crate::states::{BetStatus, Treasury};
 use crate::utils;
@@ -74,8 +74,6 @@ pub fn run_settle_pool_by_price<'a, 'b, 'c, 'info>(
     // 2) Process each Bet + associated user
     while let Some(bet_account_info) = remaining_iter.next() {
 
-
-
         let mut bet = Account::<Bet>::try_from(bet_account_info)?;
         if bet.status != BetStatus::Active {
             continue;
@@ -85,10 +83,12 @@ pub fn run_settle_pool_by_price<'a, 'b, 'c, 'info>(
         let user_account_info = remaining_iter.next()
         .ok_or(SettlementError::InvalidUserAccount)?;
 
-        let won = has_won(&bet, lower_bound_price, upper_bound_price);
-        let winnings = get_winnings(bet.amount, bet.leverage_multiplier);
+        let user_balance_before = user_account_info.lamports();
 
+        let won = has_won(&bet, lower_bound_price, upper_bound_price);
+        
         if won {
+            let winnings = get_winnings(bet.amount, bet.leverage_multiplier);
             total_winnings += winnings;
             number_of_winning_bets = number_of_winning_bets
                 .checked_add(1)
@@ -102,7 +102,8 @@ pub fn run_settle_pool_by_price<'a, 'b, 'c, 'info>(
                     treasury_vault_info.lamports() >= shortfall,
                     SettlementError::NotEnoughFundsInPoolOrTreasury
                 );
-                utils::direct_transfer_ref(
+                utils::withdraw_lamports_from_treasury( 
+                    &mut ctx.accounts.treasury,
                     &treasury_vault_info,
                     &pool_vault_info,
                     shortfall,
@@ -135,10 +136,14 @@ pub fn run_settle_pool_by_price<'a, 'b, 'c, 'info>(
 
         has_any_bet_won = has_any_bet_won || won;
 
+        let user_balance_after = user_account_info.lamports();
+
         // Emit event for bet settlement
         emit!(BetSettled { 
             bet_key: bet.key(),
             user: bet.user,
+            user_balance_before : user_balance_before,
+            user_balance_after : user_balance_after,
             amount: bet.amount,
             leverage_multiplier: bet.leverage_multiplier,
             lower_bound_price: bet.lower_bound_price,
@@ -168,15 +173,17 @@ pub fn run_settle_pool_by_price<'a, 'b, 'c, 'info>(
 fn has_won(bet: &Bet, lower_bound_price: u64, upper_bound_price: u64) -> bool {
     bet.lower_bound_price >= lower_bound_price && bet.upper_bound_price <= upper_bound_price
 }
-
 fn get_winnings(amount: u64, leverage_multiplier: u64) -> u64 {
-    amount * leverage_multiplier
+    let product = (amount as u128) * (leverage_multiplier as u128);
+    (product / (SCALE as u128)) as u64
 }
 
 #[event]
 pub struct BetSettled {
     pub bet_key: Pubkey,
     pub user: Pubkey,
+    pub user_balance_before: u64,
+    pub user_balance_after: u64,
     pub amount: u64,
     pub leverage_multiplier: u64,
     pub lower_bound_price: u64,

@@ -1334,6 +1334,14 @@ export type HorseRace = {
             "type": "pubkey"
           },
           {
+            "name": "userBalanceBefore",
+            "type": "u64"
+          },
+          {
+            "name": "userBalanceAfter",
+            "type": "u64"
+          },
+          {
             "name": "amount",
             "type": "u64"
           },

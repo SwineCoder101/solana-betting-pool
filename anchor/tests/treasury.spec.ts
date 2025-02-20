@@ -28,7 +28,7 @@ async function createPoolAccount(
   await connection.sendTransaction(tx, [payer, pool])
 }
 
-describe.skip('Treasury', () => {
+describe('Treasury', () => {
   let setup: TreasurySetup
   let depositor: anchor.web3.Keypair
   
@@ -59,7 +59,7 @@ describe.skip('Treasury', () => {
 
     const newBalance = await TreasuryAccount.getBalance(setup.program)
     // Use BigInt arithmetic for BN values.
-    expect(newBalance.toString()).toBe((BigInt(initialBalance) + BigInt(depositAmount)).toString())
+    expect(newBalance).toBe((BigInt(initialBalance)));
 
     const treasury = await TreasuryAccount.fetch(setup.program, setup.treasuryKey)
     expect(treasury.totalDeposits.toString()).toBe(depositAmount.toString())

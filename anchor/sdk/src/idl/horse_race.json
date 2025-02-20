@@ -1328,6 +1328,14 @@
             "type": "pubkey"
           },
           {
+            "name": "user_balance_before",
+            "type": "u64"
+          },
+          {
+            "name": "user_balance_after",
+            "type": "u64"
+          },
+          {
             "name": "amount",
             "type": "u64"
           },

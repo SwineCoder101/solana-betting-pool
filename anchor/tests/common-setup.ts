@@ -2,13 +2,13 @@ import * as anchor from "@coral-xyz/anchor";
 import { Program, web3 } from "@coral-xyz/anchor";
 import { Connection, Keypair, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import fs from "fs";
+import path from "path";
 import { CompetitionData, createCompetition, createTreasury, findCompetitonAddress, getCompetitionData, IDL } from "../sdk/src";
 import { createCompetitionWithPools } from "../sdk/src/instructions/admin/create-competition-with-pools";
 import { TreasuryAccount } from "../sdk/src/states/treasury-account";
 import { SdkConfig } from "../sdk/src/types";
 import { getVersionTxFromInstructions, HorseRace } from "../sdk/src/utils";
-import { createUserWithFunds, signAndSendVTx } from "./test-utils";
-import path from "path";
+import { signAndSendVTx } from "./test-utils";
 
 export type SetupDTO = {
     testAdmin: Keypair;
@@ -45,7 +45,6 @@ export type UserSetup = {
   testPlayerOne: Keypair;
   testPlayerTwo: Keypair;
 }
-
 
 export const setupEnvironment = async function (): Promise<EnvironmentSetup> {
   const provider = anchor.AnchorProvider.env();
@@ -189,6 +188,10 @@ export const setupCompetitionWithPools = async function (bypassTreasury: boolean
       }
 
       treasuryToUse = setup.treasuryAccount?.vaultKey;
+
+      // Airdrop SOL to treasury
+      await airdropSOL(treasuryToUse, program.provider.connection);
+
       console.log('poolTreasuryPubkey:', treasuryToUse.toBase58());
     } else {
       console.log('Treasury already initialized, using existing treasury');
@@ -250,10 +253,19 @@ export async function airdropSOLIfNeeded(
   connection: Connection,
   minBalance: number = LAMPORTS_PER_SOL
 ): Promise<void> {
-  const balance = await connection.getBalance(keypair.publicKey);
+  await airdropSOL(keypair.publicKey, connection, minBalance);
+}
+
+export async function airdropSOL(
+  user: PublicKey,
+  connection: Connection,
+  minBalance: number = LAMPORTS_PER_SOL
+): Promise<void> {
+
+  const balance = await connection.getBalance(user);
   if (balance < minBalance) {
     const amountToAirdrop = (minBalance - balance) * 40;
-    const signature = await connection.requestAirdrop(keypair.publicKey, amountToAirdrop);
+    const signature = await connection.requestAirdrop(user, amountToAirdrop);
     const latestBlockhash = await connection.getLatestBlockhash();
     await connection.confirmTransaction({
       signature,

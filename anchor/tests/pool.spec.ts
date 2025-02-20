@@ -5,7 +5,7 @@ import { Keypair } from '@solana/web3.js';
 import { setupEnvironment } from '../../anchor/tests/common-setup';
 import { createPool, getVersionTxFromInstructions } from '../../anchor/sdk/src';
 
-describe.skip("Pool", () => {
+describe("Pool", () => {
 
   const competitionKey = Keypair.generate().publicKey;
   const treasury = Keypair.generate().publicKey;

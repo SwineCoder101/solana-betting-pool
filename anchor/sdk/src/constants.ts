@@ -15,3 +15,4 @@ export const PRICE_FEED_ID = 'SOME_FEED';
 export const ADMIN = '3Vm8KKkd1aaCL1nnVf4PSXMZySy7Cu2DrsNVQeGpN2An';
 export const HOUSE_CUT_FACTOR = 1;
 export const MIN_PAYOUT_RATIO = 0;
+export const SCALE = 10_000;
