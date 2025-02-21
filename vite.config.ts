@@ -27,9 +27,6 @@ export default defineConfig({
       },
     },
   },
-  server: {
-    allowedHosts: true,
-  },
   optimizeDeps: {
     esbuildOptions: {
       plugins: [
