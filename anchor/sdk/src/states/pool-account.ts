@@ -3,44 +3,55 @@ import { PublicKey } from "@solana/web3.js";
 import { HorseRace } from "../../../target/types/horse_race";
 import { POOL_SEED } from "../constants";
 
-
 export type PoolData = {
   poolKey: string,
   poolHash: string,
   competitionKey: string,
   startTime: number,
   endTime: number,
-  treasury: string,
+  poolVaultKey: string,
+  poolVaultBump: number,
+  bump: number,
 }
 
 export type PoolProgramData = {
   poolKey?: PublicKey,
   poolHash: PublicKey,
-  competitionKey: PublicKey,
+  competition: PublicKey,
   startTime: BN | number,
   endTime: BN | number,
-  treasury: PublicKey,
+  vaultKey: PublicKey,
+  vaultBump: number,
+  bump: number,
 }
 
 export function convertPoolToProgramData(poolData: PoolData): PoolProgramData {
   return {
     poolKey: new PublicKey(poolData.poolKey),
-    competitionKey: new PublicKey(poolData.competitionKey),
+    competition: new PublicKey(poolData.competitionKey),
     startTime: new BN(poolData.startTime),
     endTime: new BN(poolData.endTime),
-    treasury: new PublicKey(poolData.treasury),
     poolHash: new PublicKey(poolData.poolHash),
-};
+    vaultKey: new PublicKey(poolData.poolVaultKey),
+    vaultBump: poolData.poolVaultBump,
+    bump: poolData.bump,
+  };
 }
 
 export function convertProgramToPoolData(programData: ProgramAccount<PoolProgramData>): PoolData {
   return {
     poolKey: programData.publicKey.toBase58(),
     poolHash: programData.account.poolHash.toString(),
-    competitionKey: programData.account.competitionKey.toString(),
-    startTime: typeof programData.account.startTime === 'number' ? programData.account.startTime : programData.account.startTime.toNumber(),
-    endTime: typeof programData.account.endTime === 'number' ? programData.account.endTime : programData.account.endTime.toNumber(),
-    treasury: programData.account.treasury.toString(),
+    competitionKey: programData.account.competition.toString(),
+    startTime: typeof programData.account.startTime === 'number'
+      ? programData.account.startTime
+      : programData.account.startTime.toNumber(),
+    endTime: typeof programData.account.endTime === 'number'
+      ? programData.account.endTime
+      : programData.account.endTime.toNumber(),
+    poolVaultKey: programData.account.vaultKey.toString(),
+    poolVaultBump: programData.account.vaultBump,
+    bump: programData.account.bump,
   };
 }
 
@@ -54,8 +65,8 @@ export const findPoolAddress = (programId: string, competitionKey: string, poolH
 
 // ------------------------------------------------------- Data Fetchers
 export async function getPoolData(program: Program<HorseRace>, poolPubkey: PublicKey): Promise<PoolData> {
-  const pool = await getPoolAccount(program, poolPubkey);
-  return convertProgramToPoolData({publicKey: poolPubkey, account: pool});
+  const pool = await getPoolAccount(program, poolPubkey)
+  return convertProgramToPoolData(pool);
 }
 
 export async function getBalanceOfPool(program: Program<HorseRace>, poolPubkey: PublicKey) {
@@ -66,8 +77,9 @@ export async function getBalanceOfPool(program: Program<HorseRace>, poolPubkey: 
 export async function getPoolAccount(
   program: Program<HorseRace>,
   poolPubkey: PublicKey
-) {
-  return program.account.pool.fetch(poolPubkey);
+): Promise<import('@coral-xyz/anchor').ProgramAccount<PoolProgramData>> {
+  const pool = await program.account.pool.fetch(poolPubkey);
+  return { publicKey: poolPubkey, account: pool };
 }
 
 export async function getPoolAccounts(
@@ -83,7 +95,14 @@ export async function getPoolBalance(poolPubkey: PublicKey, program: Program<Hor
 
 export async function getAllPools(program: Program<HorseRace>) {
   const pools = await program.account.pool.all();
-  return pools.map((pool) => convertProgramToPoolData(pool));
+  return pools.map((pool) => {
+    const poolData = {
+      ...pool.account,
+      poolVaultKey: pool.account.vaultKey,
+      poolVaultBump: pool.account.vaultBump,
+    };
+    return convertProgramToPoolData({publicKey: pool.publicKey, account: poolData});
+  });
 }
 
 export async function getFirstPool(program: Program<HorseRace>) {
@@ -93,17 +112,14 @@ export async function getFirstPool(program: Program<HorseRace>) {
 
 export async function getPoolAccountsFromCompetition(program: Program<HorseRace>, competitionKey: PublicKey) {
   const pools = await program.account.pool.all();
-  return pools.filter(pool => pool.account.competitionKey.toBase58() === competitionKey.toBase58());
+  return pools.filter(pool => pool.account.competition.toBase58() === competitionKey.toBase58());
 }
 
 export async function getAllPoolDataByCompetition(program: Program<HorseRace>, competition: PublicKey): Promise<PoolData[]> {
   const pools = await program.account.pool.all();
-  return pools.filter((pool) => pool.account.competitionKey.toBase58() === competition.toBase58()).map((pool) => convertProgramToPoolData(pool));
-}
-
-export async function getAllPoolDataByUser(program: Program<HorseRace>, user: PublicKey): Promise<PoolData[]> {
-  const pools = await program.account.pool.all();
-  return pools.filter((pool) => pool.account.treasury.toBase58() === user.toBase58()).map((pool) => convertProgramToPoolData(pool));
+  return pools
+    .filter((pool) => pool.account.competition.toBase58() === competition.toBase58())
+    .map((pool) => convertProgramToPoolData({ publicKey: pool.publicKey, account: pool.account }));
 }
 
 export async function findPoolKeyFromStartEndTime(program: Program<HorseRace>, competitionKey: PublicKey, startTime: number, endTime: number): Promise<PublicKey> {

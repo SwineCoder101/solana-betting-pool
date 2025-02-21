@@ -10,12 +10,28 @@ export interface CreateTreasuryParams {
   payer?: web3.PublicKey
 }
 
+export async function createTreasuryIfNotExists(
+  program: Program<HorseRace>,
+  params: CreateTreasuryParams,
+): Promise<TransactionInstruction | null> {
+  const [treasuryKey] = await TreasuryAccount.getTreasuryPda(program)
+
+  const treasuryAccount = await program.account.treasury.fetch(treasuryKey);
+
+  if (treasuryAccount.totalDeposits > 0) {
+    return null;
+  }
+  
+  return await createTreasury(program, params);
+}
+
 export async function createTreasury(
   program: Program<HorseRace>,
   params: CreateTreasuryParams,
 ): Promise<TransactionInstruction> {
   const { maxAdmins, minSignatures, initialAdmins, payer = program.provider.publicKey } = params
-  const [treasuryKey] = await TreasuryAccount.getPda(program)
+  const [treasuryKey] = await TreasuryAccount.getTreasuryPda(program)
+  const [treasuryVaultKey] = await TreasuryAccount.getTreasuryVaultPda(program)
 
   return await program.methods
     .runCreateTreasury(maxAdmins, minSignatures, initialAdmins)
@@ -23,6 +39,7 @@ export async function createTreasury(
       treasury: treasuryKey,
       payer,
       systemProgram: web3.SystemProgram.programId,
+      treasuryVault: treasuryVaultKey,
     })
     .instruction();
 } 

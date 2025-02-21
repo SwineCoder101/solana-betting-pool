@@ -12,9 +12,9 @@ export async function updateCompetitionInstruction(
   minPayoutRatio: number,
   interval: number,
   startTime: number,
-  endTime: number
+    endTime: number,
+  authority: web3.PublicKey,
 ){
-  const authority = program.provider.publicKey;
 
   return program.methods
     .runUpdateCompetition(
@@ -30,6 +30,5 @@ export async function updateCompetitionInstruction(
     .accounts({
       competition: competitionPubkey,
       authority,
-    })
-    .rpc();
+    }).instruction();
 }

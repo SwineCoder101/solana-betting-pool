@@ -46,7 +46,6 @@ export async function createCompetitionWithPoolsEntry(program: Program<HorseRace
     params.interval,
     params.startTime,
     params.endTime,
-    params.treasury
   );
 
   return {
@@ -68,13 +67,13 @@ export async function createCompetitionWithPools(
   interval: number,
   startTime: number,
   endTime: number,
-  treasury: PublicKey,
 ): Promise<CompetitionPoolResponse> {
   
   const [competitionPda] = await web3.PublicKey.findProgramAddressSync(
     [Buffer.from(COMPETITION_SEED), competitionHash.toBuffer()],
     program.programId
   );
+
 
   const competitionTx = await getVersionTxFromInstructions(
     program.provider.connection,
@@ -115,7 +114,6 @@ export async function createCompetitionWithPools(
         competitionPda, // Use actual competition PDA
         config.startTime,
         config.endTime,
-        treasury,
         config.poolHash
       );
       

@@ -64,7 +64,7 @@ dependencies:
     version: 5.1.2
   daisyui:
     specifier: ^4.12.10
-    version: 4.12.23(postcss@8.4.49)
+    version: 4.12.23(postcss@8.5.2)
   dotenv:
     specifier: ^16.4.7
     version: 16.4.7
@@ -8269,14 +8269,14 @@ packages:
     engines: {node: '>=12'}
     dev: false
 
-  /daisyui@4.12.23(postcss@8.4.49):
+  /daisyui@4.12.23(postcss@8.5.2):
     resolution: {integrity: sha512-EM38duvxutJ5PD65lO/AFMpcw+9qEy6XAZrTpzp7WyaPeO/l+F/Qiq0ECHHmFNcFXh5aVoALY4MGrrxtCiaQCQ==}
     engines: {node: '>=16.9.0'}
     dependencies:
       css-selector-tokenizer: 0.8.0
       culori: 3.3.0
       picocolors: 1.1.1
-      postcss-js: 4.0.1(postcss@8.4.49)
+      postcss-js: 4.0.1(postcss@8.5.2)
     transitivePeerDependencies:
       - postcss
     dev: false
@@ -11521,6 +11521,16 @@ packages:
     dependencies:
       camelcase-css: 2.0.1
       postcss: 8.4.49
+    dev: false
+
+  /postcss-js@4.0.1(postcss@8.5.2):
+    resolution: {integrity: sha512-dDLF8pEO191hJMtlHFPRa8xsizHaM82MLfNkUHdUtVEV3tgTp5oj+8qbEqYM57SLfc74KSbw//4SeJma2LRVIw==}
+    engines: {node: ^12 || ^14 || >= 16}
+    peerDependencies:
+      postcss: ^8.4.21
+    dependencies:
+      camelcase-css: 2.0.1
+      postcss: 8.5.2
     dev: false
 
   /postcss-load-config@4.0.2(postcss@8.4.49):

@@ -1,14 +1,18 @@
 import { setupCompetitionWithPools, SetupDTO } from "./common-setup";
 
+// Increase timeout (if needed) for slower test environments
+jest.setTimeout(30000);
+
 describe("Competition with Pools", () => {
   let setupDto: SetupDTO;
 
   beforeAll(async () => {
+    // Allow treasury creation to run so that an on-chain treasury with correct PDA exists
     setupDto = await setupCompetitionWithPools(false);
   });
 
   it("Create competition with pools successfully", async () => {
-    const { program, competitionPubkey, competitionData, poolKeys, treasury } = setupDto;
+    const { program, competitionPubkey, competitionData, poolKeys } = setupDto;
 
     // Assert competition is created
     const fetchedCompetition = await program.account.competition.fetch(competitionPubkey);
@@ -33,10 +37,9 @@ describe("Competition with Pools", () => {
     if (poolKeys  && poolKeys.length > 0){
         for (let i = 0; i < poolKeys.length; i++) {
             const pool = await program.account.pool.fetch(poolKeys[i]);
-            expect(pool.competitionKey.toString()).toEqual(competitionPubkey.toString());
+            expect(pool.competition.toBase58()).toEqual(competitionPubkey.toBase58());
             expect(pool.startTime.toNumber()).toEqual(competitionData.startTime + i * competitionData.interval);
             expect(pool.endTime.toNumber()).toEqual(pool.startTime.toNumber() + competitionData.interval);
-            expect(pool.treasury.toString()).toEqual(treasury.toBase58());
           }
     }   
   });
@@ -46,12 +49,13 @@ describe("Competition with Pools", () => {
     const competitions: SetupDTO[] = [];
 
     for (let i = 0; i < numCompetitions; i++) {
-      const setupDto = await setupCompetitionWithPools();
+      // Allow treasury creation (if not already initialized) so that each competition uses the on-chain treasury
+      const setupDto = await setupCompetitionWithPools(false);
       competitions.push(setupDto);
     }
 
     for (const setupDto of competitions) {
-      const { program, treasury, competitionPubkey, competitionData, poolKeys } = setupDto;
+      const { program, competitionPubkey, competitionData, poolKeys } = setupDto;
 
       // Assert competition is created
       const fetchedCompetition = await program.account.competition.fetch(competitionPubkey);
@@ -71,10 +75,9 @@ describe("Competition with Pools", () => {
       if (poolKeys  && poolKeys.length > 0){
         for (let i = 0; i < poolKeys?.length; i++) {
             const pool = await program.account.pool.fetch(poolKeys[i]);
-            expect(pool.competitionKey.toString()).toEqual(competitionPubkey.toString());
+            expect(pool.competition.toString()).toEqual(competitionPubkey.toString());
             expect(pool.startTime.toNumber()).toEqual(competitionData.startTime + i * competitionData.interval);
             expect(pool.endTime.toNumber()).toEqual(pool.startTime.toNumber() + competitionData.interval);
-            expect(pool.treasury.toString()).toEqual(treasury.toBase58());
           }
       }
     }

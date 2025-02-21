@@ -8,7 +8,7 @@ pub mod utils;
 
 use instructions::*;
 
-declare_id!("2Hw1SskuFzbdxFACL74E79AYymNZzmwEh2iymts3XU8D");
+declare_id!("99ieFmE1u6Pws1Nneo2ksKvZjNsbDtiEbhGSfGUth3BN");
 
 #[program]
 pub mod horse_race {
@@ -96,13 +96,11 @@ pub mod horse_race {
         ctx: Context<CreatePool>,
         start_time: u64,
         end_time: u64,
-        treasury: Pubkey,
     ) -> Result<()> {
         instructions::admin::create_pool::run_create_pool(
             ctx,
             start_time,
             end_time,
-            treasury,
         )
     }
 
