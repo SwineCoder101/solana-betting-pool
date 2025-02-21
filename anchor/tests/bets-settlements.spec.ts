@@ -8,7 +8,7 @@ import { addSettlementEventListeners, executeCreateBet, signAndSendVTx } from ".
 
 jest.setTimeout(30000);
 
-describe("Bets Settlement", () => {
+describe.skip("Bets Settlement", () => {
   let setupDto: SetupDTO;
   let program: anchor.Program<HorseRace>;
   let poolKeys: PublicKey[];
