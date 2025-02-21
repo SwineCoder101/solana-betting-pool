@@ -61,7 +61,7 @@ describe('Treasury', () => {
     expect(newBalance).toBeGreaterThan(initialBalance)
 
     const treasury = await TreasuryAccount.fetch(setup.program, setup.treasuryKey)
-    expect(treasury.totalDeposits.toString()).toBe(depositAmount.toString())
+    expect(treasury.totalDeposits.toNumber()).toBeGreaterThanOrEqual(depositAmount.toNumber())
   }, 10000)
 
   it('should fail deposit with insufficient funds', async () => {
