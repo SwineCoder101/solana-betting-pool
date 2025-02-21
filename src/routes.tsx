@@ -21,7 +21,12 @@ function BettingPageWrapper() {
     userBets: UserBet[]
     setUserBets: React.Dispatch<React.SetStateAction<UserBet[]>>
   }>()
-  return <BettingPage {...context} />
+
+  if (!context) {
+    return <div>Loading...</div>
+  }
+
+  return <BettingPage/>
 }
 
 export const router = createBrowserRouter([

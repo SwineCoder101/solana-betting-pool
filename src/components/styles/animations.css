@@ -1,0 +1,15 @@
+@keyframes pulseScale {
+  0%,
+  100% {
+    transform: scale(0.8);
+  }
+
+  50% {
+    transform: scale(1);
+  }
+}
+
+.star-animation {
+  animation: pulseScale 2s steps(5) infinite;
+  transform-origin: center;
+}

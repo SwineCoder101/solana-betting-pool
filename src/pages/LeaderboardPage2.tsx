@@ -87,20 +87,20 @@ export default function LeaderboardPage2() {
 
   return (
     <div className="min-h-screen bg-[#FDFAD1] text-black flex flex-col">
-      <h1 className="text-2xl sm:text-8xl text-center font-serif mb-8 text-[#1E1A33] bg-[#FFFABC] p-6" style={{ fontFamily: 'Instrument Serif' }}>
+      <h1 className="text-2xl md:text-8xl text-center font-serif mb-8 text-[#1E1A33] bg-[#FFFABC] p-6" style={{ fontFamily: 'Instrument Serif' }}>
         BANANABOARD
       </h1>
 
       <div className="max-w-2xl mx-auto w-full px-4 mb-6 flex flex-col flex-grow">
         {/* Top 3 Users */}
-        <div className="flex justify-center items-end gap-2 sm:gap-8 mb-16 sm:mb-24 mt-24 sm:mt-40 relative" style={{ fontFamily: 'Instrument Serif' }}>
+        <div className="flex justify-center items-end gap-2 md:gap-8 mb-16 md:mb-24 mt-24 md:mt-40 relative" style={{ fontFamily: 'Instrument Serif' }}>
           {topUsers.map((user) => (
             <div key={user.id} className={`relative flex flex-col items-center gap-2 ${user.rank === 1 ? '-translate-y-12' : ''}`}>
-              <GradientBorderWrapper size={user.rank === 1 ? 'w-32 h-32 sm:w-52 sm:h-52' : 'w-24 h-24 sm:w-46 sm:h-46'}>
+              <GradientBorderWrapper size={user.rank === 1 ? 'w-32 h-32 md:w-52 md:h-52' : 'w-24 h-24 md:w-46 md:h-46'}>
                 <img src={user.avatar} alt={user.username} className="w-full h-full rounded-full object-cover" />
               </GradientBorderWrapper>
               <div
-                className="absolute left-1/2 -translate-x-1/2 -bottom-3 sm:-bottom-5 w-8 h-8 sm:w-14 sm:h-14 flex items-center justify-center text-xl sm:text-4xl rounded-full"
+                className="absolute left-1/2 -translate-x-1/2 -bottom-3 md:-bottom-5 w-8 h-8 md:w-14 md:h-14 flex items-center justify-center text-xl md:text-4xl rounded-full"
                 style={rankGradientStyle}
               >
                 {user.rank}
@@ -109,10 +109,10 @@ export default function LeaderboardPage2() {
                 <img
                   src="/assets/images/crown.png"
                   alt="Crown"
-                  className="absolute -top-[70px] sm:-top-[110px] left-1/2 transform -translate-x-1/2 w-24 h-24 sm:w-36 sm:h-36 z-10"
+                  className="absolute -top-[70px] md:-top-[110px] left-1/2 transform -translate-x-1/2 w-24 h-24 md:w-36 md:h-36 z-10"
                 />
               )}
-              <span className="text-lg sm:text-2xl absolute -bottom-10 sm:-bottom-16 font-bold" style={{ fontFamily: 'Poppins' }}>
+              <span className="text-lg md:text-2xl absolute -bottom-10 md:-bottom-16 font-bold" style={{ fontFamily: 'Poppins' }}>
                 ${user.amount}
               </span>
             </div>

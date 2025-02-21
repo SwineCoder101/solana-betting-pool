@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction } from 'react'
-import { useConfirmationStore } from '../../../stores/useConfirmationStore'
+import { useConfirmationStore } from '@/stores/useConfirmationStore'
 import { UserBet } from '../../../types'
 import SpinningBanner from './SpinningBanner'
 import './styles.css'
@@ -14,7 +14,7 @@ export default function YourBetsBanner({ userBets, setUserBets }: Props) {
 
   return (
     <div>
-      <SpinningBanner />
+      <SpinningBanner text="@panchain won $120 new winner! @panchain won $120 new winner! @panchain won $120 new winner! " />
       <div className="ml-2 mb-2 block">
         <span
           style={{
@@ -26,7 +26,7 @@ export default function YourBetsBanner({ userBets, setUserBets }: Props) {
         </span>
       </div>
 
-      <div className="w-full px-3 py-1">
+      <div className="w-full px-3 py-1 text-white">
         <div className="flex flex-col gap-1 w-full overflow-y-auto max-h-32">
           {userBets.length > 0 ? (
             userBets.map((bet) => (
@@ -52,7 +52,7 @@ export default function YourBetsBanner({ userBets, setUserBets }: Props) {
           ) : (
             <div className="max-h-32">
               <div className="flex items-center justify-center">
-                <span className="text-xl">No bets yet</span>
+                <span className="text-xl text-white">No bets yet</span>
               </div>
             </div>
           )}

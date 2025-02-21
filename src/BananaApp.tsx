@@ -1,8 +1,10 @@
 import { useState } from 'react'
-import { RouterProvider } from 'react-router-dom'
 import { ConfirmationDialog } from './components/dialog/ConfirmationDialog'
+import AppBar from './components/header/AppBar'
+import AppHeader from './components/header/AppHeader'
+import { AppModal } from './components/modals/AppModal'
 import { OnboardingFlow } from './components/onboarding/OnboardingFlow'
-import { router } from './routes'
+import BettingPage from './pages/BettingPage'
 import { useConfirmationStore } from './stores/useConfirmationStore'
 
 export function BananaApp() {
@@ -28,18 +30,25 @@ export function BananaApp() {
 
   // Only show main app content after both steps are completed
   return (
-    <div>
-      <RouterProvider router={router} />
-      <ConfirmationDialog
-        isOpen={isOpen}
-        title={title}
-        description={description}
-        onConfirm={() => {
-          onConfirm()
-          hideConfirmation()
-        }}
-        onCancel={hideConfirmation}
-      />
+    <div className="bg-[#4F4F4F]">
+      <div className="min-h-screen flex flex-col max-w-[1440px] mx-auto">
+        <AppHeader />
+        <BettingPage />
+        <div className="md:hidden bottom-0 left-0 right-0">
+          <AppBar />
+        </div>
+        <ConfirmationDialog
+          isOpen={isOpen}
+          title={title}
+          description={description}
+          onConfirm={() => {
+            onConfirm()
+            hideConfirmation()
+          }}
+          onCancel={hideConfirmation}
+        />
+        <AppModal />
+      </div>
     </div>
   )
 }

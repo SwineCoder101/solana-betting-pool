@@ -165,7 +165,7 @@ export default function AccountPage() {
   return (
     <div className="min-h-screen bg-[#FDFAD1] text-black flex flex-col" style={{ fontFamily: 'Instrument Serif' }}>
       {/* Desktop Header */}
-      <div className="hidden sm:flex flex-col items-center justify-center py-6 bg-[#FFFABC]">
+      <div className="hidden md:flex flex-col items-center justify-center py-6 bg-[#FFFABC]">
         <h1 className="text-7xl mb-2">BananaZone</h1>
         <p className="text-gray-600 uppercase tracking-wider text-sm">Invite friends, get more bananas, go bananas</p>
       </div>
@@ -186,11 +186,11 @@ export default function AccountPage() {
       </div>
 
       {/* Main Content */}
-      <div className="flex flex-col sm:flex-row flex-grow">
+      <div className="flex flex-col md:flex-row flex-grow">
         {/* Left Side */}
-        <div className="flex flex-col p-8 sm:w-1/2 sm:border-r border-black">
+        <div className="flex flex-col p-8 md:w-1/2 md:border-r border-black">
           {/* Stats Grid - Mobile only */}
-          <div className="grid grid-cols-3 w-full max-w-2xl sm:hidden text-[#222222] mb-8">
+          <div className="grid grid-cols-3 w-full max-w-2xl md:hidden text-[#222222] mb-8">
             <div className="flex flex-col items-center">
               <span className="text-lg">Volume</span>
               <span className="">${(stats.volume * SOL_PRICE_USD).toFixed(2)}</span>
@@ -270,9 +270,9 @@ export default function AccountPage() {
         </div>
 
         {/* Right Side - Activity Section */}
-        <div className="sm:w-1/2">
+        <div className="md:w-1/2">
           {/* Tab Navigation - Mobile only */}
-          <div className="flex w-full sm:hidden">
+          <div className="flex w-full md:hidden">
             {(['Tokens', 'Activity', 'Orders'] as const).map((tab) => (
               <button
                 key={tab}
@@ -286,7 +286,7 @@ export default function AccountPage() {
           </div>
 
           {/* Desktop Tab Navigation */}
-          <div className="hidden sm:flex gap-4 p-4 border-b border-black">
+          <div className="hidden md:flex gap-4 p-4 border-b border-black">
             <button className="bg-[#FFF369] border border-black px-6 py-1">Tokens</button>
             <button className="border border-black px-6 py-1">Activity</button>
             <button className="border border-black px-6 py-1">Orders</button>

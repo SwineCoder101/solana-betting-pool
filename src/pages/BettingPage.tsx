@@ -1,6 +1,7 @@
+import Sidebar from '@/components/sidebar/Sidebar'
 import { useSolanaPrivyWallet } from '@/hooks/use-solana-privy-wallet'
+import { useUserBetsStore } from '@/stores/useUserBetsStore'
 import BettingChart from '../components/betting-chart/BettingChart'
-import { UserBet } from '../types'
 
 const tokenPairs = [
   {
@@ -26,19 +27,15 @@ const tokenPairs = [
   },
 ]
 
-interface Props {
-  userBets: UserBet[]
-  setUserBets: React.Dispatch<React.SetStateAction<UserBet[]>>
-}
-
-export default function BettingPage({ userBets, setUserBets }: Props) {
+export default function BettingPage() {
   const { embeddedWallet } = useSolanaPrivyWallet();
+  const { userBets, setUserBets } = useUserBetsStore()
 
   return (
     <div>
-      <div className="flex gap-3.5 relative bg-[#2C2C2C]">
-        <div className="flex flex-col w-full pb-20">
-          {tokenPairs.map((tokenPair) => (
+      <div className="flex gap-3.5 relative bg-[#2C2C2C] md:bg-[#4F4F4F]">
+      <div className="flex flex-col w-full pb-20">
+          {tokenPairs.map((tokenPair, index) => (
             <BettingChart
               key={tokenPair.code}
               tokenCode={tokenPair.code}
@@ -49,13 +46,14 @@ export default function BettingPage({ userBets, setUserBets }: Props) {
               showLogo={tokenPair.showLogo}
               priceFeedId={tokenPair.priceFeedId}
               embeddedWallet={embeddedWallet}
+              idx={index}
             />
           ))}
         </div>
 
-        {/* <div className="sticky top-[80px] h-full">
+        <div className="h-full hidden md:block sticky top-[75px]">
           <Sidebar userBets={userBets} setUserBets={setUserBets} />
-        </div> */}
+        </div>
       </div>
     </div>
   )

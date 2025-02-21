@@ -4,9 +4,10 @@ type Props = {
   active?: boolean
   className?: string
   style?: React.CSSProperties
+  title?: string
 }
 
-export function OldButtonV2({ children, onClick, active, className, style }: Props) {
+export function OldButtonV2({ children, onClick, active, className, style, title }: Props) {
   return (
     <button
       onClick={onClick}
@@ -16,6 +17,7 @@ export function OldButtonV2({ children, onClick, active, className, style }: Pro
         ${active ? 'bg-[#F2FA02]' : ''}
         `}
       style={style}
+      title={title ?? ''}
     >
       {children}
     </button>

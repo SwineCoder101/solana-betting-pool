@@ -1,9 +1,5 @@
-import { useSolanaPrivyWallet } from '@/hooks/use-solana-privy-wallet'
-import { usePrivy } from '@privy-io/react-auth'
-import { useEffect, useState } from 'react'
+import { useState, useEffect } from 'react'
 import { OldButton } from '../buttons/OldButton'
-import { LoginWalletButton } from '../privy/login-wallet-button'
-import { WalletManager } from '../privy/wallet-manager'
 
 interface OnboardingFlowProps {
   onComplete: () => void
@@ -43,75 +39,17 @@ const DESKTOP_BANANA_POSITIONS = [
 ]
 
 export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
-  const [step, setStep] = useState(1)
+  const [step, setStep] = useState(0)
   const [isDesktop, setIsDesktop] = useState(window.innerWidth > 768)
-  const [showWalletManager, setShowWalletManager] = useState(false)
-  const { createWallet, wallets } = useSolanaPrivyWallet();
-  const { embeddedWallet, refreshWalletState } = useSolanaPrivyWallet();
-  const { authenticated } = usePrivy();
-
-  const [walletInitialized, setWalletInitialized] = useState(false)
-  const [isCompleting, setIsCompleting] = useState(false);
 
   useEffect(() => {
     const handleResize = () => {
       setIsDesktop(window.innerWidth > 768)
     }
-    console.log("wallets", wallets);
-    console.log("embeddedWallet", embeddedWallet);
-
-    // If user is authenticated and has an embedded wallet, move to step 2
-    if (authenticated && embeddedWallet) {
-      setStep(2);
-      setWalletInitialized(true);
-    } else {
-      console.log("not authenticated or embedded wallet")
-    }
 
     window.addEventListener('resize', handleResize)
     return () => window.removeEventListener('resize', handleResize)
-  }, [authenticated, embeddedWallet, walletInitialized, wallets])
-
-
-  useEffect(() => {
-    if (step === 2 && walletInitialized) {
-      const timer = setTimeout(() => setStep(3), 1500)
-      return () => clearTimeout(timer)
-    }
-  }, [step, walletInitialized])
-
-  const handleCreateWallet = async () => {
-    try {
-      await createWallet();
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      refreshWalletState();
-      setWalletInitialized(true);
-      setStep(2);
-    } catch (error) {
-      console.error("Error creating wallet:", error);
-      refreshWalletState();
-    }
-  };
-
-  const handleCompleteOnboarding = async () => {
-    if (!walletInitialized) {
-      console.log("Wallet not initialized yet")
-      return
-    }
-    
-    setIsCompleting(true)
-    try {
-      // Additional initialization logic if needed
-      await new Promise(resolve => setTimeout(resolve, 200)) // Short delay for state propagation
-      onComplete()
-    } finally {
-      setIsCompleting(false)
-    }
-  }
-
-  const navigateToWalletManager = () => {
-    setShowWalletManager(true)
-  }
+  }, [])
 
   const steps = [
     {
@@ -126,14 +64,8 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
               <p className="text-xl [text-shadow:2px_2px_5px_rgba(0,0,0,0.7)] -mb-6">TO</p>
               <p className="text-6xl [text-shadow:2px_2px_5px_rgba(0,0,0,0.7)]">BananaZone</p>
             </div>
-              <OldButton 
-              onClick={handleCompleteOnboarding} 
-              className="w-48 h-12 bg-[#F2FA02] cursor-pointer" 
-              disabled={isCompleting}
-              style={{ fontFamily: 'Instrument Serif', fontSize: '24px' }} 
-              fullWidth
-            >
-              {isCompleting ? 'LOADING...' : 'PLAY LIVE'}
+            <OldButton onClick={() => setStep(1)} className="w-48 h-12 bg-[#FFCF00] cursor-pointer" fullWidth style={{ fontFamily: 'Instrument Serif', fontSize: '24px' }}>
+              PLAY
             </OldButton>
           </div>
         </div>
@@ -144,35 +76,14 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
       title: 'Create Your Wallet',
       content: (
         <div className="flex flex-col items-center justify-center h-full gap-8 transition-all duration-300 transform">
-          {authenticated ? (
-            <>
-              <button onClick={() => handleCreateWallet()} className="cursor-pointer">
-                <img src="/assets/images/onboarding-step-2-foreground.png" alt="Wallet" className="w-58" />
-              </button>
-              <div className="flex flex-col text-center text-[#222222]">
-                <p className="text-5xl text-center font-serif" style={{ fontFamily: 'Instrument Serif' }}>
-                  Click the icon to create <br /> your banana wallet
-                </p>
-              </div>
-              <button 
-                onClick={() => navigateToWalletManager()} 
-                className="px-4 py-2 bg-[#FFCF00] rounded-lg hover:bg-[#E6B800] transition-colors"
-              >
-                Manage Wallets
-              </button>
-              <LoginWalletButton className="text-2xl" />
-            </>
-          ) : (
-            <div className="flex flex-col items-center gap-8">
-              <img src="/assets/images/onboarding-step-2-foreground.png" alt="Wallet" className="w-58 opacity-50" />
-              <div className="flex flex-col text-center text-[#222222] gap-6">
-                <p className="text-5xl text-center font-serif" style={{ fontFamily: 'Instrument Serif' }}>
-                  Connect your wallet first
-                </p>
-                <LoginWalletButton className="text-2xl" />
-              </div>
-            </div>
-          )}
+          <button onClick={() => setStep(2)} className="cursor-pointer">
+            <img src="/assets/images/onboarding-step-2-foreground.png" alt="Wallet" className="w-58" />
+          </button>
+          <div className="flex flex-col text-center text-[#222222]">
+            <p className="text-5xl text-center font-serif" style={{ fontFamily: 'Instrument Serif' }}>
+              Click the icon to create <br /> your banana wallet
+            </p>
+          </div>
         </div>
       ),
       background: 'bg-[#D7D7D6]',
@@ -238,22 +149,6 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   ]
 
   const currentStep = steps[step]
-
-  if (showWalletManager) {
-    return (
-      <div className="fixed inset-0 z-50 bg-white">
-        <div className="p-4">
-          <button 
-            onClick={() => setShowWalletManager(false)}
-            className="mb-4 px-4 py-2 bg-[#FFCF00] rounded-lg hover:bg-[#E6B800] transition-colors"
-          >
-            Back to Onboarding
-          </button>
-          <WalletManager />
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div className="fixed inset-0 z-50">
