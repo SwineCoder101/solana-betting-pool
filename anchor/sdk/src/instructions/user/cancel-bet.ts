@@ -3,6 +3,7 @@ import { PublicKey, SystemProgram, VersionedTransaction } from '@solana/web3.js'
 import { BetData, getBetsForUserAndPool } from '../..';
 import { HorseRace } from '../../../../target/types/horse_race';
 import { getVersionTxFromInstructions } from '../../utils';
+import { TreasuryAccount } from '../../states/treasury-account';
 
 export type CancelBetParams = {
   user: PublicKey,
@@ -30,7 +31,7 @@ export async function cancelAllBetsEntry(program: Program<HorseRace>, params: Ca
 export async function cancelBetByKey(program: Program<HorseRace>, betKey: PublicKey, user: PublicKey, poolKey: PublicKey): Promise<VersionedTransaction> {
 
   const poolAccount = await program.account.pool.fetch(poolKey);
-
+  const treasuryAccount = await TreasuryAccount.getInstance(program);
 
   const tx = await program.methods
     .runCancelBet()
@@ -41,8 +42,8 @@ export async function cancelBetByKey(program: Program<HorseRace>, betKey: Public
       pool: poolKey,
       systemProgram: SystemProgram.programId,
       poolVault: poolAccount.vaultKey,
-      treasury: poolAccount.treasury,
-      treasuryVault: poolAccount.treasury,
+      treasury: treasuryAccount.treasuryKey,
+      treasuryVault: treasuryAccount.vaultKey,
     }).instruction();
 
 

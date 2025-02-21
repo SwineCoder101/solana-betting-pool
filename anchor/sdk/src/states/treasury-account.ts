@@ -15,7 +15,7 @@ export interface TreasuryData {
   treasuryKey: string;
 }
 export class TreasuryAccount {
-
+  static instance: TreasuryAccount;
   constructor(
     public adminAuthorities: PublicKey[],
     public minSignatures: number,
@@ -82,8 +82,11 @@ export class TreasuryAccount {
   }
 
   static async getInstance(program: Program<HorseRace>): Promise<TreasuryAccount> {
+    if (TreasuryAccount.instance) {
+      return TreasuryAccount.instance;
+    }
     const treasury = await program.account.treasury.all();
-    return treasury.map(t => new TreasuryAccount(
+    this.instance = treasury.map(t => new TreasuryAccount(
       t.account.adminAuthorities,
       t.account.minSignatures,
       t.account.totalDeposits,
@@ -93,6 +96,8 @@ export class TreasuryAccount {
       t.account.vaultBump,
       t.publicKey,
     ))[0];
+
+    return TreasuryAccount.instance;
   }
 
   static async getTreasuryData(program: Program<HorseRace>): Promise<TreasuryData> {

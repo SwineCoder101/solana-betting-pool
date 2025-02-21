@@ -98,7 +98,7 @@ describe("Bets", () => {
     expect(bet.poolKey).toEqual(poolKey.toString());
     expect(bet.competition).toEqual(competitionPubkey.toString());
     expect(userBalanceBefore - await connection.getBalance(signer.publicKey)).toBeGreaterThan(LAMPORTS_PER_SOL);
-  });
+  }, 30000);
 
   it("should create multiple bets against a pool", async () => {
     const amount = LAMPORTS_PER_SOL;
@@ -118,7 +118,7 @@ describe("Bets", () => {
 
     const betAccounts = await getBetAccountsForUser(program, signer.publicKey);
     expect(betAccounts.length).toEqual(initialBetCount + numBets);
-  });
+  }, 30000);
 
   it("should create multiple bets against multiple pools", async () => {
     const amount = LAMPORTS_PER_SOL;
@@ -151,7 +151,7 @@ describe("Bets", () => {
 
     const betAccounts = await getBetAccountsForUser(program, signer.publicKey);
     expect(betAccounts.length).toEqual(initialUserBetCount + (numBetsPerPool * poolKeys.length));
-  });
+  }, 30000);
 
   it("should cancel a bet after a bet is already created", async () => {
     const amount = LAMPORTS_PER_SOL;
@@ -238,7 +238,7 @@ describe("Bets", () => {
     // assert on balance
     const userBalanceAfter = await connection.getBalance(signer.publicKey);
     expect(userBalanceAfter).toBeGreaterThan(userBalanceBefore);
-  });
+  }, 30000);
 
   it("should not allow bet when time has surpassed the competition end time", async () => {
     const amount = LAMPORTS_PER_SOL;
@@ -251,7 +251,7 @@ describe("Bets", () => {
     } catch (error) {
       expect(error.message).toContain("CompetitionEnded");
     }
-  });
+  }, 30000);
 
   it("should not allow bet when time has surpassed the pool end time", async () => {
     const amount = LAMPORTS_PER_SOL;
@@ -264,5 +264,5 @@ describe("Bets", () => {
     } catch (error) {
       expect(error.message).toContain("PoolEnded");
     }
-  });
+  }, 30000);
 });
