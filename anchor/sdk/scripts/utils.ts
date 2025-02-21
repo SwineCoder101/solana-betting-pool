@@ -4,7 +4,7 @@ import NodeWallet from '@coral-xyz/anchor/dist/cjs/nodewallet';
 import { Connection, Keypair, PublicKey, VersionedTransaction } from "@solana/web3.js";
 import dotenv from 'dotenv';
 import fs from 'fs';
-import { getPoolAccountsFromCompetition, HorseRace } from "../src";
+import { getActiveBetAccountsForUser, getPoolAccountsFromCompetition, getPoolVaultKey, HorseRace } from "../src";
 
 export async function addOneHour(nowTimeStamp: number) {
     return nowTimeStamp + 3600;
@@ -36,6 +36,29 @@ export const getCompetitionKey = async (program: Program<HorseRace>) : Promise<P
 export const getFirstPoolFromCompetition = async (program: Program<HorseRace>, competitionKey: PublicKey) : Promise<PublicKey> => {
   const pools = await getPoolAccountsFromCompetition(program, competitionKey);
   return pools[0].publicKey;
+}
+
+export async function getActiveBetDetails(program: Program<HorseRace>, user: PublicKey) {
+
+  const activeBets = await getActiveBetAccountsForUser(program, user);
+  const poolKeys = [...new Set(activeBets.map((bet) => bet.poolKey))];
+  const poolVaultKeys = await Promise.all(poolKeys.map(async (poolKey) => await getPoolVaultKey(program, new PublicKey(poolKey))));
+
+
+  console.log('--------------------------------');
+  console.log('pool keys', poolKeys);
+  console.log('activeBets', activeBets);
+  console.log('pool vault keys', poolVaultKeys);
+  console.log('--------------------------------');
+
+  const getPoolBalances = Promise.all(poolVaultKeys.map(async (poolVaultKey) => await program.provider.connection.getBalance(new PublicKey(poolVaultKey))));
+
+  return {
+    getPoolBalances,
+    poolVaultKeys,
+    activeBets,
+    poolKeys,
+  }
 }
 
 export async function now(connection: Connection): Promise<number> {

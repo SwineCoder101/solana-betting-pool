@@ -10,7 +10,7 @@ export type CancelBetParams = {
   poolKey: PublicKey,
 }
 
-export async function cancelAllBetsEntry(program: Program<HorseRace>, params: CancelBetParams): Promise<{txs: VersionedTransaction[], bets: BetData[]}> {
+export async function cancelAllBetsForUserOnPoolEntry(program: Program<HorseRace>, params: CancelBetParams): Promise<{txs: VersionedTransaction[], bets: BetData[]}> {
   const { user, poolKey } = params;
   const bets = await getBetsForUserAndPool(program, user, poolKey);
 

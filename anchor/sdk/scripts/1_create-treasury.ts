@@ -60,8 +60,9 @@ const program = anchor.workspace.HorseRace as anchor.Program<HorseRace>;
     await confirmTransaction(treasurySig, program);
 
     // Fetch the PDA of the treasury from the on-chain state.
-    const [treasuryPda] = await TreasuryAccount.getPda(program);
-    console.log("Treasury created successfully at PDA:", treasuryPda.toBase58());
+    const treasuryAccount = await TreasuryAccount.getInstance(program);
+    
+    console.log("Treasury created successfully at treasury account:", treasuryAccount);
     console.log("Transaction Signature:", treasurySig);
   } catch (error) {
     console.error("Error creating treasury:", error);
