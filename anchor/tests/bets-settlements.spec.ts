@@ -142,8 +142,8 @@ describe("Bets Settlement", () => {
     const userOneBalanceBefore = await connection.getBalance(playerOne.publicKey);
     const userTwoBalanceBefore = await connection.getBalance(admin.publicKey);
 
-    await executeCreateBet(program, admin, betAmount.toNumber(), betLower, betUpper, 1.5, poolKey, competitionPubkey, admin);
-    await executeCreateBet(program, playerOne, betAmount.toNumber(), betLower, betUpper, 1.5, poolKey, competitionPubkey, playerOne);
+    await executeCreateBet(program, admin, betAmount.toNumber(), betLower, betUpper, 2, poolKey, competitionPubkey, admin);
+    await executeCreateBet(program, playerOne, betAmount.toNumber(), betLower, betUpper, 2, poolKey, competitionPubkey, playerOne);
 
     // Settle pool with a settlement range that covers both bets.
     const settlementLower = 50;

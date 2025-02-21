@@ -189,17 +189,21 @@ export const setupCompetitionWithPools = async function (bypassTreasury: boolean
 
       treasuryToUse = setup.treasuryAccount?.vaultKey;
 
-      // Airdrop SOL to treasury
-      await airdropSOL(treasuryToUse, program.provider.connection);
 
-      console.log('poolTreasuryPubkey:', treasuryToUse.toBase58());
+
+
     } else {
       console.log('Treasury already initialized, using existing treasury');
     }
   } else {
     console.log('Bypassing treasury creation');
   }
-
+  
+  // Airdrop SOL to treasury
+  await airdropSOL(treasuryToUse, program.provider.connection);
+  const treasuryBalance = await program.provider.connection.getBalance(treasuryToUse);
+  console.log('>>>> treasury: ', treasuryToUse.toBase58(), ' treasuryBalance:', treasuryBalance);
+  console.log('poolTreasuryPubkey:', treasuryToUse.toBase58());
 
   // Get versioned transaction and pool keys
   const { competitionTx, poolTxs, poolKeys } = await createCompetitionWithPools(

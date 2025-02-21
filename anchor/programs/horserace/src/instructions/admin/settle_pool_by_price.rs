@@ -3,7 +3,7 @@ use crate::constants::{POOL_VAULT_SEED, SCALE, TREASURY_VAULT_SEED};
 use crate::errors::SettlementError;
 use crate::states::{BetStatus, Treasury};
 use crate::utils;
-use crate::{states::{Pool, Bet, Competition}, errors::BettingError};
+use crate::states::{Pool, Bet, Competition};
 
 #[derive(Accounts)]
 pub struct SettlePool<'info> {
@@ -70,6 +70,7 @@ pub fn run_settle_pool_by_price<'a, 'b, 'c, 'info>(
     let mut total_losing_bets: u64 = 0;
     let mut number_of_winning_bets: u8 = 0;
     let mut number_of_losing_bets: u8 = 0;
+    let mut pool_balance_before_settlement: u64 = 0;
 
     // 2) Process each Bet + associated user
     while let Some(bet_account_info) = remaining_iter.next() {
@@ -86,6 +87,7 @@ pub fn run_settle_pool_by_price<'a, 'b, 'c, 'info>(
         let user_balance_before = user_account_info.lamports();
 
         let won = has_won(&bet, lower_bound_price, upper_bound_price);
+        pool_balance_before_settlement = pool_vault_info.lamports();
         
         if won {
             let winnings = get_winnings(bet.amount, bet.leverage_multiplier);
@@ -93,11 +95,10 @@ pub fn run_settle_pool_by_price<'a, 'b, 'c, 'info>(
             number_of_winning_bets = number_of_winning_bets
                 .checked_add(1)
                 .ok_or(SettlementError::NotEnoughFundsInPoolOrTreasury)?; // Adjust error as needed
-            // If pool vault can't cover it, pull from treasury
-            let pool_vault_balance = pool_vault_info.lamports();
-            if pool_vault_balance < winnings {
+
+            if pool_balance_before_settlement < winnings {
                 // Top up from treasury vault
-                let shortfall = winnings - pool_vault_balance;
+                let shortfall = winnings - pool_balance_before_settlement;
                 require!(
                     treasury_vault_info.lamports() >= shortfall,
                     SettlementError::NotEnoughFundsInPoolOrTreasury
@@ -144,6 +145,8 @@ pub fn run_settle_pool_by_price<'a, 'b, 'c, 'info>(
             user: bet.user,
             user_balance_before : user_balance_before,
             user_balance_after : user_balance_after,
+            pool_balance_before: pool_balance_before_settlement,
+            pool_balance_after: pool_vault_info.lamports(),
             amount: bet.amount,
             leverage_multiplier: bet.leverage_multiplier,
             lower_bound_price: bet.lower_bound_price,
@@ -161,6 +164,7 @@ pub fn run_settle_pool_by_price<'a, 'b, 'c, 'info>(
         upper_bound_price,
         has_winning_range: has_any_bet_won,
         pool_balance_before,
+        pool_balance_after: pool_vault_info.lamports(),
         winning_bets_balance: total_winnings,
         losing_bets_balance: total_losing_bets,
         number_of_bets: number_of_winning_bets + number_of_losing_bets,
@@ -184,6 +188,8 @@ pub struct BetSettled {
     pub user: Pubkey,
     pub user_balance_before: u64,
     pub user_balance_after: u64,
+    pub pool_balance_before: u64,
+    pub pool_balance_after: u64,
     pub amount: u64,
     pub leverage_multiplier: u64,
     pub lower_bound_price: u64,
@@ -201,6 +207,7 @@ pub struct PoolSettled {
     pub upper_bound_price: u64,
     pub has_winning_range: bool,
     pub pool_balance_before: u64,
+    pub pool_balance_after: u64,
     pub winning_bets_balance: u64,
     pub losing_bets_balance: u64,
     pub number_of_bets: u8,

@@ -1332,6 +1332,14 @@
             "type": "u64"
           },
           {
+            "name": "pool_balance_before",
+            "type": "u64"
+          },
+          {
+            "name": "pool_balance_after",
+            "type": "u64"
+          },
+          {
             "name": "amount",
             "type": "u64"
           },
@@ -1629,6 +1637,10 @@
           },
           {
             "name": "pool_balance_before",
+            "type": "u64"
+          },
+          {
+            "name": "pool_balance_after",
             "type": "u64"
           },
           {

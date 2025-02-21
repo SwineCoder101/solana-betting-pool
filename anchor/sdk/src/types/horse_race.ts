@@ -1338,6 +1338,14 @@ export type HorseRace = {
             "type": "u64"
           },
           {
+            "name": "poolBalanceBefore",
+            "type": "u64"
+          },
+          {
+            "name": "poolBalanceAfter",
+            "type": "u64"
+          },
+          {
             "name": "amount",
             "type": "u64"
           },
@@ -1635,6 +1643,10 @@ export type HorseRace = {
           },
           {
             "name": "poolBalanceBefore",
+            "type": "u64"
+          },
+          {
+            "name": "poolBalanceAfter",
             "type": "u64"
           },
           {

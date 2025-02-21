@@ -253,6 +253,8 @@ export async function addSettlementEventListeners(program: Program<HorseRace>): 
   const betSettledListener = await program.addEventListener("betSettled", (event) => {
     const betSettledEvent = {
       betKey: event.betKey.toBase58(),
+      poolBalanceBefore: event.poolBalanceBefore.toString(),
+      poolBalanceAfter: event.poolBalanceAfter.toString(),
       userBalanceBefore: event.userBalanceBefore.toString(),
       userBalanceAfter: event.userBalanceAfter.toString(),
       user: event.user.toBase58(),
@@ -277,6 +279,7 @@ export async function addSettlementEventListeners(program: Program<HorseRace>): 
       lowerBoundPrice: event.lowerBoundPrice.toString(),
       upperBoundPrice: event.upperBoundPrice.toString(),
       hasWinningRange: event.hasWinningRange,
+      poolBalanceAfter: event.poolBalanceAfter.toString(),
       poolBalanceBefore: event.poolBalanceBefore.toString(),
       winningBetsBalance: event.winningBetsBalance.toString(),
       losingBetsBalance: event.losingBetsBalance.toString(),
