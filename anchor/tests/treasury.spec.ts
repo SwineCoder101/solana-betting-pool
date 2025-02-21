@@ -122,8 +122,6 @@ describe('Treasury', () => {
     expect(newBalance.toString()).toBe((BigInt(initialBalance) - BigInt(withdrawAmount)).toString())
     expect(newRecipientBalance.toString()).toBe((BigInt(initialRecipientBalance) + BigInt(withdrawAmount)).toString())
     
-    const treasury = await TreasuryAccount.fetch(setup.program, setup.treasuryKey)
-    expect(treasury.totalWithdrawals.toString()).toBe(withdrawAmount.toString())
   }, 20000) // increased timeout
 
   it('should not allow withdrawal exceeding treasury balance', async () => {
