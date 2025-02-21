@@ -1,8 +1,8 @@
 import { Keypair, LAMPORTS_PER_SOL, PublicKey } from "@solana/web3.js";
 import { BetStatus, getBetAccountsForPool, getBetAccountsForUser, getBetData } from "../sdk/src";
-import { cancelAllBetsEntry } from "../sdk/src/instructions/user/cancel-bet";
 import { createBet } from "../sdk/src/instructions/user/create-bet";
 import { setupCompetitionWithPools, SetupDTO } from "./common-setup";
+import { cancelAllBetsForUserOnPoolEntry } from "../sdk/src/instructions/user/cancel-bet";
 
 describe("Bets", () => {
   let setupDto: SetupDTO;
@@ -192,7 +192,7 @@ describe("Bets", () => {
     const beforeCancelTime = new Date();
     console.log('Before cancel time:', beforeCancelTime);
 
-    const {txs: cancelBetTxs} = await cancelAllBetsEntry(program, {
+    const {txs: cancelBetTxs} = await cancelAllBetsForUserOnPoolEntry(program, {
       user: signer.publicKey,
       poolKey: poolKey,
     });

@@ -62,7 +62,7 @@ export function convertProgramToCompetitionData(programData : ProgramAccount<Com
 
 export async function getPoolAccountsFromCompetition(program: Program<HorseRace>, competitionKey: PublicKey) {
   const pools = await program.account.pool.all();
-  return pools.filter(pool => pool.account.competitionKey === competitionKey);
+  return pools.filter(pool => pool.account.competition.toBase58() === competitionKey.toBase58());
 }
 
 async function main() {
@@ -86,7 +86,7 @@ async function main() {
 
   // Process each pool and group by competition
   pools.forEach(pool => {
-    const competitionKey = pool.account.competitionKey.toBase58();
+    const competitionKey = pool.account.competition.toBase58();
     const startTime = pool.account.startTime.toNumber();
     
     // Get or create the pools map for this competition

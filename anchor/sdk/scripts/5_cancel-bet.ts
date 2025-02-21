@@ -3,10 +3,11 @@ import NodeWallet from '@coral-xyz/anchor/dist/cjs/nodewallet';
 import { Connection, Keypair, PublicKey } from '@solana/web3.js';
 import dotenv from 'dotenv';
 import fs from 'fs';
-import { HorseRace } from '../src';
-import { cancelBetEntry, CancelBetParams } from '../src/instructions/user/cancel-bet';
+import { getActiveBetAccountsForUser, getPoolVaultKey, HorseRace } from '../src';
+import { cancelAllBetsForUserOnPoolEntry, CancelBetParams } from '../src/instructions/user/cancel-bet';
 import {
   confirmTransaction,
+  getActiveBetDetails,
   signAndSendVTx
 } from './utils';
 
@@ -46,32 +47,36 @@ anchor.setProvider(provider);
 
 const program = anchor.workspace.HorseRace as anchor.Program<HorseRace>;
 
-
-const createBetParams : CancelBetParams = {
-    user: new PublicKey('7wVwUpoUTUKwRXSaKMgHEcF8AJpkAxPogJyWvdcBm5CJ'),
-    poolKey: new PublicKey('8b2NzhZ1ucFr9jvXPpJzwTsp9JyNhswWP22dVaDv7JZG'),
-    betHash: new PublicKey('9GTw54S8VJytoCvzw7NGyFdJSVwi2qPM78hFDPxRewbc'),
-}
-
-
 async function main() {
   try {
 
-    if (!createBetParams.poolKey) {
-        throw new Error('Pool key is required');
-    }
+  const {activeBets, poolVaultKeys, getPoolBalances} = await getActiveBetDetails(program, user.publicKey);
+
+  console.log('activeBets', activeBets);
+  console.log('pool vault keys', poolVaultKeys);
+
+
+  const poolBalancesBefore = await getPoolBalances;
+
+
+  if (activeBets.length === 0) {
+    throw new Error('No active bets found');
+  }
+
+  const createBetParams : CancelBetParams = {
+      user: user.publicKey,
+      poolKey: new PublicKey(activeBets[0].poolKey),
+  }
     
-  const betTx = await cancelBetEntry(program, createBetParams);
+  const {txs} = await cancelAllBetsForUserOnPoolEntry(program, createBetParams);
 
-  const poolBalanceBefore = await program.provider.connection.getBalance(new PublicKey(createBetParams.poolKey));
+  const betSigs = await Promise.all(txs.map(async (betTx) => await signAndSendVTx(betTx, payer, program.provider.connection)))
+  await Promise.all(betSigs.map((betSig) => confirmTransaction(betSig, program)));
 
-  const betSig = await signAndSendVTx(betTx, payer, program.provider.connection);
-  await confirmTransaction(betSig, program);
-
-  const poolBalanceAfter = await program.provider.connection.getBalance(new PublicKey(createBetParams.poolKey));
-
-  console.log('Pool Balance Before:', poolBalanceBefore);
-  console.log('Pool Balance After:', poolBalanceAfter);
+  const poolBalancesAfter = await getPoolBalances;
+  
+  console.log('pool balances', poolBalancesBefore);
+  console.log('pool balances', poolBalancesAfter);
 
   } catch (error) {
     console.error('Error creating competition:', error);

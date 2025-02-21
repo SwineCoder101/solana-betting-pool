@@ -71,7 +71,7 @@ export function convertBetToProgramData(betData: BetData): BetProgramData {
   };
 }
 
-export function convertToBetStatus(status: StatusEnumProgram): BetStatus {
+  export function convertToBetStatus(status: StatusEnumProgram): BetStatus {
   if ('active' in status) {
     return BetStatus.Active;
   } else if ('cancelled' in status) {
@@ -194,6 +194,30 @@ export async function getActiveBetAccountsForPool(
 ): Promise<BetData[]> {
   const accounts = await getBetAccountsForPool(program, poolPubkey);
   return accounts.filter(account => account.status === BetStatus.Active);
+}
+
+export async function getActiveBetAccountsForUser(
+  program: Program<HorseRace>,
+  userPubkey: PublicKey,
+): Promise<BetData[]> {
+  const accounts = await getBetAccountsForUser(program, userPubkey);
+  return accounts.filter(account => account.status === BetStatus.Active);
+}
+
+export async function getCancelledBetAccountsForUser(
+  program: Program<HorseRace>,
+  userPubkey: PublicKey,
+): Promise<BetData[]> {
+  const accounts = await getBetAccountsForUser(program, userPubkey);
+  return accounts.filter(account => account.status === BetStatus.Cancelled);
+}
+
+export async function getSettledBetAccountsForUser(
+  program: Program<HorseRace>,
+  userPubkey: PublicKey,
+): Promise<BetData[]> {
+  const accounts = await getBetAccountsForUser(program, userPubkey);
+  return accounts.filter(account => account.status === BetStatus.Settled);
 }
 
 export async function getBetAccountsForPool(

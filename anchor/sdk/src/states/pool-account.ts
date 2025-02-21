@@ -105,6 +105,11 @@ export async function getAllPools(program: Program<HorseRace>) {
   });
 }
 
+export async function getPoolVaultKey(program: Program<HorseRace>, poolPubkey: PublicKey) {
+  const pool = await getPoolAccount(program, poolPubkey);
+  return pool.account.vaultKey;
+}
+
 export async function getFirstPool(program: Program<HorseRace>) {
   const pools = await getAllPools(program);
   return pools.sort((a, b) => a.startTime - b.startTime)[0];
