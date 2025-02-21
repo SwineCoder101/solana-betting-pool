@@ -47,8 +47,7 @@ pub struct CreatePool<'info> {
 pub fn run_create_pool(
     ctx: Context<CreatePool>,
     start_time: u64,
-    end_time: u64,
-    treasury: Pubkey,
+    end_time: u64
 ) -> Result<()> {
 
     if end_time <= start_time {
@@ -59,7 +58,6 @@ pub fn run_create_pool(
     pool_account.competition = ctx.accounts.competition_acc.key();
     pool_account.start_time = start_time;
     pool_account.end_time = end_time;
-    pool_account.treasury = treasury;
     pool_account.pool_hash = ctx.accounts.pool_hash_acc.key();
     pool_account.bump = ctx.bumps.pool;
     pool_account.vault_key = ctx.accounts.pool_vault.key();

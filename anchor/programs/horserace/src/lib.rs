@@ -96,13 +96,11 @@ pub mod horse_race {
         ctx: Context<CreatePool>,
         start_time: u64,
         end_time: u64,
-        treasury: Pubkey,
     ) -> Result<()> {
         instructions::admin::create_pool::run_create_pool(
             ctx,
             start_time,
             end_time,
-            treasury,
         )
     }
 

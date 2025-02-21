@@ -451,10 +451,6 @@
         {
           "name": "end_time",
           "type": "u64"
-        },
-        {
-          "name": "treasury",
-          "type": "pubkey"
         }
       ]
     },
@@ -1522,10 +1518,6 @@
           {
             "name": "end_time",
             "type": "u64"
-          },
-          {
-            "name": "treasury",
-            "type": "pubkey"
           },
           {
             "name": "bump",

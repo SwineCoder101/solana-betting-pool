@@ -457,10 +457,6 @@ export type HorseRace = {
         {
           "name": "endTime",
           "type": "u64"
-        },
-        {
-          "name": "treasury",
-          "type": "pubkey"
         }
       ]
     },
@@ -1528,10 +1524,6 @@ export type HorseRace = {
           {
             "name": "endTime",
             "type": "u64"
-          },
-          {
-            "name": "treasury",
-            "type": "pubkey"
           },
           {
             "name": "bump",

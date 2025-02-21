@@ -1,4 +1,3 @@
-import { TreasuryAccount } from "../sdk/src/states/treasury-account";
 import { setupCompetitionWithPools, SetupDTO } from "./common-setup";
 
 // Increase timeout (if needed) for slower test environments
@@ -35,15 +34,12 @@ describe("Competition with Pools", () => {
     console.log('Num of pools:', numOfPools);
     expect(poolKeys?.length).toEqual(numOfPools);
 
-    const treasuryKey = await TreasuryAccount.getTreasuryKey(program);
-
     if (poolKeys  && poolKeys.length > 0){
         for (let i = 0; i < poolKeys.length; i++) {
             const pool = await program.account.pool.fetch(poolKeys[i]);
             expect(pool.competition.toBase58()).toEqual(competitionPubkey.toBase58());
             expect(pool.startTime.toNumber()).toEqual(competitionData.startTime + i * competitionData.interval);
             expect(pool.endTime.toNumber()).toEqual(pool.startTime.toNumber() + competitionData.interval);
-            expect(pool.treasury.toBase58()).toEqual(treasuryKey.toBase58());
           }
     }   
   });
@@ -59,7 +55,7 @@ describe("Competition with Pools", () => {
     }
 
     for (const setupDto of competitions) {
-      const { program, treasury, competitionPubkey, competitionData, poolKeys } = setupDto;
+      const { program, competitionPubkey, competitionData, poolKeys } = setupDto;
 
       // Assert competition is created
       const fetchedCompetition = await program.account.competition.fetch(competitionPubkey);
@@ -82,7 +78,6 @@ describe("Competition with Pools", () => {
             expect(pool.competition.toString()).toEqual(competitionPubkey.toString());
             expect(pool.startTime.toNumber()).toEqual(competitionData.startTime + i * competitionData.interval);
             expect(pool.endTime.toNumber()).toEqual(pool.startTime.toNumber() + competitionData.interval);
-            expect(pool.treasury.toString()).toEqual(treasury.toBase58());
           }
       }
     }

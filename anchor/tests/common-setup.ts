@@ -214,7 +214,6 @@ export const setupCompetitionWithPools = async function (bypassTreasury: boolean
     interval,
     startTime,
     endTime,
-    treasuryToUse
   );
 
   const compSig = await signAndSendVTx(competitionTx, testAdmin, program.provider.connection);

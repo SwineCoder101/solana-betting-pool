@@ -96,7 +96,6 @@ export class TreasuryAccount {
       t.account.vaultBump,
       t.publicKey,
     ))[0];
-
     return TreasuryAccount.instance;
   }
 

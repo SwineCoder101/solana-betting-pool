@@ -8,7 +8,6 @@ import { createPool, getVersionTxFromInstructions } from '../../anchor/sdk/src';
 describe("Pool", () => {
 
   const competitionKey = Keypair.generate().publicKey;
-  const treasury = Keypair.generate().publicKey;
   const startTime = Math.floor(Date.now() / 1000)
   const endTime = startTime + 3600; // 1 hour later
 
@@ -25,7 +24,6 @@ describe("Pool", () => {
       competitionKey,
       startTime,
       endTime,
-      treasury,
       poolHash
     );
 
@@ -49,6 +47,5 @@ describe("Pool", () => {
     expect(poolAccount.competition.toString()).toEqual(competitionKey.toString());
     expect(poolAccount.startTime.toNumber()).toEqual(startTime);
     expect(poolAccount.endTime.toNumber()).toEqual(endTime);
-    expect(poolAccount.treasury.toString()).toEqual(treasury.toString());
   });
 }); 

@@ -14,7 +14,6 @@ export async function createPool(
   competitionKey: PublicKey,
   startTime: number,
   endTime: number,
-  treasury: PublicKey,
   poolHash: PublicKey,
 ): Promise<CreatePoolResponse> {
   const [poolPda] = web3.PublicKey.findProgramAddressSync(
@@ -31,7 +30,6 @@ export async function createPool(
     .runCreatePool(
       new BN(startTime),
       new BN(endTime),
-      treasury
     )
     .accountsStrict({
       authority: admin,

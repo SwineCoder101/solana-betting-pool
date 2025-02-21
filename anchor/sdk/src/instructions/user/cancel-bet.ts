@@ -70,6 +70,20 @@ export async function cancelBet(
 
   const poolAccount = await program.account.pool.fetch(poolKey);
 
+  const treasuryAccount = await TreasuryAccount.getInstance(program);
+
+  if (!treasuryAccount) {
+    throw new Error('Treasury not found , please make sure to create a treasury first');
+  }
+
+  if (!treasuryAccount.treasuryKey) {
+    throw new Error(`Treasury not found , please check the treasury account ${treasuryAccount}`);
+  }
+
+  if (!treasuryAccount.vaultKey) {
+    throw new Error(`Treasury vault not found , please check the treasury account ${treasuryAccount}`);
+  }
+
   const tx = await program.methods
     .runCancelBet()
     .accountsStrict({
@@ -79,8 +93,8 @@ export async function cancelBet(
       pool: poolKey,
       systemProgram: SystemProgram.programId,
       poolVault: poolAccount.vaultKey,
-      treasury: poolAccount.treasury,
-      treasuryVault: poolAccount.treasury,
+      treasury: treasuryAccount.treasuryKey,
+      treasuryVault: treasuryAccount.vaultKey,
     }).instruction();
 
 
