@@ -12,9 +12,9 @@ export default function Layout() {
   const isBettingPage = location.pathname === '/'
 
   // Then show onboarding
-  if (!hasCompletedOnboarding) {
-    return <OnboardingFlow onComplete={() => setHasCompletedOnboarding(true)} />
-  }
+  // if (!hasCompletedOnboarding) {
+  //   return <OnboardingFlow onComplete={() => setHasCompletedOnboarding(true)} />
+  // }
 
   return (
     <div className="min-h-screen flex flex-col">

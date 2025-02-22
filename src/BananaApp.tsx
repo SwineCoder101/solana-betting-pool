@@ -3,6 +3,7 @@ import { AppModal } from './components/modals/AppModal'
 import { useConfirmationStore } from './stores/useConfirmationStore'
 import { router } from './routes'
 import { RouterProvider } from 'react-router-dom'
+import Marquee from "react-fast-marquee";
 
 export function BananaApp() {
 
@@ -28,7 +29,17 @@ export function BananaApp() {
 
   // Only show main app content after both steps are completed
   return (
-    <div className="bg-[#4F4F4F]">
+    <div >
+ {/* <div className="bg-[#4F4F4F]> */}
+      <Marquee className="marquee">
+        More invites means more bananas get ready to go bananas
+        More invites means more bananas get ready to go bananas
+        More invites means more bananas get ready to go bananas
+        More invites means more bananas get ready to go bananas
+        More invites means more bananas get ready to go bananas
+      </Marquee>
+     
+     
       <div className="min-h-screen flex flex-col max-w-[1440px] mx-auto">
         {/* <BettingPage /> */}
         <RouterProvider router={router} />

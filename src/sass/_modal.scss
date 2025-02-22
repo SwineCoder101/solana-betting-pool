@@ -1,0 +1,123 @@
+@use "./vars" as *;
+@use "./functions" as *;
+
+.modal {
+  .modal-dialog {
+    --bs-modal-width: 566px;
+
+    .modal-content {
+      margin-top: 390px;
+      padding: 8px 15px 8px 12px;
+      background-color: $yellow;
+      border-radius: 0;
+      border-top: 3px solid $trueWhite;
+      border-left: 3px solid $trueWhite;
+      border-right: 3px solid $trueBlack;
+      border-bottom: 3px solid $trueBlack;
+      box-shadow: inset 4px 4px 2px transparent, inset -4px -4px 2px $warmYellow;
+
+      @media (min-width: 768px) {
+        margin-top: 0;
+      }
+
+      .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+        padding: 0;
+
+        .lines {
+          height: 16px;
+          width: 100%;
+          background-image: url("/images/modal/lines.svg");
+          background-repeat: repeat-x;
+          background-position: center;
+        }
+
+        .rightWrapper {
+          display: flex;
+          align-items: center;
+          gap: 2px;
+        }
+      }
+
+      .modal-body {
+        margin-top: 8px;
+        margin-bottom: 6px;
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        border-top: 3px solid $trueBlack;
+        border-left: 3px solid $trueBlack;
+        border-right: 3px solid $trueWhite;
+        border-bottom: 3px solid $trueWhite;
+        box-shadow: inset 4px 4px 2px $warmYellow,
+        inset -4px -4px 2px transparent;
+
+        @media (min-width: 768px) {
+          padding: 44px;
+        }
+
+        h4 {
+          max-width: 431px;
+          margin: 0 auto;
+          text-align: center;
+          font-size: toRem(19.617);
+          color: $black;
+          line-height: 1.4;
+          text-shadow: 0px 0px 0px rgba($black, 1);
+        }
+
+        .btn {
+          display: block;
+          min-width: 154px;
+          margin: 30px auto 14px;
+
+          @media (min-width: 768px) {
+            margin: 45px auto 24px;
+          }
+        }
+      }
+    }
+
+    &.modal-fullscreen{
+      .modal-content{
+        margin-top: 0;
+
+        .phone {
+          position: static;
+          width: 80%;
+          max-width: 400px;
+          height: auto;
+          transform: none;
+          margin: 0 auto;
+          z-index: 1;
+        }
+
+      }
+    }
+  }
+
+  
+  .phone {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    width: 100%;
+    height: auto;
+    transform: translate(-50%, -50%);
+    z-index: -1;
+
+    @media (min-width: 768px) {
+      top: 40%;
+      left: 0;
+      width: 320px;
+      height: auto;
+      transform: translate(-66%, -50%);
+      z-index: 10;
+    }
+  }
+}
