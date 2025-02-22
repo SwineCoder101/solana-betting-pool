@@ -13,9 +13,8 @@ interface Props {
 
 export default function Sidebar({ userBets, setUserBets }: Props) {
   return (
-    <div className="flex flex-col gap-4 pt-7.5">
-      <span className="text-end text-3xl text-white">SESSION ENDS IN: 12s</span>
-
+    <div className="flex flex-col gap-4  py-4">
+      <span className="text-end text-3xl text-white pr-3">Session ends in: 12s</span>
       <div className="flex flex-col w-[330px] h-fit border-2 border-t-black border-b-[#BABABA] border-l-black border-r-[#BABABA] bg-[#2C2C2C] ">
         <YourBetsBanner userBets={userBets} setUserBets={setUserBets} />
         <LatestBetBanner />

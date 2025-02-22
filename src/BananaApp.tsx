@@ -1,14 +1,11 @@
-import { useState } from 'react'
 import { ConfirmationDialog } from './components/dialog/ConfirmationDialog'
-import AppBar from './components/header/AppBar'
-import AppHeader from './components/header/AppHeader'
 import { AppModal } from './components/modals/AppModal'
-import { OnboardingFlow } from './components/onboarding/OnboardingFlow'
-import BettingPage from './pages/BettingPage'
 import { useConfirmationStore } from './stores/useConfirmationStore'
+import { router } from './routes'
+import { RouterProvider } from 'react-router-dom'
 
 export function BananaApp() {
-  const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false)
+
   const { isOpen, title, description, onConfirm, hideConfirmation } = useConfirmationStore()
 
   // useEffect(() => {
@@ -24,19 +21,22 @@ export function BananaApp() {
   // }
 
   // Then show onboarding
-  if (!hasCompletedOnboarding) {
-    return <OnboardingFlow onComplete={() => setHasCompletedOnboarding(true)} />
-  }
+  // if (!hasCompletedOnboarding) {
+  //   navigate(ROUTES.ONBOARDING);
+  //   // return <OnboardingFlow onComplete={() => setHasCompletedOnboarding(true)} />
+  // }
 
   // Only show main app content after both steps are completed
   return (
     <div className="bg-[#4F4F4F]">
       <div className="min-h-screen flex flex-col max-w-[1440px] mx-auto">
-        <AppHeader />
-        <BettingPage />
-        <div className="md:hidden bottom-0 left-0 right-0">
+        {/* <BettingPage /> */}
+        <RouterProvider router={router} />
+        
+        {/* <div className="md:hidden bottom-0 left-0 right-0">
           <AppBar />
-        </div>
+        </div> */}
+
         <ConfirmationDialog
           isOpen={isOpen}
           title={title}

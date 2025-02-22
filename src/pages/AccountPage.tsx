@@ -166,7 +166,7 @@ export default function AccountPage() {
     <div className="min-h-screen bg-[#FDFAD1] text-black flex flex-col" style={{ fontFamily: 'Instrument Serif' }}>
       {/* Desktop Header */}
       <div className="hidden md:flex flex-col items-center justify-center py-6 bg-[#FFFABC]">
-        <h1 className="text-7xl mb-2">BananaZone</h1>
+        <h1 className="text-7xl mb-2">My Account</h1>
         <p className="text-gray-600 uppercase tracking-wider text-sm">Invite friends, get more bananas, go bananas</p>
       </div>
 

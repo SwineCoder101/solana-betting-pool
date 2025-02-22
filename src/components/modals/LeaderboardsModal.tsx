@@ -1,4 +1,6 @@
+import { useModalStore } from '@/stores/modalStore'
 import SpinningBanner from '../sidebar/components/SpinningBanner'
+import { Win95Modal } from './Win95Modal'
 
 interface BananaUser {
   username: string
@@ -163,7 +165,9 @@ function BananaListItem({
 }
 
 export function LeaderboardsModal() {
+  const { closeModal } = useModalStore()
   return (
+    <Win95Modal title="LEADERBOARDS"  onClose={closeModal}>
     <div className="w-screen md:max-w-[600px] mx-auto bg-[#2C2C2C] h-[calc(100dvh_-_92px)] md:h-[80vh] overflow-hidden">
       <SpinningBanner text="READY TO GO BANANAS READY TO GO BANANAS READY TO GO BANANAS" />
       <div className="flex flex-col gap-4 relative p-4 h-full">
@@ -188,5 +192,6 @@ export function LeaderboardsModal() {
         </div>
       </div>
     </div>
+    </Win95Modal>
   )
 }

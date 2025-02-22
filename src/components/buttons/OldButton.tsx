@@ -24,7 +24,7 @@ export function OldButton({ children, onClick, active, fullWidth, className, sty
           active
             ? 'bg-[#FFF369] text-black overflow-visible'
             : hasBorder
-            ? "bg-[#C0C0C0] border-r-4 border-b-4 after:absolute after:w-[2px] after:h-[calc(100%_+_4px)] after:bg-black after:right-[-4px] after:top-[-2px] after:content-[''] after:pointer-events-none before:absolute before:h-[2px] before:w-[calc(100%_+_6px)] before:bg-black before:bottom-[-4px] before:left-[-2px] before:content-[''] before:pointer-events-none"
+            ? "bg-[#C0C0C0] text-black border-r-4 border-b-4 after:absolute after:w-[2px] after:h-[calc(100%_+_4px)] after:bg-black after:right-[-4px] after:top-[-2px] after:content-[''] after:pointer-events-none before:absolute before:h-[2px] before:w-[calc(100%_+_6px)] before:bg-black before:bottom-[-4px] before:left-[-2px] before:content-[''] before:pointer-events-none"
             : 'bg-black text-white'
         }
         

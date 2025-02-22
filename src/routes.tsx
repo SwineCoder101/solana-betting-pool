@@ -7,9 +7,10 @@ import AccountPage from './pages/AccountPage'
 import AdminPage from './pages/AdminPage'
 import { UserBet } from './types'
 
+
 // Route paths as constants for type-safe navigation
 export const ROUTES = {
-  HOME: '/betting',
+  HOME: '/',
   LEADERBOARD: '/leaderboard',
   LEADERBOARD_2: '/leaderboard-2',
   ACCOUNT: '/account',
@@ -21,7 +22,7 @@ function BettingPageWrapper() {
     userBets: UserBet[]
     setUserBets: React.Dispatch<React.SetStateAction<UserBet[]>>
   }>()
-
+ 
   if (!context) {
     return <div>Loading...</div>
   }
@@ -34,10 +35,10 @@ export const router = createBrowserRouter([
     path: '/',
     element: <Layout />,
     children: [
-      {
-        path: '/',
-        element: <Navigate to={ROUTES.HOME} replace />,
-      },
+      // {
+      //   path: '/',
+      //   element: <Navigate to={ROUTES.HOME} replace />,
+      // },
       {
         path: ROUTES.HOME,
         element: <BettingPageWrapper />,
