@@ -16,9 +16,9 @@ export default function Layout() {
   const isBettingPage = location.pathname === '/'
 
   // Liam can u help here?
-  console.log("authenticated", authenticated, user?.wallet?.address)
+  console.log("authenticated", authenticated, user?.wallet)
   // Then show onboarding
-  if (!hasCompletedOnboarding || !authenticated) {
+  if (!user?.wallet?.address || !authenticated) {
     return <OnboardingFlow onComplete={() => setHasCompletedOnboarding(true)} />
   }
 

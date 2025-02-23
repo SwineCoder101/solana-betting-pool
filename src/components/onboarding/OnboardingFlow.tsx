@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import { OldButton } from '../buttons/OldButton'
 import { LoginWalletButton } from '../privy/login-wallet-button'
 import { usePrivy } from '@privy-io/react-auth'
+import { WalletManager } from '../privy/wallet-manager'
 
 interface OnboardingFlowProps {
   onComplete: () => void
@@ -81,6 +82,7 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
         <div className="flex flex-col items-center justify-center h-full gap-8 transition-all duration-300 transform">
           {authenticated ? (
             <>
+            <WalletManager />
               {/* <button onClick={() => handleCreateWallet()} className="cursor-pointer">
                 <img src="/assets/images/onboarding-step-2-foreground.png" alt="Wallet" className="w-58" />
               </button> */}

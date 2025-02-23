@@ -165,13 +165,13 @@ export default function AccountPage() {
   return (
     <div className="min-h-screen bg-[#FDFAD1] text-black flex flex-col" style={{ fontFamily: 'Instrument Serif' }}>
       {/* Desktop Header */}
-      <div className="hidden md:flex flex-col items-center justify-center py-6 bg-[#FFFABC]">
-        <h1 className="text-7xl mb-2">My Account</h1>
-        <p className="text-gray-600 uppercase tracking-wider text-sm">Invite friends, get more bananas, go bananas</p>
+      <div className="px-8 pt-4">
+        <h1 className="text-5xl mb-2 vt323-label">My Account</h1>
+        <p className="text-gray-600 uppercase tracking-wider text-xl bold vt323-label mb-0">Invite friends, get more bananas, go bananas</p>
       </div>
 
       {/* Time Period Selector */}
-      <div className="flex justify-center bg-[#FFFABC] pb-4">
+      {/* <div className="flex justify-center bg-[#FFFABC] pb-4">
         <div className="flex">
           {['Today', 'This Week', 'This Month'].map((period) => (
             <button
@@ -183,7 +183,7 @@ export default function AccountPage() {
             </button>
           ))}
         </div>
-      </div>
+      </div> */}
 
       {/* Main Content */}
       <div className="flex flex-col md:flex-row flex-grow">
@@ -239,17 +239,17 @@ export default function AccountPage() {
               onClick={() => openFundingModal('send')}
               className="flex-1 bg-[#FFF369] text-[#222222] py-1 rounded-full border border-black font-medium flex items-center justify-center gap-2"
             >
-              Send <img src="/assets/svg/arrow.svg" alt="Arrow" className="w-4 h-4" />
+              Fund <img src="/assets/svg/arrow.svg" alt="Arrow" className="w-4 h-4" />
             </button>
             <button 
               onClick={() => openFundingModal('receive')}
               className="flex-1 bg-[#FFF369] text-[#222222] py-1 rounded-full border border-black font-medium flex items-center justify-center gap-2"
             >
-              Receive <img src="/assets/svg/arrow.svg" alt="Arrow" className="w-4 h-4 rotate-180" />
+              Widthdraw <img src="/assets/svg/arrow.svg" alt="Arrow" className="w-4 h-4 rotate-180" />
             </button>
-            <button className="flex-1 bg-[#FFF369] text-[#222222] py-1 rounded-full border border-black font-medium">
+            {/* <button className="flex-1 bg-[#FFF369] text-[#222222] py-1 rounded-full border border-black font-medium">
               Buy
-            </button>
+            </button> */}
           </div>
 
           {/* Stats Grid */}
@@ -319,9 +319,9 @@ export default function AccountPage() {
           {/* Activity List */}
           <div className="p-4">
             {bets.length > 0 ? (
-              <div className="space-y-4">
+              <div className="space-y-4 overflow-visible  max-h-96 overflow-y-scroll" style={{ scrollbarColor: "auto"}}>
                 {bets.map((bet, index) => (
-                  <div key={index} className="border border-black p-4">
+                  <div key={index} className="border border-black p-4 mr-2">
                     <div className="flex justify-between">
                       <span>Bet Amount: {(bet.amount / LAMPORTS_PER_SOL).toFixed(4)} SOL</span>
                       <span>${((bet.amount / LAMPORTS_PER_SOL) * SOL_PRICE_USD).toFixed(2)}</span>
