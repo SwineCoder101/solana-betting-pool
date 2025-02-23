@@ -1,4 +1,4 @@
-import ctaBannerStyles from "../../../sass/ctaBanner.module.scss";
+// import ctaBannerStyles from "../../../sass/ctaBanner.module.scss";
 import { useRef } from "react";
 import { useGSAP } from "@gsap/react";
 import gsap from "gsap";
@@ -28,21 +28,21 @@ export default function CTABanner({ isMobile }: any) {
   }, []);
 
   return (
-    <div className={`${displayClass} ${ctaBannerStyles.ctaBanner}`}>
+    <div className={`${displayClass} ctaBanner}`}>
       <h3 className="yellowStroke special">More Invites Means...</h3>
       <img
         src="/landing-page/images/banana-men.png"
         alt="Two men dressed as bananas"
         width={315}
         height={155}
-        className={ctaBannerStyles.bananaMen}
+        className={"bananaMen"}
       />
       <img
         src="/landing-page/images/more-bananas-text.png"
         alt="More bananas"
         width={474}
         height={120}
-        className={ctaBannerStyles.moreBananasText}
+        className={"moreBananasText"}
         ref={moreBananasRef}
       />
       <img
@@ -50,7 +50,7 @@ export default function CTABanner({ isMobile }: any) {
         alt="star with 13 points"
         width={153}
         height={153}
-        className={ctaBannerStyles.star}
+        className={"star"}
         ref={starRef}
       />
     </div>

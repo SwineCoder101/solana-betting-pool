@@ -90,46 +90,46 @@ export default function GreenBananasList() {
   
   useGSAP(() => {
     gsap.timeline({ repeat: -1, repeatDelay: 3 })
-      .set(`.${greenBananaListStyles.greenBananasList} li:first-child`, {
+      .set(`.greenBananasList li:first-child`, {
         background: "linear-gradient(180deg, #85FF3F 0%, #85FF3F 100%)",
       }, 0)
-      .set(`.${greenBananaListStyles.greenBananasList} li:first-child`, {
+      .set(`.greenBananasList li:first-child`, {
         background: "linear-gradient(180deg, #BDF55A 0%, #BDF55A 100%)",
       }, 0.1)
-      .set(`.${greenBananaListStyles.greenBananasList} li:first-child`, {
+      .set(`.greenBananasList li:first-child`, {
         background: "linear-gradient(180deg, #85FF3F 0%, #85FF3F 100%)",
       }, 0.2)
-      .set(`.${greenBananaListStyles.greenBananasList} li:first-child`, {
+      .set(`.greenBananasList li:first-child`, {
         background: "linear-gradient(180deg, #BDF55A 0%, #BDF55A 100%)",
       }, 0.3)
-      .to(`.${greenBananaListStyles.greenBananasList} li:first-child`, {
+      .to(`.greenBananasList li:first-child`, {
         x: 20,
         duration: 0.1,
         ease: "power2.inOut",
         repeat: 3
       }, 0)
-      .to(`.${greenBananaListStyles.greenBananasList} li:first-child`, {
+      .to(`.greenBananasList li:first-child`, {
         x: -20,
         duration: 0.1,
         ease: "power2.inOut",
         repeat: 3
       })
-      .set(`.${greenBananaListStyles.greenBananasList} li:first-child`, {
+      .set(`.greenBananasList li:first-child`, {
         background: "linear-gradient(180deg, #85FF3F 0%, #85FF3F 100%)",
       }, 0.4)
-      .set(`.${greenBananaListStyles.greenBananasList} li:first-child`, {
+      .set(`.greenBananasList li:first-child`, {
         background: "linear-gradient(180deg, #BDF55A 0%, #BDF55A 100%)",
       }, 0.5)
-      .set(`.${greenBananaListStyles.greenBananasList} li:first-child`, {
+      .set(`.greenBananasList li:first-child`, {
         background: "linear-gradient(180deg, #85FF3F 0%, #85FF3F 100%)",
       }, 0.6)
-      .to(`.${greenBananaListStyles.greenBananasList} li:first-child`, {
+      .to(`.greenBananasList li:first-child`, {
         x: 0,
         duration: 0.1,
         ease: "power2.inOut",
         repeat: 3
       })
-      .set(`.${greenBananaListStyles.greenBananasList} li:first-child`, {
+      .set(`greenBananasList li:first-child`, {
         background: "linear-gradient(180deg, #FDDE51 0%, #DE8749 100%)"
       });
   });
