@@ -1,8 +1,8 @@
-import { Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
+import { Outlet,  useNavigate, useSearchParams } from 'react-router-dom'
+import AppHeader from './header/AppHeader'
 import AppBar from './header/AppBar'
 import { useState } from 'react'
 import { UserBet } from '../types'
-import AppHeader from './header/AppHeader'
 import { OnboardingFlow } from './onboarding/OnboardingFlow'
 import { usePrivy } from '@privy-io/react-auth'
 import { ROUTES } from '@/routes'
@@ -10,22 +10,22 @@ import { ROUTES } from '@/routes'
 export default function Layout() {
   const {user} = usePrivy();
   const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const [searchParams] = useSearchParams();
   const invite = searchParams.get("invite")
   const { authenticated } = usePrivy();
 
-  const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false)
   const [userBets, setUserBets] = useState<UserBet[]>([])
-  const location = useLocation()
-  const isBettingPage = location.pathname === '/'
 
+  const onHandleCompleteOnboarding = (val: boolean) =>{
+    console.log('complete onboarding', val);
+  }
   // Liam can u help here?
   console.log("authenticated", authenticated, !user?.wallet?.address)
   // Then show onboarding if user is invited
   if (invite) {
     // if they don't have a wallet created
     if(!user?.wallet?.address || !authenticated ){
-      return <OnboardingFlow onComplete={() => setHasCompletedOnboarding(true)} />
+      return <OnboardingFlow onComplete={() => onHandleCompleteOnboarding(true)} />
     }
     if(user?.wallet?.address || !authenticated ){
       return <div className="yellow-shadow">You are on the Early Access waiting list</div>

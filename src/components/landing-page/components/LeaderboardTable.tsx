@@ -48,7 +48,7 @@ const LeaderboardTable = () => {
   // Sample JSON data - you can move this to a separate file or fetch it from an API
 
   // Fetch data and apply the prize distribution
-  const { status, data: leaderboard, error, isFetching } = useGetLeaders();
+  const { data: leaderboard } = useGetLeaders();
   const leaderboardData = leaderboard?.data ? distributePrizes(leaderboard.data) : [];
   
   useGSAP(() => {

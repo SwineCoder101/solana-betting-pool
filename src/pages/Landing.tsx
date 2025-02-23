@@ -9,7 +9,7 @@ import InfoModal from "../components/landing-page/components/InfoModal";
 import ChatBanana from "../components/landing-page/components/ChatBanana";
 import LeaderboardTable from "../components/landing-page/components/LeaderboardTable";
 import TvDisplay from "../components/landing-page/components/TvDisplay";
-import { QueryClient, useQuery, useQueryClient } from '@tanstack/react-query'
+import { QueryClient } from '@tanstack/react-query'
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client'
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister'
 import '../App.css'
@@ -33,8 +33,7 @@ const persister = typeof window !== "undefined"
 // let persister;
 
 export default function Landing() {
-  const {user, authenticated} = usePrivy();
-  const [isClient, setIsClient] = useState(false);
+  const {authenticated} = usePrivy();
   const [showModal, setShowModal] = useState(false);
   const handleClose = () => setShowModal(false);
   const handleShow = () => setShowModal(true);

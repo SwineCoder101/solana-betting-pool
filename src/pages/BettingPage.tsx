@@ -2,7 +2,6 @@ import Sidebar from '@/components/sidebar/Sidebar'
 import { useSolanaPrivyWallet } from '@/hooks/use-solana-privy-wallet'
 import { useUserBetsStore } from '@/stores/useUserBetsStore'
 import BettingChart from '../components/betting-chart/BettingChart'
-import { useState } from 'react'
 
 const tokenPairs = [
   {
