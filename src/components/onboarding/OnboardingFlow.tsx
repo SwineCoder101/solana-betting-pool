@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
 import { OldButton } from '../buttons/OldButton'
+import { LoginWalletButton } from '../privy/login-wallet-button'
+import { usePrivy } from '@privy-io/react-auth'
 
 interface OnboardingFlowProps {
   onComplete: () => void
@@ -41,6 +43,7 @@ const DESKTOP_BANANA_POSITIONS = [
 export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
   const [step, setStep] = useState(0)
   const [isDesktop, setIsDesktop] = useState(window.innerWidth > 768)
+  const { authenticated } = usePrivy()
 
   useEffect(() => {
     const handleResize = () => {
@@ -71,6 +74,43 @@ export function OnboardingFlow({ onComplete }: OnboardingFlowProps) {
         </div>
       ),
       background: '',
+    },
+    {
+      title: 'Connect Your Wallet',
+      content: (
+        <div className="flex flex-col items-center justify-center h-full gap-8 transition-all duration-300 transform">
+          {authenticated ? (
+            <>
+              {/* <button onClick={() => handleCreateWallet()} className="cursor-pointer">
+                <img src="/assets/images/onboarding-step-2-foreground.png" alt="Wallet" className="w-58" />
+              </button> */}
+              <div className="flex flex-col text-center text-[#222222]">
+                <p className="text-5xl text-center font-serif" style={{ fontFamily: 'Instrument Serif' }}>
+                  Click the icon to create <br /> your banana wallet
+                </p>
+              </div>
+              {/* <button 
+                onClick={() => navigateToWalletManager()} 
+                className="px-4 py-2 bg-[#FFCF00] rounded-lg hover:bg-[#E6B800] transition-colors"
+              >
+                Manage Wallets
+              </button> */}
+              <LoginWalletButton className="text-2xl" />
+            </>
+          ) : (
+            <div className="flex flex-col items-center gap-8">
+              <img src="/assets/images/onboarding-step-2-foreground.png" alt="Wallet" className="w-58 opacity-50" />
+              <div className="flex flex-col text-center text-[#222222] gap-6">
+                <p className="text-5xl text-center font-serif" style={{ fontFamily: 'Instrument Serif' }}>
+                  Connect your wallet first
+                </p>
+                <LoginWalletButton className="text-2xl" />
+              </div>
+            </div>
+          )}
+        </div>
+      ),
+      background: 'bg-[#D7D7D6]',
     },
     {
       title: 'Create Your Wallet',

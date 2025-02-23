@@ -2,8 +2,9 @@ import { ModalType, useModalStore } from '@/stores/modalStore'
 import { OldButtonV2 } from '../../buttons/OldButtonV2'
 import { Features } from '@/features'
 import { Link } from 'react-router-dom'
-
-export default function DesktopHeader() {
+import { ROUTES } from '@/routes'
+import { NavigateFunction } from 'react-router-dom'
+export default function DesktopHeader({ isAdmin, authenticated, navigate }: { isAdmin: boolean, authenticated: boolean, navigate: NavigateFunction }) {
   const { openModal } = useModalStore()
 
   return (
@@ -100,6 +101,18 @@ export default function DesktopHeader() {
           </div>
         </Link>
       </div>
+      {isAdmin && (
+          <button
+            onClick={() => navigate(ROUTES.ADMIN)}
+            className={`px-4 py-2 rounded font-medium transition-colors ${
+              authenticated 
+                ? 'bg-yellow-500 hover:bg-yellow-600 text-white'
+                : 'bg-blue-500 hover:bg-blue-600 text-white'
+            }`}
+          >
+            Admin
+          </button>
+        )} 
     </div>
   )
 }

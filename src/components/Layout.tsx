@@ -8,7 +8,7 @@ import { usePrivy } from '@privy-io/react-auth'
 
 export default function Layout() {
   const {user} = usePrivy();
-  const { authenticated, logout } = usePrivy();
+  const { authenticated } = usePrivy();
 
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false)
   const [userBets, setUserBets] = useState<UserBet[]>([])
@@ -18,7 +18,7 @@ export default function Layout() {
   // Liam can u help here?
   console.log("authenticated", authenticated, user?.wallet?.address)
   // Then show onboarding
-  if (!hasCompletedOnboarding) {
+  if (!hasCompletedOnboarding || !authenticated) {
     return <OnboardingFlow onComplete={() => setHasCompletedOnboarding(true)} />
   }
 
