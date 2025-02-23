@@ -4,13 +4,19 @@ import { useState } from 'react'
 import { UserBet } from '../types'
 import AppHeader from './header/AppHeader'
 import { OnboardingFlow } from './onboarding/OnboardingFlow'
+import { usePrivy } from '@privy-io/react-auth'
 
 export default function Layout() {
+  const {user} = usePrivy();
+  const { authenticated, logout } = usePrivy();
+
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false)
   const [userBets, setUserBets] = useState<UserBet[]>([])
   const location = useLocation()
   const isBettingPage = location.pathname === '/'
 
+  // Liam can u help here?
+  console.log("authenticated", authenticated, user?.wallet?.address)
   // Then show onboarding
   if (!hasCompletedOnboarding) {
     return <OnboardingFlow onComplete={() => setHasCompletedOnboarding(true)} />
