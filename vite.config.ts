@@ -1,8 +1,8 @@
-import react from '@vitejs/plugin-react'
-import { defineConfig } from 'vite'
-import { nodePolyfills } from 'vite-plugin-node-polyfills'
-import viteTsconfigPaths from 'vite-tsconfig-paths' // https://vitejs.dev/config/
-import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import { nodePolyfills } from 'vite-plugin-node-polyfills';
+import viteTsconfigPaths from 'vite-tsconfig-paths';
+// import { NodeGlobalsPolyfillPlugin } from '@esbuild-plugins/node-globals-polyfill';
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -27,14 +27,21 @@ export default defineConfig({
       },
     },
   },
-  optimizeDeps: {
-    esbuildOptions: {
-      plugins: [
-        NodeGlobalsPolyfillPlugin({
-          process: true,
-        }),
-      ],
+  resolve: {
+    alias: {
+      process: 'process/browser',
     },
   },
-  plugins: [viteTsconfigPaths(), react(), nodePolyfills()],
-})
+  optimizeDeps: {
+    esbuildOptions: {
+      define: {
+        global: 'globalThis',
+      },
+    },
+  },
+  plugins: [
+    viteTsconfigPaths(),
+    react(),
+    nodePolyfills(),
+  ],
+});
