@@ -1,13 +1,17 @@
-import { Outlet, useLocation } from 'react-router-dom'
+import { Outlet, useLocation, useNavigate, useSearchParams } from 'react-router-dom'
 import AppBar from './header/AppBar'
 import { useState } from 'react'
 import { UserBet } from '../types'
 import AppHeader from './header/AppHeader'
 import { OnboardingFlow } from './onboarding/OnboardingFlow'
 import { usePrivy } from '@privy-io/react-auth'
+import { ROUTES } from '@/routes'
 
 export default function Layout() {
   const {user} = usePrivy();
+  const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const invite = searchParams.get("invite")
   const { authenticated } = usePrivy();
 
   const [hasCompletedOnboarding, setHasCompletedOnboarding] = useState(false)
@@ -16,16 +20,26 @@ export default function Layout() {
   const isBettingPage = location.pathname === '/'
 
   // Liam can u help here?
-  console.log("authenticated", authenticated, user?.wallet)
-  // Then show onboarding
-  if (!user?.wallet?.address || !authenticated) {
-    return <OnboardingFlow onComplete={() => setHasCompletedOnboarding(true)} />
+  console.log("authenticated", authenticated, !user?.wallet?.address)
+  // Then show onboarding if user is invited
+  if (invite) {
+    // if they don't have a wallet created
+    if(!user?.wallet?.address || !authenticated ){
+      return <OnboardingFlow onComplete={() => setHasCompletedOnboarding(true)} />
+    }
+    if(user?.wallet?.address || !authenticated ){
+      return <div className="yellow-shadow">You are on the Early Access waiting list</div>
+    }
+  }
+
+  if (!authenticated){
+    navigate(ROUTES.WTF)
   }
 
   return (
     <div className="min-h-screen flex flex-col">
       {/* <Header darkMode={isBettingPage} /> */}
-      <AppHeader />
+      {authenticated && <AppHeader />}
 
       {/* <main className="flex flex-col overflow-auto pb-[60px] sm:pb-0"> */}
         <Outlet context={{ userBets, setUserBets }} />

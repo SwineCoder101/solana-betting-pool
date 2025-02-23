@@ -13617,12 +13617,13 @@ p {
 
 @media(min-width: 650px) {
     .pageContainer:before {
+        z-index: 3;
         content:"";
         display: block;
         position: absolute;
         bottom: 0;
-        left: 0;
-        transform: translateX(-77%);
+        right: 0;
+        transform: translateX(20%);
         width: 333px;
         height: 464px;
         background-image: url(/landing-page/images/banana_man_background.png);

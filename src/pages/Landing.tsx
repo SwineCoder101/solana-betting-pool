@@ -14,6 +14,7 @@ import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client
 import { createSyncStoragePersister } from '@tanstack/query-sync-storage-persister'
 import '../App.css'
 import WordArt from "@/components/landing-page/components/WordArt";
+import { usePrivy } from "@privy-io/react-auth";
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -32,6 +33,7 @@ const persister = typeof window !== "undefined"
 // let persister;
 
 export default function Landing() {
+  const {user, authenticated} = usePrivy();
   const [isClient, setIsClient] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const handleClose = () => setShowModal(false);
@@ -57,29 +59,31 @@ export default function Landing() {
     client={queryClient}
     persistOptions={{ persister } as any}
     >
-    <Container className={`pageContainer`}>
-      <header className={`${headerStyles.mainHeader}`}>
-        <Button variant="primary" className="btn-icon" style={{height: '75px'}} onClick={handleShow}>
-          <img
-            src="/landing-page/images/banana.svg"
-            alt="Pixelated Banana"
-            width={41}
-            height={41}
-            ref={btnBananaRef}
-          />
-          Click For More Info
-        </Button>
-        <h1>
-          <img
-            src="/landing-page/images/banana-logo.svg"
-            alt="Banana Zone Logo"
-            width={496}
-            height={102}
-          />
-         <div className="text-3xl bold"> Tap, Bet, Boom <span style={{fontSize: "1.5em", paddingLeft: "10px"}}>🍌</span></div>
-        </h1>
-      </header>
-      <main>
+    <Container className={`pageContainer `}>
+      {!authenticated && (
+        <header className={`${headerStyles.mainHeader}  `}>
+          <Button variant="primary" className="btn-icon" style={{height: '75px'}} onClick={handleShow}>
+            <img
+              src="/landing-page/images/banana.svg"
+              alt="Pixelated Banana"
+              width={41}
+              height={41}
+              ref={btnBananaRef}
+            />
+            Click For More Info
+          </Button>
+          <h1>
+            <img
+              src="/landing-page/images/banana-logo.svg"
+              alt="Banana Zone Logo"
+              width={496}
+              height={102}
+            />
+          <div className="text-3xl bold"> Tap, Bet, Boom <span style={{fontSize: "1.5em", paddingLeft: "10px"}}>🍌</span></div>
+          </h1>
+        </header>
+      )}
+      <main className={`${authenticated ? 'pt-4' : ''}`}>
         <Row>
           <Col xs={12} lg={8}>
             <h2 className="yellowStroke special uppercase bold">Top Bananas</h2>

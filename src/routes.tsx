@@ -37,10 +37,10 @@ export const router = createBrowserRouter([
     path: '/',
     element: <Layout />,
     children: [
-      {
-        path: '/',
-        element: <Navigate to={ROUTES.WTF} replace />,
-      },
+      // {
+      //   path: '/',
+      //   element: <Navigate to={ROUTES.WTF} replace />,
+      // },
       {
         path: ROUTES.WTF,
         element: <Landing />
