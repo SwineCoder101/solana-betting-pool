@@ -39,7 +39,7 @@ export const router = createBrowserRouter([
     children: [
       // {
       //   path: '/',
-      //   element: <Navigate to={ROUTES.HOME} replace />,
+      //   element: <Navigate to={ROUTES.WTF} replace />,
       // },
       {
         path: ROUTES.WTF,
