@@ -1,15 +1,18 @@
+import { useNavigate } from 'react-router'
 import DesktopHeader from './components/DesktopHeader'
 import MobileHeader from './components/MobileHeader'
+import { useAdminCheck } from '@/hooks/use-admin-check'
+import { usePrivy } from '@privy-io/react-auth'
 
 export default function AppHeader() {
-  // const navigate = useNavigate()
-  // const { isAdmin } = useAdminCheck()
-  // const { authenticated } = usePrivy()
+  const navigate = useNavigate()
+  const { isAdmin } = useAdminCheck()
+  const { authenticated } = usePrivy()
 
   return (
     <>
       {/* TODO: Add connnect wallet button with router */}
-      <DesktopHeader />
+      <DesktopHeader isAdmin={isAdmin} authenticated={authenticated} navigate={navigate}/>
       <MobileHeader />
       {/* <ErrorBoundary fallback={<div>Error</div>}>
         <LoginWalletButton />

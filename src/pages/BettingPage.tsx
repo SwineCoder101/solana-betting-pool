@@ -31,6 +31,7 @@ export default function BettingPage() {
   const { embeddedWallet } = useSolanaPrivyWallet();
   const { userBets, setUserBets } = useUserBetsStore()
 
+  
   return (
     <div>
       <div className="flex gap-3.5 relative bg-[#2C2C2C] md:bg-[#4F4F4F]">

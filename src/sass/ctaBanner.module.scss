@@ -1,0 +1,72 @@
+@use "./vars" as *;
+@use "./functions" as *;
+
+.ctaBanner {
+  position: relative;
+  padding: 9px 50px;
+  background: linear-gradient(0deg, #bdf55a 0%, #fff369 100%);
+  box-shadow: 0px 7px 4px 0px rgba(0, 0, 0, 0.35);
+  margin-top: 45px;
+  margin-bottom: 34px;
+
+  @media (min-width: 576px) {
+    margin-top: 34px;
+  }
+
+  @media (min-width: 992px) {
+    margin-top: 0;
+  }
+
+  h3 {
+    font-size: 28px;
+    margin: 0;
+    position: relative;
+    z-index: 6;
+    
+    @media (min-width: 380px) {
+      max-width: 280px;
+      font-size: 20px;
+    }
+
+    @media (min-width: 560px) {
+      font-size: 38px;
+    }
+  }
+
+  .bananaMen {
+    position: absolute;
+    left: -30px;
+    bottom: 0;
+    z-index: 3;
+  }
+
+  .moreBananasText {
+    display: none;
+
+    @media (min-width: 560px) {
+      display: block;
+      position: absolute;
+      top: 50%;
+      right: 20px;
+      transform: translateY(-50%);
+      width: calc(100% - 355px);
+      height: auto;
+      z-index: 4;
+    }
+  }
+
+  .star {
+    display: none;
+
+    @media (min-width: 560px) {
+      display: block;
+      position: absolute;
+      right: -13px;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 3;
+      height: 100%;
+      width: auto;
+    }
+  }
+}

@@ -7,7 +7,7 @@ export default function MobileHeader() {
   return (
     <div className="flex md:hidden items-center justify-center flex-col w-full bg-gradient-to-r from-[#FFA163] to-[#FFCF00] sticky top-0 z-10">
       <div className="relative h-12">
-        <h1 className="text-[50px] leading-12 text-center font-bold text-black">BananaZone</h1>
+        <h1 className="text-[30px] leading-12 text-center font-bold text-black">BananaZone</h1>
         <img src="/assets/images/bananas.png" alt="Banana" className="w-8 h-8 absolute left-[132px] top-[12px]" />
       </div>
 

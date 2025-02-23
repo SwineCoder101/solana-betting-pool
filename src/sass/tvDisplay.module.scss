@@ -1,0 +1,49 @@
+@use "./vars" as *;
+@use "./functions" as *;
+
+.tvContainer {
+  position: relative;
+  width: 100%;
+  height: auto;
+  box-shadow: 0px 4px 23.9px 22px $offWhite;
+  margin-bottom: 20px;
+
+  video {
+    position: absolute;
+    top: 7.7vw;
+    left: 50%;
+    width: calc(100% - 7.7vw);
+    height: auto;
+    z-index: 1;
+    transform: translateX(-49.5%);
+    
+    @media (min-width: 576px) {
+      top: 40px;
+      width: calc(100% - 40px);
+    }
+
+    @media (min-width: 768px) {
+      top: 60px;
+      width: calc(100% - 60px);
+    }
+    
+    @media (min-width: 992px) {
+      top: 23px;
+      width: calc(100% - 20px);
+    }
+
+    @media (min-width: 1200px) {
+      top: 29px;
+      width: calc(100% - 30px);
+    }
+    @media (min-width: 1400px) {
+      top: 33px;
+    }
+  }
+  img {
+    position: relative;
+    width: 100%;
+    height: auto;
+    z-index: 2;
+  }
+}

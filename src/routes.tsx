@@ -6,14 +6,17 @@ import LeaderboardPage2 from './pages/LeaderboardPage2'
 import AccountPage from './pages/AccountPage'
 import AdminPage from './pages/AdminPage'
 import { UserBet } from './types'
+import Landing from './pages/Landing'
+
 
 // Route paths as constants for type-safe navigation
 export const ROUTES = {
-  HOME: '/betting',
+  HOME: '/',
   LEADERBOARD: '/leaderboard',
   LEADERBOARD_2: '/leaderboard-2',
   ACCOUNT: '/account',
   ADMIN: '/admin',
+  WTF: '/wtf'
 } as const
 
 function BettingPageWrapper() {
@@ -21,7 +24,7 @@ function BettingPageWrapper() {
     userBets: UserBet[]
     setUserBets: React.Dispatch<React.SetStateAction<UserBet[]>>
   }>()
-
+ 
   if (!context) {
     return <div>Loading...</div>
   }
@@ -34,9 +37,13 @@ export const router = createBrowserRouter([
     path: '/',
     element: <Layout />,
     children: [
+      // {
+      //   path: '/',
+      //   element: <Navigate to={ROUTES.WTF} replace />,
+      // },
       {
-        path: '/',
-        element: <Navigate to={ROUTES.HOME} replace />,
+        path: ROUTES.WTF,
+        element: <Landing />
       },
       {
         path: ROUTES.HOME,
@@ -60,7 +67,7 @@ export const router = createBrowserRouter([
       },
       {
         path: '*',
-        element: <Navigate to={ROUTES.HOME} replace />,
+        element: <Navigate to={ROUTES.WTF} replace />,
       },
     ],
   },

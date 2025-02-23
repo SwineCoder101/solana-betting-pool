@@ -1,0 +1,332 @@
+@use "./vars" as *;
+@use "./functions" as *;
+@use "~bootstrap/scss/bootstrap" as bootstrap;
+@use "./modal.scss";
+@use "./marquee.scss";
+@use "./chatBanana.scss";
+
+body {
+  background-color: $yellow;
+  background-image: url("/images/banana_background.jpg");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  color: $black;
+  cursor: url("/images/banana_cursor.png"), auto !important;
+}
+
+::selection {
+  background-color: $hiVisYellow;
+  color: $black;
+}
+
+::-moz-selection {
+  background-color: $hiVisYellow;
+  color: $black;
+}
+
+/* Windows 98-style scrollbar ;) */
+::-webkit-scrollbar {
+  width: 16px;
+}
+::-webkit-scrollbar-track {
+  background: #c0c0c0;
+  border-left: 1px solid #868686;
+  border-right: 1px solid #fff;
+}
+::-webkit-scrollbar-thumb {
+  background: #c0c0c0;
+  border: 1px solid;
+  border-color: #fff #868686 #868686 #fff;
+  box-shadow: inset 1px 1px #dfdfdf, inset -1px -1px #808080;
+}
+::-webkit-scrollbar-button:single-button {
+  background: #c0c0c0;
+  border: 1px solid;
+  border-color: #fff #868686 #868686 #fff;
+  box-shadow: inset 1px 1px #dfdfdf, inset -1px -1px #808080;
+  height: 16px;
+}
+::-webkit-scrollbar-button:single-button:vertical:decrement {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 100 100'><path fill='black' d='M50 25 L75 75 L25 75 Z' transform='rotate(180 50 50)'/></svg>");
+  background-position: center 4px;
+  background-repeat: no-repeat;
+}
+::-webkit-scrollbar-button:single-button:vertical:increment {
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='8' height='8' viewBox='0 0 100 100'><path fill='black' d='M50 25 L75 75 L25 75 Z'/></svg>");
+  background-position: center 4px;
+  background-repeat: no-repeat;
+}
+
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: var(--poppins-font);
+  font-weight: 900;
+  font-style: italic;
+  text-transform: uppercase;
+  line-height: 1;
+  margin-bottom: 0.4em;
+
+  &.yellowStroke {
+    text-shadow: 0px 4px 4px rgba($trueBlack, 0.25);
+    -webkit-text-stroke-width: 2px;
+    -webkit-text-stroke-color: $hiVisYellow2;
+  }
+  &.greenStroke {
+    text-shadow: 0px 4px 4px rgba($trueBlack, 0.25);
+    -webkit-text-stroke-width: 2px;
+    -webkit-text-stroke-color: $hiVisGreen2;
+  }
+}
+
+h2 {
+  font-size: toRem(26.25);
+
+  @media (min-width: 768px) {
+    font-size: toRem(38.889);
+  }
+}
+
+p {
+  font-family: var(--instrument-serif-font);
+  font-weight: 400;
+}
+
+.viewport-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.pageContainer {
+  background-color: $yellow;
+  min-height: calc(100vh - 38px);
+  padding-left: 16px;
+  padding-right: 16px;
+  position: relative;
+
+  @include bootstrap.media-breakpoint-up(xl) {
+    padding-left: 34px;
+    padding-right: 34px;
+  }
+
+  &:before {
+    display: none;
+
+    @media (min-width: 650px) {
+      content: "";
+      display: block;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      transform: translateX(-77%);
+      width: 333px;
+      height: 464px;
+      background-image: url("/images/banana_man_background.png");
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+  }
+
+  main{
+    padding-bottom: 14px;
+  }
+}
+
+button:not(:disabled),
+[type="button"]:not(:disabled),
+[type="reset"]:not(:disabled),
+[type="submit"]:not(:disabled) {
+  cursor: url("/images/banana_cursor.png"), auto !important;
+}
+
+button.no-style {
+  background-color: transparent;
+  border: none;
+  padding: 0;
+  margin: 0;
+  line-height: 1;
+  outline: none;
+}
+
+.btn {
+  font-family: var(--comic-neue-font);
+  font-size: toRem(21.309);
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: -0.852px;
+  border-radius: 0;
+  padding: 16px 12px 12px;
+  text-shadow: 0px 0px 0px rgba($black, 1);
+  line-height: 1;
+  transition: all 0.4s ease;
+  outline: none;
+
+  &.btn-primary {
+    color: $black;
+    background-color: $hiVisYellow;
+    border: none;
+    box-shadow: 4px 4px 2px 0px $trueWhite inset,
+      -4px -4px 2px 0px $trueBlack inset;
+
+    &:hover,
+    &:focus,
+    &:active {
+      background-color: $hiVisGreen;
+      box-shadow: 4px 4px 2px 0px $trueBlack inset,
+        -4px -4px 2px 0px $trueWhite inset;
+    }
+  }
+
+  &.btn-secondary {
+    color: $black;
+    background-color: $yellow;
+    border: none;
+    border-top: 3px solid $trueWhite;
+    border-left: 3px solid $trueWhite;
+    border-right: 3px solid $trueBlack;
+    border-bottom: 3px solid $trueBlack;
+    box-shadow: inset 4px 4px 2px transparent, inset -4px -4px 2px $warmYellow;
+    font-family: var(--poppins-font);
+    font-style: italic;
+    font-weight: 900;
+
+    &:hover,
+    &:focus,
+    &:active {
+      background-color: $hiVisYellow;
+      border-top: 3px solid $trueBlack;
+      border-left: 3px solid $trueBlack;
+      border-right: 3px solid $trueWhite;
+      border-bottom: 3px solid $trueWhite;
+      box-shadow: inset 4px 4px 2px $warmYellow, inset -4px -4px 2px transparent;
+    }
+  }
+
+  &.btn-icon {
+    padding-left: 40px;
+    position: relative;
+
+    img,
+    svg {
+      position: absolute;
+      top: 50%;
+      left: -10px;
+      transform: translateY(-50%);
+    }
+  }
+}
+
+.btn-minimize {
+  background-image: url("/images/modal/minimize-button.svg");
+  background-size: 20px;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 20px;
+  height: 20px;
+
+  &:hover,
+  &:focus,
+  &:active {
+    background-image: url("/images/modal/minimize-hover-button.svg");
+  }
+}
+
+.btn-maximize {
+  background-image: url("/images/modal/maximize-button.svg");
+  background-size: 20px;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 20px;
+  height: 20px;
+
+  &:hover,
+  &:focus,
+  &:active {
+    background-image: url("/images/modal/maximize-hover-button.svg");
+  }
+}
+
+.btn-closing {
+  background-image: url("/images/modal/close-button.svg");
+  background-size: 20px;
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 20px;
+  height: 20px;
+
+  &:hover,
+  &:focus,
+  &:active {
+    background-image: url("/images/modal/close-hover-button.svg");
+  }
+}
+
+header {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+
+  @media (min-width: 992px) {
+    display: block;
+  }
+
+  .btn {
+    &.btn-icon {
+      margin-left: auto;
+      margin-bottom: 30px;
+      text-align: left;
+      max-width: 173px;
+
+      @media (min-width: 992px) {
+        position: absolute;
+        top: 20px;
+        right: 0;
+        margin-left: 0;
+      }
+
+      @media (min-width: 1200px) {
+        top: 34px;
+      }
+    }
+  }
+}
+
+.wordArt {
+  position: fixed;
+  z-index: 9999;
+  pointer-events: none;
+
+  &-1 {
+    top: 15%;
+    left: 0;
+    transform: translateX(-100%);
+  }
+  &-2 {
+    top: 32%;
+    right: 0;
+    transform: translateX(100%);
+  }
+  &-3 {
+    top: 49%;
+    left: 0;
+    transform: translateX(-100%);
+  }
+  &-4 {
+    top: 66%;
+    right: 0;
+    transform: translateX(100%);
+  }
+  &-5 {
+    top: 83%;
+    left: 0;
+    transform: translateX(-100%);
+  }
+}

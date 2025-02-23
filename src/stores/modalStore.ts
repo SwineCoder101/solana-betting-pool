@@ -7,6 +7,7 @@ export enum ModalType {
   FavouriteCoins = 'favouriteCoins',
   Teleswap = 'teleswap',
   WatchBananaTV = 'watchBananaTV',
+  MoreInfo = 'moreInfo',
 }
 
 interface ModalState {
