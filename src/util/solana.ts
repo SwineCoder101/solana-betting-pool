@@ -9,7 +9,7 @@ export const getConnection = (): Connection => {
     return new Connection('https://api.devnet.solana.com');
 };
 
-export const DEVNET_PROGRAM = new PublicKey('2Hw1SskuFzbdxFACL74E79AYymNZzmwEh2iymts3XU8D');
+export const DEVNET_PROGRAM = new PublicKey('99ieFmE1u6Pws1Nneo2ksKvZjNsbDtiEbhGSfGUth3BN');
 
 
 

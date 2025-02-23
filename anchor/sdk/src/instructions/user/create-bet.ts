@@ -4,6 +4,7 @@ import { Keypair, PublicKey, VersionedTransaction } from '@solana/web3.js';
 import { HorseRace } from '../../../../target/types/horse_race';
 import { getVersionTxFromInstructions } from '../../utils';
 import { findPoolKeyFromStartEndTime } from '../../states';
+import { POOL_VAULT_SEED } from '../../constants';
 
 
 export type CreateBetParams = {
@@ -60,6 +61,20 @@ export async function createBet(
     program.programId
   );
 
+  const [poolVaultPDA] = PublicKey.findProgramAddressSync(
+    [
+      Buffer.from(POOL_VAULT_SEED),
+      poolKey.toBuffer(),
+    ],
+    program.programId
+  );
+
+  // console log all accounts
+  // console.log("betPDA", betPDA.toBase58());
+  // console.log("user", user.toBase58());
+  // console.log("poolKey", poolKey.toBase58());
+  // console.log("betHash", betHash.toBase58());
+
   const tx = await program.methods
     .runCreateBet(
       new anchor.BN(amount),
@@ -74,6 +89,7 @@ export async function createBet(
       bet: betPDA,
       pool: poolKey,
       betHashAcc: betHash,
+      poolVault: poolVaultPDA,
       systemProgram: web3.SystemProgram.programId,
     }).instruction();
 

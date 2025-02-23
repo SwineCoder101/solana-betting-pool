@@ -74,9 +74,6 @@ dependencies:
   daisyui:
     specifier: ^4.12.10
     version: 4.12.23(postcss@8.5.2)
-  dayjs:
-    specifier: ^1.11.13
-    version: 1.11.13
   dotenv:
     specifier: ^16.4.7
     version: 16.4.7
@@ -11621,7 +11618,21 @@ packages:
       postcss: 8.5.2
     dev: false
 
+<<<<<<< HEAD
   /postcss-load-config@4.0.2(postcss@8.5.2):
+=======
+  /postcss-js@4.0.1(postcss@8.5.2):
+    resolution: {integrity: sha512-dDLF8pEO191hJMtlHFPRa8xsizHaM82MLfNkUHdUtVEV3tgTp5oj+8qbEqYM57SLfc74KSbw//4SeJma2LRVIw==}
+    engines: {node: ^12 || ^14 || >= 16}
+    peerDependencies:
+      postcss: ^8.4.21
+    dependencies:
+      camelcase-css: 2.0.1
+      postcss: 8.5.2
+    dev: false
+
+  /postcss-load-config@4.0.2(postcss@8.4.49):
+>>>>>>> origin/main
     resolution: {integrity: sha512-bSVhyJGL00wMVoPUzAVAnbEoWyqRxkjv64tUl427SKnPrENtq6hJwUojroMz2VB+Q1edmi4IfrAPpami5VVgMQ==}
     engines: {node: '>= 14'}
     peerDependencies:

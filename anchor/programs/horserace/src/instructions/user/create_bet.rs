@@ -1,6 +1,6 @@
-use anchor_lang::prelude::*;
+use anchor_lang::{prelude::*, solana_program::system_program};
 use crate::{
-    errors::BettingError, states::{Bet, BetStatus, Pool}, utils::*
+    constants::POOL_VAULT_SEED, errors::BettingError, states::{Bet, BetStatus, Pool}, utils::*
 };
 use anchor_lang::solana_program::clock::Clock;
 #[derive(Accounts)]
@@ -22,10 +22,25 @@ pub struct CreateBet<'info> {
     )]
     pub bet: Account<'info, Bet>,
 
+
+    /// CHECK: The pool_vault is mutable because the pool_vault is stored in the pool account.
+    #[account(
+            init,
+            payer = user,
+            seeds = [
+                POOL_VAULT_SEED,
+                pool.key().as_ref(),
+            ],
+            bump,
+            space = 0,
+            owner = system_program::ID
+        )]
+    pub pool_vault: AccountInfo<'info>,
+
     #[account(mut)]
     pub pool: Account<'info, Pool>,
 
-    /// System program
+    #[account(address = system_program::ID)]
     pub system_program: Program<'info, System>,
 }
 
@@ -51,18 +66,11 @@ pub fn run_create_bet(
         return Err(BettingError::PoolEnded.into());
     }
 
-    // Transfer lamports from user to pool
-    let ix = anchor_lang::solana_program::system_instruction::transfer(
-        &ctx.accounts.user.key(),
-        &ctx.accounts.pool.key(),
+    transfer_from_user_to_vault(
+        &ctx.accounts.user,
+        &ctx.accounts.pool_vault,
+        &ctx.accounts.system_program,
         amount,
-    );
-    anchor_lang::solana_program::program::invoke(
-        &ix,
-        &[
-            ctx.accounts.user.to_account_info(),
-            ctx.accounts.pool.to_account_info(),
-        ],
     )?;
 
     // Create the bet account data
@@ -77,6 +85,7 @@ pub fn run_create_bet(
     bet_account.leverage_multiplier = leverage_multiplier;
     bet_account.created_at = Clock::get()?.unix_timestamp as u64;
     bet_account.updated_at = Clock::get()?.unix_timestamp as u64;
+    bet_account.pool_vault_key = ctx.accounts.pool.vault_key;
 
     emit!(BetCreated {
         bet_key: bet_account.key(),
@@ -85,6 +94,7 @@ pub fn run_create_bet(
         lower_bound_price,
         upper_bound_price,
         pool_key,
+        pool_vault_key: ctx.accounts.pool.vault_key,
         competition,
         leverage_multiplier,
         created_at: Clock::get()?.unix_timestamp as u64,
@@ -99,6 +109,7 @@ pub struct BetCreated {
     pub amount: u64,
     pub lower_bound_price: u64,
     pub upper_bound_price: u64,
+    pub pool_vault_key: Pubkey,
     pub pool_key: Pubkey,
     pub competition: Pubkey,
     pub leverage_multiplier: u64,

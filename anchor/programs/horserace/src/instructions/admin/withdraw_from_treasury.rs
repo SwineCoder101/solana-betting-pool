@@ -1,7 +1,8 @@
 use anchor_lang::prelude::*;
 use crate::states::Treasury;
 use crate::errors::TreasuryError;
-use crate::constants::TREASURY_SEED;
+use crate::constants::TREASURY_VAULT_SEED;
+use crate::utils;
 
 #[derive(Accounts)]
 pub struct WithdrawFromTreasury<'info> {
@@ -10,11 +11,11 @@ pub struct WithdrawFromTreasury<'info> {
     
     #[account(
         mut,
-        seeds = [TREASURY_SEED],
-        bump = treasury.bump
+        seeds = [TREASURY_VAULT_SEED],
+        bump = treasury.vault_bump
     )]
     /// CHECK: This is the PDA that holds the funds
-    pub treasury_account: UncheckedAccount<'info>,
+    pub treasury_vault: UncheckedAccount<'info>,
     
     /// CHECK: This is safe because we only use it to transfer funds to
     #[account(mut)]
@@ -35,24 +36,13 @@ pub struct WithdrawFromTreasury<'info> {
 
 pub fn withdraw_from_treasury(ctx: Context<WithdrawFromTreasury>, amount: u64) -> Result<()> {
     let treasury = &mut ctx.accounts.treasury;
-    
-    // Verify we have enough funds
-    let treasury_balance = ctx.accounts.treasury_account.lamports();
-    require!(treasury_balance >= amount, TreasuryError::InsufficientFunds);
-
-    // Transfer funds from treasury to recipient
-    **ctx.accounts.treasury_account.try_borrow_mut_lamports()? = treasury_balance
-        .checked_sub(amount)
-        .ok_or(TreasuryError::Overflow)?;
-    
-    **ctx.accounts.recipient.try_borrow_mut_lamports()? = ctx.accounts.recipient
-        .lamports()
-        .checked_add(amount)
-        .ok_or(TreasuryError::Overflow)?;
-
-    treasury.total_withdrawals = treasury.total_withdrawals
-        .checked_add(amount)
-        .ok_or(TreasuryError::Overflow)?;
-
+    utils::withdraw_lamports_from_treasury(
+        treasury,
+        &ctx.accounts.treasury_vault.to_account_info(),
+        &ctx.accounts.recipient.to_account_info(),
+        amount,
+    )?;
     Ok(())
 }
+
+

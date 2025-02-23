@@ -1,12 +1,29 @@
-use anchor_lang::prelude::*;
+use anchor_lang::{prelude::*, system_program};
 use crate::errors::TreasuryError;
 use crate::states::Treasury;
-use crate::constants::TREASURY_SEED;
-
+use crate::constants::{TREASURY_SEED, TREASURY_VAULT_SEED};
 #[derive(Accounts)]
 #[instruction(max_admins: u8, min_signatures: u8)]
 pub struct CreateTreasury<'info> {
+    
+    #[account(mut)]
+    pub payer: Signer<'info>,
+
+    pub system_program: Program<'info, System>,
+
+    /// CHECK: The treasury_account is mutable because the treasury_account is stored in the treasury account.
     #[account(
+        init,
+        payer = payer,
+        seeds = [TREASURY_VAULT_SEED],
+        bump,
+        space = 0,
+        owner = system_program::ID
+      )]
+      pub treasury_vault: AccountInfo<'info>,
+
+      /// CHECK: The treasury is mutable because the treasury is stored in the treasury account.
+      #[account(
         init,
         payer = payer,
         space = Treasury::space(max_admins as usize),
@@ -14,10 +31,6 @@ pub struct CreateTreasury<'info> {
         bump
     )]
     pub treasury: Account<'info, Treasury>,
-    
-    #[account(mut)]
-    pub payer: Signer<'info>,
-    pub system_program: Program<'info, System>,
 }
 
 pub fn create_treasury(
@@ -41,6 +54,8 @@ pub fn create_treasury(
     treasury.total_deposits = 0;
     treasury.total_withdrawals = 0;
     treasury.bump = ctx.bumps.treasury;
+    treasury.vault_key = ctx.accounts.treasury_vault.key();
+    treasury.vault_bump = ctx.bumps.treasury_vault;
 
     Ok(())
 } 

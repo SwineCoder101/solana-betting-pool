@@ -6,7 +6,6 @@ pub enum BettingError {
     NotEligible,
     #[msg("User does not own this bet.")]
     BetOwnershipMismatch,
-
     #[msg("Unauthorized: Not the competition owner.")]
     Unauthorized,
     #[msg("Pool not finished yet.")]
@@ -17,6 +16,8 @@ pub enum BettingError {
     PoolEnded,
     #[msg("Invalid user account")]
     InvalidUserAccount,
+    #[msg("Pool vault key mismatch with pool account")]
+    PoolVaultMismatch,
 }
 
 #[error_code]
@@ -29,6 +30,18 @@ pub enum SettlementError {
     PoolNotEnded,
     #[msg("Invalid competition account, cannot settle pool")]
     InvalidCompetitionAccount,
+    #[msg("Arithmetic overflow")]
+    Overflow,
+    #[msg("Not enough funds in pool or treasury")]
+    NotEnoughFundsInPoolOrTreasury,
+    #[msg("Not enough funds")]
+    NotEnoughFunds,
+    #[msg("Invalid from account")]
+    InvalidFromAccount,
+    #[msg("Invalid to account")]
+    InvalidToAccount,
+    #[msg("Invalid user account")]
+    InvalidUserAccount,
 }
 
 #[error_code]
