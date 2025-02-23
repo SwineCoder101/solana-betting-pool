@@ -13600,7 +13600,8 @@ p {
     min-height: calc(100vh - 38px);
     padding-left: 16px;
     padding-right: 16px;
-    position: relative
+    position: relative;
+    max-width: 100%;
 }
 
 @media(min-width: 1200px) {

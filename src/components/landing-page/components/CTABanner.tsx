@@ -29,7 +29,7 @@ export default function CTABanner({ isMobile }: any) {
 
   return (
     <div className={`${displayClass} ${ctaBannerStyles.ctaBanner}`}>
-      <h3 className="yellowStroke">More Invites Means...</h3>
+      <h3 className="yellowStroke special">More Invites Means...</h3>
       <img
         src="/landing-page/images/banana-men.png"
         alt="Two men dressed as bananas"

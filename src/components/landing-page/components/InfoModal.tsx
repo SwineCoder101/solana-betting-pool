@@ -48,7 +48,7 @@ export default function InfoModal({ show, onClose }: any) {
           className="phone"
           priority={true}
         />
-        <h4>
+        <h4 className="text-white">
           One tap trading at it's finest. Predict where a chart is heading,
           tap to bet for a chance to win bananas.
           <br />

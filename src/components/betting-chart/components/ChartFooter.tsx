@@ -12,7 +12,7 @@ export default function ChartFooter({ tokenName, idx }: Props) {
     <>
       <div className="hidden md:flex items-center justify-between space-between gap-8 w-full mt-12">
         <div className="relative bg-gradient-to-b from-[#bdf55a] to-[#fff369] shadow-lg py-2 px-10 w-full">
-          <span className="yellow-shadow">
+          <span className="yellow-shadow ">
             MORE INVITES
             <br />
             MEANS...
