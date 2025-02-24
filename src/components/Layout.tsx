@@ -1,25 +1,24 @@
-import { Outlet,  useNavigate, useSearchParams } from 'react-router-dom'
-import AppHeader from './header/AppHeader'
-import AppBar from './header/AppBar'
-import { useState } from 'react'
-import { UserBet } from '../types'
-import { OnboardingFlow } from './onboarding/OnboardingFlow'
 import { usePrivy } from '@privy-io/react-auth'
-import { ROUTES } from '@/routes'
+import { useState } from 'react'
+import { Outlet } from 'react-router-dom'
+import { UserBet } from '../types'
+import AppBar from './header/AppBar'
+import AppHeader from './header/AppHeader'
+import { OnboardingFlow } from './onboarding/OnboardingFlow'
 
 export default function Layout() {
   const {user, authenticated} = usePrivy();
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-  const invite = searchParams.get("invite")
+
+  //TODO: Re-enable invite logic when we have completed testing solana integrations
+  // const navigate = useNavigate();
+  // const [searchParams] = useSearchParams();
+  // const invite = searchParams.get("invite")
 
   const [userBets, setUserBets] = useState<UserBet[]>([])
 
   const onHandleCompleteOnboarding = (val: boolean) =>{
     console.log('complete onboarding', val);
   }
-  // Liam can u help here?
-  console.log("authenticated", authenticated, user?.wallet?.address)
   // Then show onboarding if user is invited
   // if (invite) {
     // if they don't have a wallet created

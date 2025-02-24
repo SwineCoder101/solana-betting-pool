@@ -1,12 +1,11 @@
-import { createBrowserRouter, Navigate, useOutletContext } from 'react-router-dom'
+import { createBrowserRouter, useOutletContext } from 'react-router-dom'
 import Layout from './components/Layout'
+import AccountPage from './pages/AccountPage'
+import AdminPage from './pages/AdminPage'
 import BettingPage from './pages/BettingPage'
 import LeaderboardPage from './pages/LeaderboardPage'
 import LeaderboardPage2 from './pages/LeaderboardPage2'
-import AccountPage from './pages/AccountPage'
-import AdminPage from './pages/AdminPage'
 import { UserBet } from './types'
-import Landing from './pages/Landing'
 
 
 // Route paths as constants for type-safe navigation
@@ -37,6 +36,7 @@ export const router = createBrowserRouter([
     path: '/',
     element: <Layout />,
     children: [
+      //TODO: Re-enable invite logic when we have completed testing solana integrations
       // {
       //   path: '/',
       //   element: <Navigate to={ROUTES.WTF} replace />,
