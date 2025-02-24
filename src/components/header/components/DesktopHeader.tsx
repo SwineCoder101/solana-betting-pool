@@ -4,6 +4,7 @@ import { Features } from '@/features'
 import { Link } from 'react-router-dom'
 import { ROUTES } from '@/routes'
 import { NavigateFunction } from 'react-router-dom'
+import { LoginWalletButton } from '@/components/privy/login-wallet-button'
 export default function DesktopHeader({ isAdmin, authenticated, navigate }: { isAdmin: boolean, authenticated: boolean, navigate: NavigateFunction }) {
   const { openModal } = useModalStore()
 
@@ -112,7 +113,8 @@ export default function DesktopHeader({ isAdmin, authenticated, navigate }: { is
           >
             Admin
           </button>
-        )} 
+        )}
+        <LoginWalletButton/>
     </div>
   )
 }

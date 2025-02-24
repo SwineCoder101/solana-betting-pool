@@ -42,7 +42,7 @@ import {
   
     return (
       <button
-        className="px-4 py-2 w-full mt-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400 flex items-center justify-center"
+        className="px-4 py-2 w-50 mt-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:bg-gray-400 flex items-center justify-center"
         disabled={!ready || !walletToDelegate}
         onClick={onDelegate}
       >
