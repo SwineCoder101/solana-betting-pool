@@ -8,7 +8,7 @@ export const TICK_POSITIONS = {
   lg: [0, 5, 10, 15],
 }
 
-export const SECONDS_PER_CELL_BLOCK = 60
+export const SECONDS_PER_CELL_BLOCK = 30
 
 // Define size configurations
 export const CHART_CONFIGS = {
@@ -19,7 +19,7 @@ export const CHART_CONFIGS = {
     height: 1000,
   },
   [BettingChartSize.DESKTOP_EXPANDED]: {
-    cols: 16,
+    cols: 8,
     rows: 10,
     width: 1500,
     height: 1000,

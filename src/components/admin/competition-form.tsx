@@ -153,7 +153,7 @@ const CompetitionForm: React.FC = () => {
             value={interval}
             onChange={(e) => setInterval(e.target.value)}
             className="input input-bordered w-full bg-gray-200"
-            min="60"
+            min="10"
             required
           />
         </div>

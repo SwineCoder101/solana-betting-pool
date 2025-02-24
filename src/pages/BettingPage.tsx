@@ -13,7 +13,7 @@ export default function BettingPage() {
     <div>
       <div className="flex gap-3.5 relative bg-[#2C2C2C] md:bg-[#4F4F4F]">
       <div className="flex flex-col w-full pb-20">
-          {tokenPairs.map((tokenPair, index) => (
+          {tokenPairs.filter((tkp) => tkp.competitionKey).map((tokenPair, index) => (
             <BettingChart
               key={tokenPair.code}
               tokenCode={tokenPair.code}

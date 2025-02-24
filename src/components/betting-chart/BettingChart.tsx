@@ -892,13 +892,16 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
                   // Calculate minutes
                   const minutes = Math.floor(totalSeconds / 60)
 
+                  const seconds = totalSeconds % 60;
+
+
                   // Get the actual time by adding to start time
                   const totalMinutes = startTime.minute + minutes
                   const newHour = startTime.hour + Math.floor(totalMinutes / 60)
                   const newMinute = totalMinutes % 60
 
                   // Format as HH:MM:SS
-                  return `${newHour.toString().padStart(2, '0')}:${newMinute.toString().padStart(2, '0')}`
+                  return `${newHour.toString().padStart(2, '0')}:${newMinute.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`
                 }}
                 tickLine={true}
                 stroke="#9ca3af"

@@ -1,4 +1,4 @@
-import { tokens } from '@/data/data-constants';
+import { tokenPairs } from '@/data/data-constants';
 import { usePrivy } from '@privy-io/react-auth';
 import { useMutation } from '@tanstack/react-query';
 import { useBackend } from './use-backend';
@@ -57,7 +57,7 @@ export function useCreateCompetitionBackend() {
         throw new Error('User not authenticated');
       }
 
-      const tokenData = tokens.find(t => t.symbol === params.tokenSymbol);
+      const tokenData = tokenPairs.find(t => t.symbol === params.tokenSymbol);
         if (!tokenData) {
           throw new Error('Invalid token symbol');
       }
