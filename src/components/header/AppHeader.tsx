@@ -13,7 +13,7 @@ export default function AppHeader() {
     <>
       {/* TODO: Add connnect wallet button with router */}
       <DesktopHeader isAdmin={isAdmin} authenticated={authenticated} navigate={navigate}/>
-      <MobileHeader />
+      <MobileHeader isAdmin={isAdmin} authenticated={authenticated} navigate={navigate}/>
       {/* <ErrorBoundary fallback={<div>Error</div>}>
         <LoginWalletButton />
         {isAdmin && (

@@ -1,8 +1,20 @@
 import { ModalType, useModalStore } from '@/stores/modalStore'
 import { OldButtonV2 } from '../../buttons/OldButtonV2'
+import { NavigateFunction } from 'react-router-dom'
+import { ROUTES } from '@/routes'
+import { LoginWalletButton } from '@/components/privy/login-wallet-button'
 
-export default function MobileHeader() {
+interface MobileHeaderProps {
+  isAdmin: boolean
+  authenticated: boolean
+  navigate: NavigateFunction
+}
+
+
+
+export default function MobileHeader({ isAdmin, authenticated, navigate }: MobileHeaderProps) {
   const { openModal } = useModalStore()
+
 
   return (
     <div className="flex md:hidden items-center justify-center flex-col w-full bg-gradient-to-r from-[#FFA163] to-[#FFCF00] sticky top-0 z-10">
@@ -33,6 +45,19 @@ export default function MobileHeader() {
           </div>
         </OldButtonV2>
       </div>
+      {isAdmin && (
+          <button
+            onClick={() => navigate(ROUTES.ADMIN)}
+            className={`px-4 py-2 rounded font-medium transition-colors ${
+              authenticated 
+                ? 'bg-yellow-500 hover:bg-yellow-600 text-white'
+                : 'bg-blue-500 hover:bg-blue-600 text-white'
+            }`}
+          >
+            Admin
+          </button>
+        )} 
+        <LoginWalletButton/>
     </div>
   )
 }

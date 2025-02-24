@@ -27,6 +27,9 @@ export default defineConfig({
       },
     },
   },
+  server: {
+    allowedHosts: true,
+  },
   resolve: {
     alias: {
       process: 'process/browser',

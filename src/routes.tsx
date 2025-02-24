@@ -16,7 +16,7 @@ export const ROUTES = {
   LEADERBOARD_2: '/leaderboard-2',
   ACCOUNT: '/account',
   ADMIN: '/admin',
-  WTF: '/wtf'
+  // WTF: '/wtf'
 } as const
 
 function BettingPageWrapper() {
@@ -41,10 +41,10 @@ export const router = createBrowserRouter([
       //   path: '/',
       //   element: <Navigate to={ROUTES.WTF} replace />,
       // },
-      {
-        path: ROUTES.WTF,
-        element: <Landing />
-      },
+      // {
+      //   path: ROUTES.WTF,
+      //   element: <Landing />
+      // },
       {
         path: ROUTES.HOME,
         element: <BettingPageWrapper />,
@@ -65,10 +65,10 @@ export const router = createBrowserRouter([
         path: ROUTES.ADMIN,
         element: <AdminPage />,
       },
-      {
-        path: '*',
-        element: <Navigate to={ROUTES.WTF} replace />,
-      },
+      // {
+      //   path: '*',
+      //   element: <Navigate to={ROUTES.WTF} replace />,
+      // },
     ],
   },
 ])

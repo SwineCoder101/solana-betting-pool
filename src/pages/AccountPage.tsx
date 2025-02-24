@@ -1,3 +1,4 @@
+import { DelegateActionButton } from '@/components/privy/delegate-action-button'
 import { useAllBets } from '@/hooks/queries'
 import { useSolanaPrivyWallet } from '@/hooks/use-solana-privy-wallet'
 import { Dialog } from '@headlessui/react'
@@ -169,6 +170,7 @@ export default function AccountPage() {
         <h1 className="text-5xl mb-2 vt323-label">My Account</h1>
         <p className="text-gray-600 uppercase tracking-wider text-xl bold vt323-label mb-0">Invite friends, get more bananas, go bananas</p>
       </div>
+      <DelegateActionButton/>
 
       {/* Time Period Selector */}
       {/* <div className="flex justify-center bg-[#FFFABC] pb-4">
