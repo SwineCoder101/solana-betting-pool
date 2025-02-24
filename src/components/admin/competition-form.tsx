@@ -1,4 +1,4 @@
-import { tokens } from "@/data/data-constants";
+import { tokenPairs, tokens } from "@/data/data-constants";
 import React, { useState } from "react";
 import { usePrivy } from '@privy-io/react-auth';
 import { useCreateCompetitionBackend } from "@/hooks/use-create-competition-backend";
@@ -51,7 +51,7 @@ const CompetitionForm: React.FC = () => {
       setStartTime("");
       setEndDate("");
       setEndTime("");
-      setInterval("20");
+      setInterval("30");
       setHouseCutFactor("5");
       setMinPayoutRatio("1.5");
       setAdminKeys("");
@@ -76,7 +76,7 @@ const CompetitionForm: React.FC = () => {
             onChange={(e) => setTokenSymbol(e.target.value)}
             className="input input-bordered w-full bg-gray-200"
           >
-            {tokens.map((token) => (
+            {tokenPairs.map((token) => (
               <option key={token.symbol} value={token.symbol}>
                 {token.symbol}
               </option>

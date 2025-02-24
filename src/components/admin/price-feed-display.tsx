@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { PriceServiceConnection } from "@pythnetwork/price-service-client";
-import { tokens } from "@/data/data-constants";
+import { tokenPairs } from "@/data/data-constants";
 
 const PriceFeedDisplay: React.FC = () => {
-  const [selectedToken, setSelectedToken] = useState(tokens[0]);
+  const [selectedToken, setSelectedToken] = useState(tokenPairs[0]);
   const [price, setPrice] = useState<number | null>(null);
 
   useEffect(() => {
@@ -48,11 +48,11 @@ const PriceFeedDisplay: React.FC = () => {
         <select
           value={selectedToken.symbol}
           onChange={(e) =>
-            setSelectedToken(tokens.find((token) => token.symbol === e.target.value) || tokens[0])
+            setSelectedToken(tokenPairs.find((token) => token.symbol === e.target.value) || tokenPairs[0])
           }
           className="input input-bordered w-full bg-gray-200"
         >
-          {tokens.map((token) => (
+          {tokenPairs.map((token) => (
             <option key={token.symbol} value={token.symbol}>
               {token.symbol}
             </option>
@@ -60,7 +60,7 @@ const PriceFeedDisplay: React.FC = () => {
         </select>
       </div>
       <div className="flex items-center gap-4">
-        <img src={selectedToken.logoPath} alt={selectedToken.symbol} className="w-12 h-12" />
+        <img src={selectedToken.showLogo ? selectedToken.logoPath : "/images/solana.png"} alt={selectedToken.symbol} className="w-12 h-12" />
         <div>
           <p className="text-lg font-semibold">{selectedToken.symbol}</p>
           <p className="text-sm text-gray-600">
@@ -70,7 +70,7 @@ const PriceFeedDisplay: React.FC = () => {
               rel="noopener noreferrer"
               className="text-yellow-600 hover:underline"
             >
-              {selectedToken.devnet}
+              {selectedToken.tokenAddress}
             </a>
           </p>
         </div>
