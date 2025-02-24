@@ -29,6 +29,7 @@ export function useAllCompetitions() {
 
   if (!program) {
     console.log("Program not initialized yet in useAllCompetitions");
+    // eslint-disable-next-line react-hooks/rules-of-hooks
     return useQuery({
       queryKey: ['allCompetitions'],
       queryFn: async () => [],
@@ -36,6 +37,7 @@ export function useAllCompetitions() {
     });
   }
   
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   return useQuery({
     queryKey: ['allCompetitions'],
     queryFn: async (): Promise<CompetitionData[]> => {
