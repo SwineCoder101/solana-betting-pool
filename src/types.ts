@@ -57,11 +57,11 @@ export interface ColumnData {
   competitionKey: string
   startTime: number
   endTime: number
-  treasury: string
   bets?: BetData[]
   totalBets?: number
   isFull?: boolean
   isHot?: boolean
+  poolIndex: number
 }
 
 export interface BetData {

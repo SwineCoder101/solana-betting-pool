@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
 import { ColumnData } from '../types'
 import WebSocketManager from '../websocketManager'
+import { PoolData } from '@/competition-pools'
 
-export const useColumnData = (competitionKey: string) => {
+export const useColumnData = (competitionKey: string, competitionPools: PoolData[] | undefined) => {
   const [columnData, setColumnData] = useState<Record<number, ColumnData>>({})
   const [isLoading, setIsLoading] = useState(true)
 
@@ -16,19 +17,18 @@ export const useColumnData = (competitionKey: string) => {
 
         // Initialize default data for all columns
         const initialData: Record<number, ColumnData> = {}
-        for (let i = 0; i < 16; i++) {
-          // Use your TOTAL_COLUMNS constant if available
+        for (let i = 0; i < 8; i++) {
           initialData[i] = {
-            poolKey: `pool-${i}`, // Temporary mock data
+            poolKey: competitionPools?.[i].poolKey || '', // Temporary mock data
             poolHash: '11111111111111111111111111111111',
             competitionKey,
             startTime: Math.floor(Date.now() / 1000) + i * 30,
             endTime: Math.floor(Date.now() / 1000) + (i + 1) * 30,
-            treasury: '3Vm8KKkd1aaCL1nnVf4PSXMZySy7Cu2DrsNVQeGpN2An',
             bets: [],
             totalBets: 0,
             isFull: false,
             isHot: false,
+            poolIndex: i,
           }
         }
         setColumnData(initialData)

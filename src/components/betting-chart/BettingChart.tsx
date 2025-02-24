@@ -19,6 +19,8 @@ import { ChartBounds, Rectangle } from './types'
 import { getActiveColumnBounds, getStartTime } from './utils'
 import bananaSmiling from '/assets/images/banana-smiling.png'
 import fullCellPool from '/assets/svg/full-cell-pool.svg'
+import { useCompetitionPools } from '@/hooks/queries'
+import { PublicKey } from '@solana/web3.js'
 
 export interface Props {
   tokenCode: string
@@ -156,6 +158,7 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
   const latestPriceRef = useRef<number | null>(null)
   const gameStartTimeRef = useRef<number>(Date.now())
   const { createBet, cancelBet } = useCreateBetBackend();
+  const { data: competitionPools } = useCompetitionPools(competitionKey ? new PublicKey(competitionKey) : null);
 
 
   const [gridState, dispatch] = useReducer(rectangleReducer, {
@@ -178,7 +181,8 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
   const [colData, setColData] = useState<ColumnData | null>(null)
 
   const { bettingPools, placeBet } = useBettingData(competitionKey)
-  const { columnData, isLoading: isColumnDataLoading } = useColumnData(competitionKey)
+  
+  const { columnData, isLoading: isColumnDataLoading } = useColumnData(competitionKey,competitionPools)
 
   const currentConfig = CHART_CONFIGS[chartSize]
   const CHART_HEIGHT = currentConfig.height
@@ -498,18 +502,16 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
         dispatch({ type: 'ADD_BET', bet: newBet })
         dispatch({ type: 'REMOVE_CONFIRMATION_CELL', col, row })
 
-        console.log('submitting bet', newBet);
-
         const createBetParam = {
           amount: 0.001,
           poolKey: colData.poolKey,
-          competitionKey: competitionKey,
+          competitionKey,
           lowerBoundPrice: bounds.lowerBound,
           upperBoundPrice: bounds.upperBound,
           leverageMultiplier: Number(newBet.multiplier),
         }
 
-        console.log('createBetParam', createBetParam);
+        if (!pool) return;
 
         await createBet.mutateAsync(createBetParam);
       }

@@ -57,7 +57,7 @@ export const tokens = [
       code: 'solusdt',
       name: 'Solana',
       symbol: 'SOL',
-      competitionKey: '',
+      competitionKey: 'APaw8vCHhvps2knAkBBXNAFDuRVVtWqFLkHFmLVAdreC',
       priceFeedId: '0xef0d8b6fda2ceba41da15d4095d1da392a0d2f8ed0c6c7bc0f4cfac8c280b56d',
       tokenAddress: 'So11111111111111111111111111111111111111111',
       logoPath: '/images/solana.png',
