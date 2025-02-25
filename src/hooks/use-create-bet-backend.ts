@@ -1,6 +1,7 @@
 import { usePrivy } from '@privy-io/react-auth';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { useBackend } from './use-backend';
+import { BetData } from '@/types';
 
 interface CreateBetParams {
   amount: number;
@@ -16,12 +17,21 @@ interface CancelBetParams {
   userKey: string;
 }
 
+export interface CreateBetResponse {
+  txHash: string;
+}
+
+export interface CancelBetResponse {
+  txs: string[];
+  bets: BetData[];
+}
+
 export function useCreateBetBackend() {
   const { user } = usePrivy();
   const queryClient = useQueryClient();
   const { baseUrl } = useBackend();
 
-  const createBetMutation = useMutation({
+  const createBetMutation = useMutation<CreateBetResponse, Error, CreateBetParams>({
     mutationFn: async (params: CreateBetParams) => {
       if (!user?.id) {
         throw new Error('User not authenticated');
@@ -48,7 +58,7 @@ export function useCreateBetBackend() {
         throw new Error(error.message || 'Failed to create bet');
       }
 
-      return response.json();
+      return response.json() as unknown as CreateBetResponse;
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ 
@@ -67,7 +77,7 @@ export function useCreateBetBackend() {
     },
   });
 
-  const cancelBetMutation = useMutation({
+  const cancelBetMutation = useMutation<CancelBetResponse, Error, CancelBetParams>({
     mutationFn: async (params: CancelBetParams) => {
       if (!user?.id) {
         throw new Error('User not authenticated');

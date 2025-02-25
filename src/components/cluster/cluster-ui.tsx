@@ -4,13 +4,34 @@ import { IconTrash } from '@tabler/icons-react'
 import { useQuery } from '@tanstack/react-query'
 import { ReactNode, useState } from 'react'
 import { AppModal } from '../ui/ui-layout'
-import { ClusterNetwork, useCluster } from './cluster-data-access'
+import { Cluster, ClusterNetwork, useCluster } from './cluster-data-access'
 
-export function ExplorerLink({ path, label, className }: { path: string; label: string; className?: string }) {
-  const { getExplorerUrl } = useCluster()
+export function getClusterUrlParam(cluster: Cluster): string {
+  let suffix = ''
+  switch (cluster.network) {
+    case ClusterNetwork.Devnet:
+      suffix = 'devnet'
+      break
+    case ClusterNetwork.Mainnet:
+      suffix = ''
+      break
+    case ClusterNetwork.Testnet:
+      suffix = 'testnet'
+      break
+    default:
+      suffix = `custom&customUrl=${encodeURIComponent(cluster.endpoint)}`
+      break
+  }
+
+  return suffix.length ? `?cluster=${suffix}` : ''
+}
+
+export const getExplorerUrl=  (path: string, cluster: Cluster) => `https://explorer.solana.com/${path}${getClusterUrlParam(cluster)}`
+
+export function ExplorerLink({ path, label, className, cluster }: { path: string; label: string; className?: string, cluster: Cluster }) {
   return (
     <a
-      href={getExplorerUrl(path)}
+      href={getExplorerUrl(path, cluster)}
       target="_blank"
       rel="noopener noreferrer"
       className={className ? className : `link font-mono`}

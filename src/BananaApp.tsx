@@ -1,9 +1,9 @@
+import Marquee from "react-fast-marquee"
+import { RouterProvider } from 'react-router-dom'
 import { ConfirmationDialog } from './components/dialog/ConfirmationDialog'
 import { AppModal } from './components/modals/AppModal'
-import { useConfirmationStore } from './stores/useConfirmationStore'
 import { router } from './routes'
-import { RouterProvider } from 'react-router-dom'
-import Marquee from "react-fast-marquee";
+import { useConfirmationStore } from './stores/useConfirmationStore'
 
 export function BananaApp() {
 

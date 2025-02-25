@@ -1,3 +1,6 @@
+import { CLUSTER_TO_USE } from '@/config'
+import { useAnchorProgram } from '@/hooks/use-anchor-program'
+import { useTransactionToast } from '@/hooks/use-toaster'
 import { TOKEN_2022_PROGRAM_ID, TOKEN_PROGRAM_ID } from '@solana/spl-token'
 import { useConnection, useWallet } from '@solana/wallet-adapter-react'
 import {
@@ -11,8 +14,6 @@ import {
 } from '@solana/web3.js'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import toast from 'react-hot-toast'
-import { useTransactionToast } from '../ui/ui-layout'
-import { useAnchorProgram } from '@/hooks/use-anchor-program'
 
 export function useGetBalance({ address }: { address: PublicKey }) {
   const {connection} = useAnchorProgram();
@@ -53,7 +54,7 @@ export function useGetTokenAccounts({ address }: { address: PublicKey }) {
 
 export function useTransferSol({ address }: { address: PublicKey }) {
   const { connection } = useConnection()
-  const transactionToast = useTransactionToast()
+  const transactionToast = useTransactionToast(CLUSTER_TO_USE)
   const wallet = useWallet()
   const client = useQueryClient()
 
@@ -104,7 +105,7 @@ export function useTransferSol({ address }: { address: PublicKey }) {
 
 export function useRequestAirdrop({ address }: { address: PublicKey }) {
   const { connection } = useConnection()
-  const transactionToast = useTransactionToast()
+  const transactionToast = useTransactionToast(CLUSTER_TO_USE)
   const client = useQueryClient()
 
   return useMutation({

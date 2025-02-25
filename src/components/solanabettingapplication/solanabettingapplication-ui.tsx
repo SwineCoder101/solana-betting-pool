@@ -1,7 +1,5 @@
 import { Keypair, PublicKey } from '@solana/web3.js'
 import { useMemo } from 'react'
-import { ExplorerLink } from '../cluster/cluster-ui'
-import { ellipsify } from '../ui/ui-layout'
 import { useSolanabettingapplicationProgram, useSolanabettingapplicationProgramAccount } from './solanabettingapplication-data-access'
 
 export function SolanabettingapplicationCreate() {
@@ -97,9 +95,9 @@ function SolanabettingapplicationCard({ account }: { account: PublicKey }) {
             </button>
           </div>
           <div className="text-center space-y-4">
-            <p>
+            {/* <p>
               <ExplorerLink path={`account/${account}`} label={ellipsify(account.toString())} />
-            </p>
+            </p> */}
             <button
               className="btn btn-xs btn-secondary btn-outline"
               onClick={() => {

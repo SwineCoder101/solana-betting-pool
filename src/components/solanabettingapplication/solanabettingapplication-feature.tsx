@@ -1,13 +1,11 @@
 import { useWallet } from '@solana/wallet-adapter-react'
-import { ExplorerLink } from '../cluster/cluster-ui'
 import { WalletButton } from '../solana/solana-provider'
-import { AppHero, ellipsify } from '../ui/ui-layout'
-import { useSolanabettingapplicationProgram } from './solanabettingapplication-data-access'
+import { AppHero } from '../ui/ui-layout'
 import { SolanabettingapplicationCreate, SolanabettingapplicationList } from './solanabettingapplication-ui'
 
 export default function SolanabettingapplicationFeature() {
   const { publicKey } = useWallet()
-  const { programId } = useSolanabettingapplicationProgram()
+  // const { programId } = useSolanabettingapplicationProgram()
 
   return publicKey ? (
     <div>
@@ -18,7 +16,7 @@ export default function SolanabettingapplicationFeature() {
         }
       >
         <p className="mb-6">
-          <ExplorerLink path={`account/${programId}`} label={ellipsify(programId.toString())} />
+          {/* <ExplorerLink path={`account/${programId}`} label={ellipsify(programId.toString())} /> */}
         </p>
         <SolanabettingapplicationCreate />
       </AppHero>

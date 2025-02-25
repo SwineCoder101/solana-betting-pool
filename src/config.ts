@@ -1,3 +1,4 @@
+import { Cluster, ClusterNetwork } from './components/cluster/cluster-data-access'
 import { BettingChartSize } from './types'
 
 export const PADDING = 0.005 // 0.5% padding between rows
@@ -9,6 +10,14 @@ export const TICK_POSITIONS = {
 }
 
 export const SECONDS_PER_CELL_BLOCK = 30
+
+export const DEVNET_CLUSTER: Cluster = {
+  name: 'Devnet',
+  endpoint: 'https://api.devnet.solana.com',
+  network: ClusterNetwork.Devnet,
+}
+
+export const CLUSTER_TO_USE = DEVNET_CLUSTER;
 
 // Define size configurations
 export const CHART_CONFIGS = {

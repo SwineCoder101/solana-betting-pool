@@ -5,6 +5,7 @@ import BettingChart from '../components/betting-chart/BettingChart'
 import { tokenPairs } from '@/data/data-constants'
 import { getStartTime } from '@/components/betting-chart/utils'
 import { useState } from 'react'
+import { Toaster } from 'react-hot-toast'
 
 export default function BettingPage() {
   const { embeddedWallet } = useSolanaPrivyWallet();
@@ -37,6 +38,7 @@ export default function BettingPage() {
           <Sidebar userBets={userBets} setUserBets={setUserBets} embeddedWallet={embeddedWallet} startTime={startTime}/>
         </div>
       </div>
+      <Toaster position="bottom-right" />
     </div>
   )
 }

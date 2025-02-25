@@ -7,12 +7,13 @@ import { useMemo } from 'react'
 import toast from 'react-hot-toast'
 import { useCluster } from '../cluster/cluster-data-access'
 import { useAnchorProvider } from '../solana/solana-provider'
-import { useTransactionToast } from '../ui/ui-layout'
+import { useTransactionToast } from '@/hooks/use-toaster'
+import { CLUSTER_TO_USE } from '@/config'
 
 export function useSolanabettingapplicationProgram() {
   const { connection } = useConnection()
   const { cluster } = useCluster()
-  const transactionToast = useTransactionToast()
+  const transactionToast = useTransactionToast(CLUSTER_TO_USE)
   const provider = useAnchorProvider()
   const programId = useMemo(() => getSolanabettingapplicationProgramId(cluster.network as Cluster), [cluster])
   const program = useMemo(() => getSolanabettingapplicationProgram(provider, programId), [provider, programId])
@@ -49,7 +50,7 @@ export function useSolanabettingapplicationProgram() {
 
 export function useSolanabettingapplicationProgramAccount({ account }: { account: PublicKey }) {
   const { cluster } = useCluster()
-  const transactionToast = useTransactionToast()
+  const transactionToast = useTransactionToast(CLUSTER_TO_USE)
   const { program, accounts } = useSolanabettingapplicationProgram()
 
   const accountQuery = useQuery({

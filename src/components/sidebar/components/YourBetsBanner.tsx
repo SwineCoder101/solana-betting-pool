@@ -5,6 +5,8 @@ import { Dispatch, SetStateAction } from 'react'
 import { UserBet } from '../../../types'
 import SpinningBanner from './SpinningBanner'
 import './styles.css'
+import { useTransactionToast } from '@/hooks/use-toaster'
+import { CLUSTER_TO_USE } from '@/config'
 interface Props {
   userBets: UserBet[]
   setUserBets: Dispatch<SetStateAction<UserBet[]>>
@@ -14,13 +16,18 @@ interface Props {
 export default function YourBetsBanner({ userBets, setUserBets, embeddedWallet }: Props) {
   const showBetCancellation = useConfirmationStore((state) => state.showBetCancellation)
   const {cancelBet} = useCreateBetBackend();
-
+  const transactionToast = useTransactionToast(CLUSTER_TO_USE);
+  
   const handleBetCancellation = async (bet: UserBet) => {
 
-    await cancelBet.mutateAsync({
+    const response = await cancelBet.mutateAsync({
       poolKey: bet.poolKey,
       userKey: embeddedWallet?.address || '',
     })
+
+    if (response.txs.length > 0) {
+      transactionToast(response.txs[0])
+    }
 
     showBetCancellation({
                         bet,

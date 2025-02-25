@@ -4,8 +4,7 @@ import { IconRefresh } from '@tabler/icons-react'
 import { useQueryClient } from '@tanstack/react-query'
 import { useMemo, useState } from 'react'
 import { useCluster } from '../cluster/cluster-data-access'
-import { ExplorerLink } from '../cluster/cluster-ui'
-import { AppModal, ellipsify } from '../ui/ui-layout'
+import { AppModal } from '../ui/ui-layout'
 import {
   useGetBalance,
   useGetSignatures,
@@ -148,17 +147,17 @@ export function AccountTokens({ address }: { address: PublicKey }) {
                     <td>
                       <div className="flex space-x-2">
                         <span className="font-mono">
-                          <ExplorerLink label={ellipsify(pubkey.toString())} path={`account/${pubkey.toString()}`} />
+                          {/* <ExplorerLink label={ellipsify(pubkey.toString())} path={`account/${pubkey.toString()}`} /> */}
                         </span>
                       </div>
                     </td>
                     <td>
                       <div className="flex space-x-2">
                         <span className="font-mono">
-                          <ExplorerLink
+                          {/* <ExplorerLink
                             label={ellipsify(account.data.parsed.info.mint)}
                             path={`account/${account.data.parsed.info.mint.toString()}`}
-                          />
+                          /> */}
                         </span>
                       </div>
                     </td>
@@ -227,12 +226,12 @@ export function AccountTransactions({ address }: { address: PublicKey }) {
               <tbody>
                 {items?.map((item) => (
                   <tr key={item.signature}>
-                    <th className="font-mono">
+                    {/* <th className="font-mono">
                       <ExplorerLink path={`tx/${item.signature}`} label={ellipsify(item.signature, 8)} />
                     </th>
                     <td className="font-mono text-right">
                       <ExplorerLink path={`block/${item.slot}`} label={item.slot.toString()} />
-                    </td>
+                    </td> */}
                     <td>{new Date((item.blockTime ?? 0) * 1000).toISOString()}</td>
                     <td className="text-right">
                       {item.err ? (

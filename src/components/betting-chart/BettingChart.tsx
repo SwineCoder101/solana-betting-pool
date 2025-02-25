@@ -1,11 +1,12 @@
 import { useCompetitionPools } from '@/hooks/queries'
 import { useCreateBetBackend } from '@/hooks/use-create-bet-backend'
+import { useTransactionToast } from '@/hooks/use-toaster'
 import { ConnectedSolanaWallet } from '@privy-io/react-auth'
 import { PriceServiceConnection } from '@pythnetwork/price-service-client'
 import { PublicKey } from '@solana/web3.js'
 import React, { Dispatch, SetStateAction, useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { Line, LineChart, ReferenceArea, XAxis, YAxis } from 'recharts'
-import { CHART_CONFIGS, MULTIPLIER_CONFIG, PADDING, SECONDS_PER_CELL_BLOCK } from '../../config'
+import { CHART_CONFIGS, CLUSTER_TO_USE, MULTIPLIER_CONFIG, PADDING, SECONDS_PER_CELL_BLOCK } from '../../config'
 import { useBettingData } from '../../hooks/useBettingData'
 import { useColumnData } from '../../hooks/useColumnData'
 import { MockData } from '../../mockdata'
@@ -163,6 +164,7 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
   const { createBet, cancelBet } = useCreateBetBackend();
   const { data: competitionPools } = useCompetitionPools(competitionKey ? new PublicKey(competitionKey) : null);
 
+  const transactionToast = useTransactionToast(CLUSTER_TO_USE)
 
   const [gridState, dispatch] = useReducer(rectangleReducer, {
     cells: {},
@@ -520,8 +522,9 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
 
         if (!pool) return;
 
-        await createBet.mutateAsync(createBetParam);
+        const createBetResponse = await createBet.mutateAsync(createBetParam);
         await refetchBalance();
+        transactionToast(createBetResponse.txHash);
       }
     } else {
       console.log('SET_CONFIRMATION_CELL', col, row)
@@ -631,22 +634,7 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
         }
       })
     }).flat()
-  }, [
-    BASE_TIME_RANGE,
-    gridState.cells,
-    gridState.activeColumn,
-    gridState.chartBounds,
-    gridDimensions,
-    gridState.lineData,
-    chartSize,
-    visibleRowRange,
-    removingBetId,
-    userBets,
-    rowHeightPriceValue,
-    columnData,
-    competitionKey,
-    selectedAmount,
-  ])
+  }, [BASE_TIME_RANGE, TOTAL_COLUMNS, columnData, gridState.activeColumn, gridState.lineData, gridState.cells, chartSize, visibleRowRange.end, visibleRowRange.start, TOTAL_ROWS, getYAxisMinAndMaxValues, getRowPriceBounds, findBetAtPosition, removingBetId, gridDimensions.rows])
 
   // SVG defs which are used for styling cells
   // These are patterns and gradients which we use so we don't have to add space between cells and
@@ -962,10 +950,14 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
         onConfirm={async () => {
           if (betToCancel) {
             
-            await cancelBet.mutateAsync({
+            const response = await cancelBet.mutateAsync({
               userKey: embeddedWallet?.address || '',
               poolKey: colData?.poolKey || '',
             })
+
+            if (response.txs.length > 0) {
+              transactionToast(response.txs[0])
+            }
 
             await refetchBalance();
 

@@ -1,10 +1,10 @@
 import { ReactNode, Suspense, useEffect, useRef } from 'react'
-import toast, { Toaster } from 'react-hot-toast'
+import { Toaster } from 'react-hot-toast'
 import { Link, useLocation } from 'react-router-dom'
 
-import { AccountChecker } from '../account/account-ui'
-import { ClusterChecker, ClusterUiSelect, ExplorerLink } from '../cluster/cluster-ui'
 import { WalletMultiButton } from '@solana/wallet-adapter-react-ui'
+import { AccountChecker } from '../account/account-ui'
+import { ClusterChecker, ClusterUiSelect } from '../cluster/cluster-ui'
 
 export function UiLayout({ children, links }: { children: ReactNode; links: { label: string; path: string }[] }) {
   const pathname = useLocation().pathname
@@ -141,18 +141,18 @@ export function AppHero({
 export function ellipsify(str = '', len = 4) {
   if (str.length > 30) {
     return str.substring(0, len) + '..' + str.substring(str.length - len, str.length)
-  }
-  return str
+    }
+    return str
 }
 
-// eslint-disable-next-line react-refresh/only-export-components
-export function useTransactionToast() {
-  return (signature: string) => {
-    toast.success(
-      <div className={'text-center'}>
-        <div className="text-lg">Transaction sent</div>
-        <ExplorerLink path={`tx/${signature}`} label={'View Transaction'} className="btn btn-xs btn-primary" />
-      </div>,
-    )
-  }
-}
+ 
+// export function useTransactionToast() {
+//   return (signature: string) => {
+//     toast.success(
+//       <div className={'text-center'}>
+//         <div className="text-lg">Transaction sent</div>
+//         <ExplorerLink path={`tx/${signature}`} label={'View Transaction'} className="btn btn-xs btn-primary" />
+//       </div>,
+//     )
+//   }
+// }
