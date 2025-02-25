@@ -3,33 +3,20 @@ import DesktopHeader from './components/DesktopHeader'
 import MobileHeader from './components/MobileHeader'
 import { useAdminCheck } from '@/hooks/use-admin-check'
 import { usePrivy } from '@privy-io/react-auth'
+import { useGetBalance } from '../account/account-data-access'
+import { PublicKey } from '@solana/web3.js'
+import { useSolanaPrivyWallet } from '@/hooks/use-solana-privy-wallet'
 
 export default function AppHeader() {
   const navigate = useNavigate()
   const { isAdmin } = useAdminCheck()
   const { authenticated } = usePrivy()
-
+  const {embeddedWallet} = useSolanaPrivyWallet()
+  const { data: balance } = useGetBalance({ address: new PublicKey(embeddedWallet?.address || '6oMF85KwcY57VaweFE7JNeziNaVRdCKHzNLpARdG9mMw') })
   return (
     <>
-      {/* TODO: Add connnect wallet button with router */}
-      <DesktopHeader isAdmin={isAdmin} authenticated={authenticated} navigate={navigate}/>
-      <MobileHeader isAdmin={isAdmin} authenticated={authenticated} navigate={navigate}/>
-      {/* <ErrorBoundary fallback={<div>Error</div>}>
-        <LoginWalletButton />
-        {isAdmin && (
-          <button
-            onClick={() => navigate(ROUTES.ADMIN)}
-            className={`px-4 py-2 rounded font-medium transition-colors ${
-              authenticated 
-                ? 'bg-yellow-500 hover:bg-yellow-600 text-white'
-                : 'bg-blue-500 hover:bg-blue-600 text-white'
-            }`}
-          >
-            Admin
-          </button>
-        )} 
-      </ErrorBoundary> */}
-
+      <DesktopHeader isAdmin={isAdmin} authenticated={authenticated} navigate={navigate} balance={balance || '0'}/>
+      <MobileHeader isAdmin={isAdmin} authenticated={authenticated} navigate={navigate} balance={balance || '0'}/>
     </>
   )
 }

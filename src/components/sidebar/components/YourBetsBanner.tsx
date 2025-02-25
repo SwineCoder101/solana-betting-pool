@@ -1,16 +1,32 @@
-import { Dispatch, SetStateAction } from 'react'
+import { useCreateBetBackend } from '@/hooks/use-create-bet-backend'
 import { useConfirmationStore } from '@/stores/useConfirmationStore'
+import { ConnectedSolanaWallet } from '@privy-io/react-auth'
+import { Dispatch, SetStateAction } from 'react'
 import { UserBet } from '../../../types'
 import SpinningBanner from './SpinningBanner'
 import './styles.css'
-
 interface Props {
   userBets: UserBet[]
   setUserBets: Dispatch<SetStateAction<UserBet[]>>
+  embeddedWallet: ConnectedSolanaWallet | null
 }
 
-export default function YourBetsBanner({ userBets, setUserBets }: Props) {
+export default function YourBetsBanner({ userBets, setUserBets, embeddedWallet }: Props) {
   const showBetCancellation = useConfirmationStore((state) => state.showBetCancellation)
+  const {cancelBet} = useCreateBetBackend();
+
+  const handleBetCancellation = async (bet: UserBet) => {
+
+    await cancelBet.mutateAsync({
+      poolKey: bet.poolKey,
+      userKey: embeddedWallet?.address || '',
+    })
+
+    showBetCancellation({
+                        bet,
+                        onCancel: (betId) => setUserBets(userBets.filter((b) => b.id !== betId)),
+                      })
+  }
 
   return (
     <div>
@@ -37,11 +53,7 @@ export default function YourBetsBanner({ userBets, setUserBets }: Props) {
                   <span className="text-2xl">{bet.multiplier}x</span>
                   <button
                     className="underline cursor-pointer"
-                    onClick={() =>
-                      showBetCancellation({
-                        bet,
-                        onCancel: (betId) => setUserBets(userBets.filter((b) => b.id !== betId)),
-                      })
+                    onClick={async () => await handleBetCancellation(bet)
                     }
                   >
                     CANCEL

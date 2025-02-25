@@ -44,6 +44,7 @@ export interface UserBet {
   multiplier: string
   time: string
   tokenCode: string
+  poolKey: string
   position?: {
     col: number
     row: number

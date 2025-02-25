@@ -21,6 +21,7 @@ import bananaSmiling from '/assets/images/banana-smiling.png'
 import fullCellPool from '/assets/svg/full-cell-pool.svg'
 import { useCompetitionPools } from '@/hooks/queries'
 import { PublicKey } from '@solana/web3.js'
+import { useGetBalance } from '../account/account-data-access'
 
 export interface Props {
   tokenCode: string
@@ -193,6 +194,12 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
   const isCompactMode = chartSize === BettingChartSize.DESKTOP_COMPACT || chartSize === BettingChartSize.MOBILE_COMPACT
 
   const isMobile = chartSize === BettingChartSize.MOBILE_COMPACT || chartSize === BettingChartSize.MOBILE_EXPANDED
+
+  const { refetch: refetchBalance} = useGetBalance({
+    address: new PublicKey(
+      embeddedWallet?.address || '6oMF85KwcY57VaweFE7JNeziNaVRdCKHzNLpARdG9mMw'
+    )
+  });
 
   // Find bet at position for this chart
   const findBetAtPosition = (col: number, row: number) => {
@@ -442,9 +449,6 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
   // Then update the handleCellClick function
   const handleCellClick = async (col: number, row: number, isBettingDisabled: boolean, multiplier: string, isFull: boolean) => {
     if (isBettingDisabled || isFull) return
-
-    setColData(columnData[col])
-    
     setColData(columnData[col])
     if (!colData) {
       console.error('No column data found for column:', col)
@@ -496,6 +500,7 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
           time: new Date().toTimeString().slice(0, 8),
           position: { col, row },
           tokenCode: tokenCode,
+          poolKey: colData.poolKey
         }
 
         setUserBets([newBet, ...userBets])
@@ -503,7 +508,7 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
         dispatch({ type: 'REMOVE_CONFIRMATION_CELL', col, row })
 
         const createBetParam = {
-          amount: 0.001,
+          amount: 0.01,
           poolKey: colData.poolKey,
           competitionKey,
           lowerBoundPrice: bounds.lowerBound,
@@ -514,6 +519,7 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
         if (!pool) return;
 
         await createBet.mutateAsync(createBetParam);
+        await refetchBalance();
       }
     } else {
       console.log('SET_CONFIRMATION_CELL', col, row)
@@ -951,13 +957,15 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
         isOpen={!!betToCancel}
         title="Cancel Bet"
         description="Are you sure you want to cancel this bet? A small fee will be charged."
-        onConfirm={() => {
+        onConfirm={async () => {
           if (betToCancel) {
             
-            cancelBet.mutateAsync({
+            await cancelBet.mutateAsync({
               userKey: embeddedWallet?.address || '',
               poolKey: colData?.poolKey || '',
             })
+
+            await refetchBalance();
 
             // Remove the bet from userBets state
             setUserBets(userBets.filter((bet) => bet.id !== betToCancel.id))

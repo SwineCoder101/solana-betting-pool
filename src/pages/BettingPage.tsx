@@ -30,7 +30,7 @@ export default function BettingPage() {
         </div>
 
         <div className="h-full hidden md:block sticky top-[75px]">
-          <Sidebar userBets={userBets} setUserBets={setUserBets} />
+          <Sidebar userBets={userBets} setUserBets={setUserBets} embeddedWallet={embeddedWallet}/>
         </div>
       </div>
     </div>

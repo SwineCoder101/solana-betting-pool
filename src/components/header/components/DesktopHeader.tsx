@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom'
 import { ROUTES } from '@/routes'
 import { NavigateFunction } from 'react-router-dom'
 import { LoginWalletButton } from '@/components/privy/login-wallet-button'
-export default function DesktopHeader({ isAdmin, authenticated, navigate }: { isAdmin: boolean, authenticated: boolean, navigate: NavigateFunction }) {
+export default function DesktopHeader({ isAdmin, authenticated, navigate, balance }: { isAdmin: boolean, authenticated: boolean, navigate: NavigateFunction, balance: string }) {
   const { openModal } = useModalStore()
 
   return (
@@ -92,7 +92,7 @@ export default function DesktopHeader({ isAdmin, authenticated, navigate }: { is
           <div className="bg-[#4F4F4F] text-white h-10 grid place-items-center px-4">
             <div className="flex justify-center items-center gap-2.5">
               <img src="/assets/svg/banana-pixelated.svg" alt="Banana" className="w-5 h-5 rotate-[22deg]" />
-              <span className="text-2xl">£1,211.32</span>
+              <span className="text-2xl">{balance} SOL</span>
               <img
                 src="/assets/images/penguin.png"
                 alt="Profile icon"

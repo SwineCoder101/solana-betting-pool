@@ -65,7 +65,7 @@ const PriceFeedDisplay: React.FC = () => {
           <p className="text-lg font-semibold">{selectedToken.symbol}</p>
           <p className="text-sm text-gray-600">
             <a
-              href={`https://dexscreener.com/${selectedToken.devnet}`}
+              href={`https://dexscreener.com/${selectedToken.tokenAddress}`}
               target="_blank"
               rel="noopener noreferrer"
               className="text-yellow-600 hover:underline"

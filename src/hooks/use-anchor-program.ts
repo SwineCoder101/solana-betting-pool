@@ -24,8 +24,6 @@ export function useAnchorProgram(): ProgramResult {
     new PublicKey("3Fanwf9uVRFUscsRkXHo4qTkUbFFmjzUSett4dU7qhgs")
   );
 
-  console.log("showing solana wallets from anchor program hook", wallets);
-
   useEffect(() => {
     if (wallets.some(w => w.type === "solana")) {
       setWalletReady(true);

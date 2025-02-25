@@ -10,11 +10,6 @@ export const useColumnData = (competitionKey: string, competitionPools: PoolData
   useEffect(() => {
     const fetchColumnData = async () => {
       try {
-        console.log('🔄 Fetching initial column data for competition:', competitionKey)
-        // TODO: Replace with actual API call
-        // const response = await fetch(`/api/competitions/${competitionKey}/columns`)
-        // const data = await response.json()
-
         // Initialize default data for all columns
         const initialData: Record<number, ColumnData> = {}
         for (let i = 0; i < 8; i++) {
@@ -70,7 +65,7 @@ export const useColumnData = (competitionKey: string, competitionPools: PoolData
       console.log('👋 Cleaning up WebSocket connection')
       WebSocketManager.closeConnection(`columns-${competitionKey}`)
     }
-  }, [competitionKey])
+  }, [competitionKey, competitionPools])
 
   return { columnData, isLoading }
 }

@@ -8,11 +8,12 @@ interface MobileHeaderProps {
   isAdmin: boolean
   authenticated: boolean
   navigate: NavigateFunction
+  balance: string
 }
 
 
 
-export default function MobileHeader({ isAdmin, authenticated, navigate }: MobileHeaderProps) {
+export default function MobileHeader({ isAdmin, authenticated, navigate, balance }: MobileHeaderProps) {
   const { openModal } = useModalStore()
 
 
@@ -40,7 +41,7 @@ export default function MobileHeader({ isAdmin, authenticated, navigate }: Mobil
         <OldButtonV2 onClick={() => {}} className="bg-[#4F4F4F] text-white grid place-items-center px-4 grow">
           <div className="flex justify-center items-center gap-2.5">
             <img src="/assets/svg/banana-pixelated.svg" alt="Banana" className="w-5 h-5 rotate-[22deg]" />
-            <span className="text-2xl">£1,211.32</span>
+            <span className="text-2xl">{balance} SOL</span>
             <img src="/assets/images/penguin.png" alt="Profile icon" className="w-6 h-6 rounded-full border-2 border-white" />
           </div>
         </OldButtonV2>
