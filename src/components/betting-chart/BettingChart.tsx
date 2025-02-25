@@ -1,6 +1,8 @@
+import { useCompetitionPools } from '@/hooks/queries'
 import { useCreateBetBackend } from '@/hooks/use-create-bet-backend'
 import { ConnectedSolanaWallet } from '@privy-io/react-auth'
 import { PriceServiceConnection } from '@pythnetwork/price-service-client'
+import { PublicKey } from '@solana/web3.js'
 import React, { Dispatch, SetStateAction, useEffect, useMemo, useReducer, useRef, useState } from 'react'
 import { Line, LineChart, ReferenceArea, XAxis, YAxis } from 'recharts'
 import { CHART_CONFIGS, MULTIPLIER_CONFIG, PADDING, SECONDS_PER_CELL_BLOCK } from '../../config'
@@ -9,6 +11,7 @@ import { useColumnData } from '../../hooks/useColumnData'
 import { MockData } from '../../mockdata'
 import { BettingChartSize, ColumnData, UserBet } from '../../types'
 import { generateRandomId, getCurrentTime, timeToMinutes } from '../../utils'
+import { useGetBalance } from '../account/account-data-access'
 import { ConfirmationDialog } from '../dialog/ConfirmationDialog'
 import './BettingChart.css'
 import ChartFooter from './components/ChartFooter'
@@ -16,12 +19,9 @@ import { ChartHeader } from './components/ChartHeader'
 import { getCellDimensions, getImageDimensions } from './dimensions'
 import { rectangleReducer } from './rectangleReducer'
 import { ChartBounds, Rectangle } from './types'
-import { getActiveColumnBounds, getStartTime } from './utils'
+import { BananaTime, getActiveColumnBounds } from './utils'
 import bananaSmiling from '/assets/images/banana-smiling.png'
 import fullCellPool from '/assets/svg/full-cell-pool.svg'
-import { useCompetitionPools } from '@/hooks/queries'
-import { PublicKey } from '@solana/web3.js'
-import { useGetBalance } from '../account/account-data-access'
 
 export interface Props {
   tokenCode: string
@@ -33,6 +33,8 @@ export interface Props {
   priceFeedId: string
   embeddedWallet: ConnectedSolanaWallet | null
   idx: number
+  startTime: BananaTime
+  setStartTime: Dispatch<SetStateAction<BananaTime>>
 }
 
 // Update the CustomLabel component to use chartSize instead of isCompactMode
@@ -153,7 +155,7 @@ const CustomLabel = (props: any) => {
   }
 }
 
-function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competition.competitionKey, userBets, setUserBets, showLogo = false, priceFeedId , embeddedWallet, idx }: Props) {
+function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competition.competitionKey, userBets, setUserBets, showLogo = false, priceFeedId , embeddedWallet, idx, startTime, setStartTime }: Props) {
   const priceRangeShiftRef = useRef(0)
   const basePriceRef = useRef<number | null>(null)
   const latestPriceRef = useRef<number | null>(null)
@@ -174,7 +176,7 @@ function BettingChart({ tokenCode, tokenName, competitionKey = MockData.competit
   const [isConnected, setIsConnected] = useState(false)
   const [selectedAmount, setSelectedAmount] = useState(1)
   const [chartSize, setChartSize] = useState<BettingChartSize>(BettingChartSize.DESKTOP_COMPACT)
-  const [startTime, setStartTime] = useState(getStartTime())
+  // const [startTime, setStartTime] = useState(getStartTime())
   const [rowHeightPriceValue, setRowHeightPriceValue] = useState(0)
   const [removingBetId, setRemovingBetId] = useState<string | null>(null)
   const [betToCancel, setBetToCancel] = useState<UserBet | null>(null)

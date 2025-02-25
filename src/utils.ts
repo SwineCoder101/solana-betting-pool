@@ -13,6 +13,7 @@ export const getCurrentTime = () => {
   return {
     hour: now.getHours(),
     minute: now.getMinutes(),
+    date: now
   }
 }
 

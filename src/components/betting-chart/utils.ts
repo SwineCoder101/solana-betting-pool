@@ -5,11 +5,18 @@ import { BettingChartSize } from '../../types'
 // Use the same column count for all chart sizes
 const TOTAL_COLUMNS = CHART_CONFIGS[BettingChartSize.DESKTOP_EXPANDED].cols
 
-export const getStartTime = () => {
+export type BananaTime = {
+  hour: number
+  minute: number
+  date: Date
+}
+
+export const getStartTime = (): BananaTime => {
   const now = new Date()
   return {
     hour: now.getHours(),
     minute: now.getMinutes(),
+    date: now
   }
 }
 
