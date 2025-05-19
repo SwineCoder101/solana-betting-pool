@@ -1,0 +1,230 @@
+commit,author_date,author_name,subject
+cf5918d3f4c16a80f9d17c7b918a7ad288fee9f4,2025-02-25T18:46:56+08:00,Liam Faruq,add-tx-toasters-for-bets
+d5456c4efb1cf9a543c5f0506464f8f52c20b385,2025-02-25T16:37:49+08:00,Liam Faruq,add-timer
+bf66956cfb4756e4b74c91bdb6a1939b6862c92d,2025-02-25T14:46:50+08:00,Liam Faruq,fix-build-add-balance-updates-add-cancellations-in-side-bar
+a1942b56ffe7e3049529778337242c119dc23bf5,2025-02-25T00:15:24+08:00,Liam Faruq,create-cancel-bets-working
+aa7e6d34bd1fb9c69f34916c8474d81de12d65e7,2025-02-24T22:13:47+08:00,Liam Faruq,configure-timing-of-competitions
+33c6830264c915c18468330d1cc7521a5d82a98a,2025-02-24T20:41:45+08:00,Liam Faruq,update-admin-form-with-new-token-mappings
+bac04d338a4d7613564f7456f2bd1d747728b914,2025-02-24T20:23:45+08:00,Liam Faruq,update-token-feed-mapping-with-new-treasury-display
+8bd0336b583e3f5ea2ab3f706232133dfb34b823,2025-02-24T16:07:10+08:00,SwineCoder101,Merge pull request #78 from talentgram/77-re-integrate-privy-after-migration-changes
+9d42c8b4ea79c4440df1dc6ed897153d11ce4153,2025-02-24T15:49:25+08:00,Liam Faruq,clean-build-with-comments
+e3a2aea05168347ae28cb6bfde5bc08222bffa3b,2025-02-24T15:40:50+08:00,Liam Faruq,fix-privy-login-in-layout
+d495dd6e788654b9ceaaeef0637871054468f464,2025-02-23T18:43:03Z,wehavelanded,Merge pull request #75 from talentgram/feat/ui-improvements
+4d7e32e764cc2588d63263fa914356347473bc7c,2025-02-23T17:56:20Z,wehavelanded,remove NodeGlobalsPolyfillPlugin
+b66817f02f397ea6b81a688a725d1a83406648bd,2025-02-23T17:52:06Z,wehavelanded,BUILD: VITE config fix
+b564acaafd6737f8d3044b30edfbc0022f9e395e,2025-02-23T16:48:53Z,wehavelanded,Merge pull request #74 from talentgram/feat/ui-improvements
+29aca992a7181fd0f3a4b5db8724ffbc2aa40562,2025-02-23T16:32:37Z,wehavelanded,fix linting errors
+85ca69c93c79640b091d27450eb9a7db8988b29f,2025-02-23T16:08:27Z,wehavelanded,pnpm lock file
+86c0259e479ac7653ed6a37821111b66cefb2cf9,2025-02-23T15:48:32Z,wehavelanded,fix: landing page fix file
+edd903f51654e634e66746ce24457f58a141eff4,2025-02-23T15:44:13Z,wehavelanded,Merge remote-tracking branch 'origin/main' into feat/ui-improvements
+065c114ae564a18da0a80a595d38a36fdfa3caf8,2025-02-23T15:41:49Z,wehavelanded,fix: home page header when loggdin
+4f5a78d815ffe196aa2d79e982efbbb1d4003358,2025-02-23T14:32:16Z,wehavelanded,force wtf route
+92897a8ca00a5bce34b792ea6a1c344ee601cb3e,2025-02-23T14:32:01Z,wehavelanded,update route
+c84f17aab80d98936e735d6389c96e42ee45ff11,2025-02-23T14:21:45Z,wehavelanded,fix account page
+f454323af8cf923151eda389c47ac0f99cff76b6,2025-02-23T18:41:15+08:00,Liam Faruq,add-layout-privy-check-and-privy-connect-in-onboarding
+fdb9da4f2cdf26de78957934406cb5aa02666f56,2025-02-23T10:02:49Z,wehavelanded,need helo
+bbce1bfa001c8c57bf044fa99fad619c907ca65c,2025-02-23T09:56:00Z,wehavelanded,check if user wallet connect
+bf5114c6f6b4d3ace0df41fb1d6f6b3eafbb339b,2025-02-23T09:47:26Z,wehavelanded,fix footer
+bff1aa59c638df90ee00d28b6e9cff754be384e9,2025-02-23T09:33:29Z,wehavelanded,fix package deps
+772040d682ed5f5be34b7ce9d3ed87aba4cf64c5,2025-02-23T00:57:41Z,wehavelanded,added landing page
+6d5563a39d0d844f612588c0269331756139917a,2025-02-22T23:18:24Z,wehavelanded,feat: add the landing pagE
+26b193f80453b48cbc55d69867dc2cfd71dd9f9c,2025-02-22T21:46:36Z,wehavelanded,feat: fixing ui issues
+ae63f54e0469a9ee2102b6c8c3bd7cf6c9dece87,2025-02-22T00:45:22+08:00,SwineCoder101,Merge pull request #73 from talentgram/setup-test-devnet-environment
+1f5e7f2dc21b0e4b20a380c756a9bd052412e10a,2025-02-21T21:36:11+08:00,Liam Faruq,clean
+09f72679ba1869b879a5d7740569e0180ddac16f,2025-02-21T21:08:35+08:00,Liam Faruq,setup-test-devnet-env
+1bf4b08e04cfea379cbe348d7b18fdf28b0b4266,2025-02-21T18:29:07+08:00,SwineCoder101,Merge pull request #67 from talentgram/66-fix-bet-cancellations-treasury-withdrawals-and-pool-settlements-in-smart-contracts
+4ff2196e84baa477a16e2ba936cb496a5358811a,2025-02-21T17:58:59+08:00,Liam Faruq,update-treasury-test-for-env
+71171f0c12d47749b6fe4ed8480b271e49f525c9,2025-02-21T17:40:43+08:00,Liam Faruq,update-tests
+6e73b8d7639b2be07c843b7fe4cae255a1e840bc,2025-02-21T17:26:14+08:00,Liam Faruq,fix-pnpm-build
+053a953dc1f407a060759e79573ca0c378a41565,2025-02-21T17:19:20+08:00,Liam Faruq,update-with-main
+1261e4b92176c4bfb840bc1f97c636531d5ed16d,2025-02-21T17:17:07+08:00,Liam Faruq,update-test-with-sdk-for-environment-setup
+f096c6d6e9226d514126912dd549550f410d9115,2025-02-21T15:31:07+08:00,Liam Faruq,allow-tests-to-run-in-unison
+ffe7f55e5d803225f9b1da72e053979c23063385,2025-02-21T15:22:09+08:00,Liam Faruq,tests-passing-inunison-and-removing-treasury-state-from-pool
+ba5276547ab4dcd4f7298438f714a5dfb7e248cb,2025-02-21T14:38:43+08:00,Liam Faruq,update-treasury-account-for-cancel-bet
+cce37efc6c94646826d409485478650660e6550d,2025-02-21T02:01:28+08:00,Liam Faruq,enable-tests-settlement-tests-passing
+b18a7b512372d7ef5fcb434eeed73c4a4469feab,2025-02-20T19:41:52+08:00,Liam Faruq,fix-settle-signing-logic-with-pda
+ec263bb182c30d1ffd4b238521f65c9130b3a321,2025-02-19T20:06:05+08:00,SwineCoder101,Merge pull request #72 from talentgram/68-check-the-patch-for-the-frontend-skeleton-ui
+2c7ddbefa279e3384bc20beae829317c88bdd872,2025-02-19T18:58:54+08:00,Liam Faruq,update-clean-build
+df59e08cf42c8f24374e469f61b6d0d3baa957e1,2025-02-19T18:23:52+08:00,Liam Faruq,update-betting-page
+1762f1b91532edeb563e4dd19fcdaed733b78337,2025-02-19T18:06:45+08:00,Liam Faruq,add-public-files
+b3863d0e4f9edc97d7f51b61cf98e445f7c4782b,2025-02-19T18:03:07+08:00,Liam Faruq,migrate-skeleton-ui-files
+91d45930235d68f0d0820a9859a3e2a5d0c697ee,2025-02-18T23:14:23+08:00,Liam Faruq,testing-bet-settlements
+cf5efcfe58f80fa3688c558d8f139a34ece07c07,2025-02-18T22:28:29+08:00,Liam Faruq,bets-passing-with-other-tests
+9568838204a66a49da979252f68985390477a814,2025-02-18T21:51:24+08:00,Liam Faruq,competition-pools-treasury-passing-tests
+c00e4db513678c6b2a6d19dc14b80ab74c66ea56,2025-02-18T21:15:37+08:00,Liam Faruq,update-testing-setup-make-it-faster
+eb7c41f3f4b734dc223e93325e42a8be90d09b6a,2025-02-18T15:55:41+08:00,Liam Faruq,fix-treasury-withdrawal
+b1430a477473c2c22c19e63d14023b96126b4bc8,2025-02-18T15:12:41+08:00,Liam Faruq,fix-treasury-deposits
+3a28a2e9bc1e9d3c5df3c8fe37df0d7192301bcd,2025-02-18T00:11:15+08:00,Liam Faruq,update-sdk-for-treasury-tests-and-program-seeds-treasury
+8b2186324768d45e8d3aab45605fd3c5702d10c7,2025-02-17T21:28:37+08:00,Liam Faruq,refactor-tests
+038e3fe243527bc29408a87b52ef87a80c8c1b68,2025-02-17T21:00:17+08:00,Liam Faruq,update-pool-test-and-idl-contract
+2c84d4e4fc1a5a6fd086332cd3ac790d0964ad4b,2025-02-17T19:07:05+08:00,Liam Faruq,refactor-tests
+0c7bfa38582f2f3a7bc2934a2dd64cf08922e451,2025-02-17T18:56:40+08:00,Liam Faruq,fix-anchor-compilations-and-sdk-amendments
+1a228f21f377390418b42c6e49ad7f4de288a7e2,2025-02-17T12:57:27+08:00,Liam Faruq,update-treasury-handling-and-settlement-of-vaults
+549dbb69a11412a7695cde1d0e0ba09cfc1fdb69,2025-02-16T23:51:58+08:00,Liam Faruq,Merge branch '61-fix-anchor-provider-context-in-frontend' of https://github.com/talentgram/solana-horse-race into 66-fix-bet-cancellations-treasury-withdrawals-and-pool-settlements-in-smart-contracts
+fb6486a78e7bfc8745d37504cc3b6a6a559bb5f3,2025-02-16T23:49:00+08:00,Liam Faruq,fix-treasury-and-refactor
+131ea703c2c15eed83c64b2b73c7688dff0fff8a,2025-02-16T21:06:48+08:00,Liam Faruq,refactor-clean
+d62f6bb76079990b1a7841971017d98e9973c892,2025-02-16T20:42:47+08:00,Liam Faruq,fix-bet-cancellations-with-tests
+9c332d0232d190623e96a3ccf5b18354a2109e71,2025-02-16T15:32:13+08:00,Liam Faruq,update-pool-vault-signing-for-bet-cancellations
+6142c77c09df465349253b81cc63bed32b558c54,2025-02-15T19:07:12+08:00,SwineCoder101,Merge pull request #65 from talentgram/61-fix-anchor-provider-context-in-frontend
+2f265124df7c596c85b3aab41e39b10eef81b782,2025-02-15T18:07:14+08:00,Liam Faruq,clean
+4230852058fb7d4fef670eeb0ecd16fe3ef50c8e,2025-02-15T18:04:17+08:00,Liam Faruq,fix-frontend-context-provider-issues-with-onboarding
+e4d3794adbe229575d1333aa7745f83eb91e9eb2,2025-02-15T14:27:07+08:00,SwineCoder101,Merge pull request #64 from talentgram/migrate-graphs-to-pyth
+211cb064e411d7ea9063e55336880d139b7aabde,2025-02-15T14:15:49+08:00,Liam Faruq,migrate-to-pyth
+6abd754b80c6448ba9685d24e7785c1ca275cd92,2025-02-15T02:12:13+08:00,Liam Faruq,resolve-conflict
+940834da2663cbe15a6beac7f3683510232a07c8,2025-02-15T02:09:29+08:00,Liam Faruq,update-cancellation-program
+4ac711f2d237923154ee7380526870dd9abeb43b,2025-02-15T00:44:49+08:00,SwineCoder101,Merge pull request #59 from talentgram/58-fix-betting-in-frontend
+c7b81fbb428dce0589a5f40ad7ffc0d357ec52bd,2025-02-15T00:13:50+08:00,Liam Faruq,add-cancellations
+5815fa6f1d81875635a1d3dbb42f54a4dd70360c,2025-02-14T23:20:15+08:00,Liam Faruq,apply-create-bet-to-grid
+a3f3a927507791ee2a2af74c7221d3fab27ea065,2025-02-14T02:51:24+08:00,SwineCoder101,Merge pull request #55 from talentgram/54-setup-3-competitions-for-btc-eth-sol-wire-these-to-the-frontend
+d68d71751703ba02b52aee65b72f066eba570008,2025-02-14T02:49:44+08:00,Liam Faruq,clean-build
+d02204ab3c557e53b6c70f5678f78b585c2cef5c,2025-02-14T02:47:16+08:00,Liam Faruq,update-form
+b2079de6aac55350a95108788dad46789c485c4c,2025-02-14T02:06:36+08:00,Liam Faruq,add-frontend-changes-and-treasury
+26a06e55dbdfb9e53a5cc6724b692f305c328f2c,2025-02-13T21:02:05+08:00,SwineCoder101,Merge pull request #53 from talentgram/52-redeploy-program-for-websockets-and-settlements
+7ec108d92445985db8b11ae4fee801d6839efc68,2025-02-13T20:48:52+08:00,Liam Faruq,change-back-for-localnet-testing
+c0417d69ca3f20a75aab39f789549e731134e940,2025-02-13T20:29:01+08:00,Liam Faruq,upgrade-environment
+62f54ed55a31c813d12091e3b4626e0819ed40b0,2025-02-13T18:40:26+08:00,SwineCoder101,Merge pull request #51 from talentgram/50-fix-settlement-unsufficient-funds-with-treasury
+ec69099b9104d3a3dd2a504711258fa9ee64becc,2025-02-13T18:23:45+08:00,Liam Faruq,update-tests-with-treasury
+ea7b3017013ec9eebb4264d43a8e59cb2a6eee78,2025-02-13T17:28:49+08:00,Liam Faruq,add-test-for-settlements
+9aecba0f30f00699a33cfc77fe2afa4fb80b4e26,2025-02-13T03:23:21+08:00,Liam Faruq,update-test-setup
+09121652260c147c0373ed374b64cc6a306da07a,2025-02-13T02:55:36+08:00,Liam Faruq,add-treasury-for-borrow-funds
+535476b3049765ba5b66d0fdd9c23dd70121147c,2025-02-13T01:03:26+08:00,SwineCoder101,Merge pull request #49 from talentgram/41-integrate-wallet-manager-into-the-new-uiux
+f9fc2d26f932535ef50a96493a8b4096af2f6ea8,2025-02-13T00:49:12+08:00,Liam Faruq,update-privy-account-integration
+6ef55e9df7265c612a3271bc350e36d5399cce21,2025-02-13T00:37:19+08:00,Liam Faruq,add-pages
+a0573ff72ee78bfc28dc0ce0071f2f96ab266ae8,2025-02-13T00:12:04+08:00,Liam Faruq,add-timestamp-to-bets-update-tests
+9a517adb68f4364881ec5f3ec3fd6c1567df7a57,2025-02-12T22:04:35+08:00,SwineCoder101,Merge pull request #48 from talentgram/47-integrate-admin-page-into-the-new-uiux
+dbe595cbc454139e54e01c72eff887397b554dd1,2025-02-12T21:55:38+08:00,Liam Faruq,fix-admin-page
+e43af87618221f0960c5f75691d69e20f2d989fb,2025-02-12T20:44:20+08:00,SwineCoder101,Merge pull request #46 from talentgram/39-migrate-miniapp-uiux-frontend-into-the-repo
+0f66e6b6e0291968ebe68037d0d7b7dd247eb7d8,2025-02-12T20:41:56+08:00,Liam Faruq,update-account-page
+69e0e7a6b00533cde4a65aa6564851145c6431f1,2025-02-12T20:37:55+08:00,Liam Faruq,add-privy-connect-wallet-to-header
+968aa31775805078677aaedcec8a4a728c536c45,2025-02-12T20:19:02+08:00,Liam Faruq,clean-build
+b89c93f8510a7250b60583def049fbf7875e5b6c,2025-02-12T20:17:24+08:00,Liam Faruq,add-account-page
+c9f9543d3da5ebdd0b1fe5c112f623fa5e63b321,2025-02-12T19:12:15+08:00,Liam Faruq,fix-app-router
+e8ac8c7ea4ce817c799dbaf617fcdce78f913c3f,2025-02-12T18:26:33+08:00,Liam Faruq,add-privy-wallet-checker
+4617784daf0bbeab2e6383100295fe14c40bf8f6,2025-02-12T17:10:15+08:00,SwineCoder101,Merge pull request #45 from talentgram/36-add-events-for-create-bet-settlements-create-competitions
+e60978995a0232076cf9df02465a68b5bad6cbdf,2025-02-12T16:56:21+08:00,Liam Faruq,clean-build
+9f0f4617988ef8ddfa68e9bdd329f455db80c5e2,2025-02-12T16:48:17+08:00,Liam Faruq,update-target-and-idl-with-events
+f4170191a90de9bfe360cee39505ff3335031b65,2025-02-12T14:47:50+08:00,Liam Faruq,add-events-to-program-with-leverage-state
+2d3acdfa846820cdb8aa376a522281816726725f,2025-02-12T00:58:28+08:00,SwineCoder101,Merge pull request #44 from talentgram/40-integrate-provider-into-the-miniapp-uiux
+3213bac7e396d3688eae3abfc67bf990a152a28a,2025-02-12T00:43:59+08:00,Liam Faruq,clean-build
+518537ac6d2d094518107611e8b835bb1bc16b1e,2025-02-12T00:41:18+08:00,Liam Faruq,add-banana-ui-ux
+3f87b0b0d0f3a692270e2ccb9666295bf9a70a2d,2025-02-11T01:22:09+08:00,SwineCoder101,Merge pull request #43 from talentgram/35-update-admin-panel-form-for-settlement-and-create-competition
+43bbf02729325a0d6ebd17734a590460560195fa,2025-02-11T00:02:19+08:00,Liam Faruq,clean
+83244eabaa2c49d0fb4ba231f4f771641795eb90,2025-02-10T23:59:21+08:00,Liam Faruq,update-form
+30b14bda495eefb083981fda5a0dc614dabf7269,2025-02-10T22:40:55+08:00,Liam Faruq,add-settlement-form
+fa2462d976a0089a913fdd96b0d39714c93d6449,2025-02-10T21:28:36+08:00,Liam Faruq,update-for-competition-form
+194bb8f03cfea605fb4dde38398fafcda8171d0e,2025-02-10T11:11:46+08:00,SwineCoder101,Merge pull request #42 from talentgram/fix-pipeline
+09e729f7c9ccb1f40f8960252273d99896a29bb4,2025-02-10T10:57:15+08:00,Liam Faruq,update-anchor
+12dd3b98780be57623ca49ff6d1678e35d9a5c42,2025-02-10T10:35:15+08:00,Liam Faruq,fix-pipeline
+4c84dfd12484fbdf56d468b48ace5bbbf512c610,2025-02-10T00:09:47+08:00,Liam Faruq,test-settlements-devnet
+ea8d04b6ea09d79dfbf0ebac9c04d927bce63fa1,2025-02-09T01:17:48+08:00,SwineCoder101,Merge pull request #33 from talentgram/11-create-settlement-at-the-end-of-every-game-interval
+77c952433d5f3844825bd22bae7c6cae27d82ace,2025-02-09T01:04:06+08:00,Liam Faruq,clean
+c3ad23088c6d6abb2a1f7052726a7d4f108d2c04,2025-02-09T00:49:18+08:00,Liam Faruq,update-sdk-for-settlement-and-update-tests
+f8dbf4f245c095d7614a5bcc08dca52741492f82,2025-02-08T22:53:45+08:00,Liam Faruq,settlement-working
+e8e31e61ad1768712a445200999798c462a13bcb,2025-02-07T23:49:44+08:00,Liam Faruq,add-rust-unit-test-setup
+6133cb4353df4ce7ea734f71849ffe4897910d89,2025-02-07T22:06:26+08:00,Liam Faruq,testing-settlements
+9943c1a8db444b28352c0e9abf408116fb258942,2025-02-07T12:00:03+08:00,Liam Faruq,add-settlement-test-without-time-travel
+e41f9450eac0c610997fc3384455953f9f6ba96e,2025-02-06T15:26:16+08:00,Liam Faruq,settlement-logic-compiles
+b7eea065998c0cbea5bda09331e6bd8761db4416,2025-02-06T14:23:47+08:00,Liam Faruq,update-settlement
+6de2149fcf6e4637ca1d4b5eb406d0f78af9064a,2025-02-05T19:27:05+08:00,Liam Faruq,add-settlement-with-treasury
+bd29d9dee91a53b364be1be96402467e55a37a4c,2025-02-05T00:13:46+08:00,SwineCoder101,Merge pull request #32 from talentgram/16-wire-competitions-sdk-into-the-admin-page
+22ee50eed2bf6de52dfeddc76ff39d0dc6df0516,2025-02-05T00:03:15+08:00,Liam Faruq,disable-old-template-program-anchor
+99738bca0971daf211776e770bb89cea81e3f54d,2025-02-04T23:56:14+08:00,Liam Faruq,update-form-with-price-interval
+ff65c1e2426d78b8ee5be0c26693b36fb3a81268,2025-02-04T17:28:07+08:00,Liam Faruq,update-pipeline-anchor-env
+1eb03fae75e99f318490bdf557b35f59e4fa7f48,2025-02-04T16:59:32+08:00,Liam Faruq,clean-fix-build-local
+dcd8c5758ffba6321eb8cf0e6e76ce291f5144d5,2025-02-04T16:56:54+08:00,Liam Faruq,clean
+12218c1551e99be177b18eed4c96937fbcbffe85,2025-02-04T16:53:46+08:00,Liam Faruq,update-form
+89b752a6105f989144282c87310e2d43ad8079e4,2025-02-04T14:21:59+08:00,Liam Faruq,update-todo
+e99650c7793b5d0fb39a20488d30496ce24636da,2025-02-04T13:58:32+08:00,Liam Faruq,update-competition-dropdown
+c83ac27c3febec7ae96fb5d458a629a44262e504,2025-02-04T13:29:50+08:00,Liam Faruq,add-backend-indicator-with-bet-form-adjustments
+5897a151b1644680c83f4052e23e377ed6e920ab,2025-02-04T12:12:49+08:00,Liam Faruq,update-competition-form-with-create-bet-backend-hook
+a4587cc9490e6294bbe0a920aeca61cb2a4dbc02,2025-02-03T19:16:42+08:00,Liam Faruq,add-pools-display
+63f5588140046338434fd1184142c814e5595800,2025-02-03T19:01:22+08:00,Liam Faruq,update-competition-display
+0e8793b2ad300a185baa479fc67523224b875636,2025-02-03T18:51:48+08:00,Liam Faruq,fix-bet-display
+8b4db751384c18098840f3d5f47832e77ad69d83,2025-02-03T17:13:49+08:00,Liam Faruq,debug-betting-display
+b8fb1db45209521f2bfabd1fb361808c354e6cff,2025-02-03T16:26:36+08:00,Liam Faruq,merge-with-main
+00b267a571d2a76e5e9baeb27a8187bc3f120010,2025-02-03T11:35:01+08:00,Liam Faruq,update-wallet-manager
+36bff4f68ff04ce74ce44751c240512e47e5e301,2025-02-03T10:53:09+08:00,Liam Faruq,fix-startup-front-end-with-privy
+35075fe5d0076aac5db05e721736adcdeacf49cf,2025-02-02T12:38:55+08:00,Liam Faruq,clean
+56b24380e291db402821b842d4d417fdd124f1ab,2025-02-01T20:30:21+08:00,SwineCoder101,Merge pull request #31 from talentgram/30-add-devnet-testnet-mainnet-scripts-to-be-executed-by-admin
+e180b07dd79d831718d4952ceabc31fd427b3026,2025-02-01T20:22:30+08:00,Liam Faruq,add-bet-cancellation
+cd5eb434485cfec379d3c5e339d65e24279e0c6f,2025-02-01T15:50:27+08:00,Liam Faruq,add-script-for-add-bet
+0c86c526c1b931d831a510c34f2cd92bf0eafbd7,2025-02-01T11:48:14+08:00,Liam Faruq,update-scripts
+1064a476d43aa0cbce0d2eff4bf210a4ff91ffe6,2025-02-01T00:10:24+08:00,Liam Faruq,add-env-util-scripts-for-competition-pool-creation
+4009346cce96eefa3948fcaa1aeea0db1a66094c,2025-01-29T14:38:51+08:00,SwineCoder101,Merge pull request #29 from talentgram/14-fix-anchor-test-pipeline
+bea03c60386a5bba58b026c5c8b8b308c260ed75,2025-01-29T14:26:28+08:00,Liam Faruq,add-deploy-target-for-pipeline-with-test-update-and-program-hook-update
+906ae8b46318f2c25fb48aed6c400c813e9b63a7,2025-01-28T20:55:34+08:00,Liam Faruq,add-backend-hooks
+abad78a0bac0ce9bffa0e6f237336e38d510e2bc,2025-01-28T10:59:59+08:00,Liam Faruq,fix-sdk-with-admin-changes
+df83800ddc01dc5d7a1b435fc64858af7b432bbc,2025-01-27T21:25:14+08:00,SwineCoder101,Merge pull request #28 from talentgram/27-create-sdk-lib-for-backend
+70bb50ed8b1c7510fa59c4008876db0eafd1b372,2025-01-27T21:23:33+08:00,Liam Faruq,clean-build
+06d2b2d629c8d7922adb570ba984b0f288a0450d,2025-01-27T21:18:43+08:00,Liam Faruq,clean-sdk-build-with-alterations
+463b2bc63c3b52a7143e5e19d67886aebdda4190,2025-01-27T16:54:52+08:00,SwineCoder101,Merge pull request #26 from talentgram/24-add-privy-delegate-actions-into-the-frontend
+af3b4c6275b6aeb7d25dc9dd59c4327d04bb8b19,2025-01-27T16:52:19+08:00,Liam Faruq,add-privy-delegation-to-frontend
+9c24065915ef0d938ac81f2387d7ebf4a359cdad,2025-01-27T16:32:24+08:00,SwineCoder101,Merge pull request #23 from talentgram/22-integrate-privy-wallet-into-the-mini-app-with-anchor-sdk-changes
+4333fc76a2cb29a41a81ba43ad3e7da2b7ed5250,2025-01-27T16:29:58+08:00,Liam Faruq,clean
+ebe91116485290bc7f3923992c8e55ac230c7d20,2025-01-27T16:23:09+08:00,Liam Faruq,clean
+b942452cd10ccc3689b8b5647fd7b0af38742453,2025-01-27T16:17:17+08:00,Liam Faruq,Merge branch 'add-privy-integration' of https://github.com/talentgram/solana-horse-race into 22-integrate-privy-wallet-into-the-mini-app-with-anchor-sdk-changes
+836626b870b0970839dea50fedc646e8eff52155,2025-01-27T16:13:04+08:00,Liam Faruq,add-todo-for-competition-form
+937d700ed792ba7d5cb6bc7f40c4b42fc7feafac,2025-01-27T15:05:06+08:00,Liam Faruq,update-for-versioned-transactions-and-fix-tests
+2114be0256e587ac29829f8d39004ccc558a3e90,2025-01-27T00:10:33+08:00,Liam Faruq,update-to-versionTx-for-privy
+feda248d4dd6f47a53122768dce63760e2ac9f0a,2025-01-26T20:50:23+08:00,Liam Faruq,refactor-tests-and-fix-bet-cancellations
+043845928c5c681180cfbab3222201cdb8f9e702,2025-01-26T16:33:08+08:00,Liam Faruq,update-hooks-with-instructions-for-privy
+a62bc67d677a7c91f6edeb12faa56e288ff16061,2025-01-26T16:11:20+08:00,Liam Faruq,fix-anchor-provider-frontend-and-add-smart-contract-data-quries
+58e8f4d1c34cadb8f5f098a90b76b23753d85f2f,2025-01-25T21:12:07+08:00,Liam Faruq,update-build-info
+5d41aeb6af0ec206dea6dd828a7db26afdc059d3,2025-01-25T19:14:41+08:00,Liam Faruq,update-states-for-hook
+8d34419fe946f0aaba57f19c6441657addbbbd6b,2025-01-25T18:51:08+08:00,Liam Faruq,Merge branch 'main' of https://github.com/talentgram/solana-horse-race into add-privy-integration
+04a43fc9ffc2ea2ab701a3a8056dcca5163b46be,2025-01-25T13:19:10+08:00,Liam Faruq,update-form
+2bf405f47d21a7ff2e13eb3992a8ff6272d63216,2025-01-25T00:42:04+08:00,Liam Faruq,fix-wallet-inputs
+64f6e93d6e715edd10861bd8f240df6a9e643963,2025-01-25T00:27:50+08:00,Liam Faruq,update-wallet-manager
+b903eb31ec21c78d4af8db9a57e05c9ccdbf1231,2025-01-23T12:13:30+08:00,SwineCoder101,Merge pull request #20 from talentgram/9-add-pyth-oracle-price-feed-to-smart-contracts
+e9ff254f59f44d508adee472e43bbfe3e5e13364,2025-01-23T12:08:33+08:00,Liam Faruq,add-pyt-oracle-price-updates
+70b78300a9f150755cdf8bfe91f2f40300aa68cf,2025-01-22T23:11:55+08:00,SwineCoder101,Merge pull request #19 from talentgram/8-create-bets-per-pool
+d9983e6f038fb40426cf853f9c1503e80dbb5b78,2025-01-22T23:09:48+08:00,Liam Faruq,fix-betting-tests-with-error-handling
+37a7e68b52ce97d766cdafcba939b3c40008ec0a,2025-01-22T11:09:06+08:00,Liam Faruq,add-privy-client-and-test
+828b5b13d09d4f8594c1262d3638c074f14c15e9,2025-01-21T23:37:41+08:00,Liam Faruq,update-bet-instruction-and-parsing-for-tests
+962a9b46458de763984777873da537b2ca26ffd4,2025-01-21T18:19:07+08:00,Liam Faruq,fix-competition-pools-setup
+be44c54f655fabfcbbfb56738ec68b39d98252c7,2025-01-20T23:54:18+08:00,Liam Faruq,refactor-for-betting-pools
+3f2d4b80e6ace9b760d1d34722496d2064a35f7d,2025-01-20T21:06:50+08:00,Liam Faruq,test-privy-provider
+24c41161d8bac9a99dcc6c003fddb613a8390e25,2025-01-20T16:23:05+08:00,Liam Faruq,Merge branch 'main' of https://github.com/talentgram/solana-horse-race into add-privy-integration
+e76fe3ac18e1bad79c88b6b6c9f0c876acc3c76b,2025-01-19T23:38:50+08:00,Liam Faruq,add-bets-test
+d903bc47e9cc54a12fda7ac20dd4a1f32097acaf,2025-01-19T17:34:47+08:00,SwineCoder101,Merge pull request #18 from talentgram/7-create-pools-for-game-intervalsoutcomes
+5491429998e504cef963df21d69550c367e805a0,2025-01-19T16:40:21+08:00,Liam Faruq,add-pools-per-competition
+c783961e1ec35b1f05411ec4113905840be4d6fb,2025-01-18T18:18:11+08:00,Liam Faruq,fix-anchor-competition-setup
+055ea89be3f0c2c7e638c6b0cf8b0d1af34dce94,2025-01-18T12:46:08+08:00,Liam Faruq,add-multiple-competitions
+a91d70f970d5fb8b25f65f855d37e09fbf05d6c5,2025-01-18T00:01:34+08:00,Liam Faruq,add-create-pools
+a60a73c18bfcfda41db6a0df1f6b695c5ae34744,2025-01-17T22:03:50+08:00,Liam Faruq,ignore-template-tests
+8bd5226547a1625a9b59aaf23b83cec4bc09b91c,2025-01-17T13:40:29+08:00,Liam Faruq,update-pools
+ec48a2782a291e359d76a0cb761b4979ed3f5767,2025-01-16T21:49:30+08:00,Liam Faruq,update-create-pool
+009b2b80422df897fbfa92c3d17081950bafe653,2025-01-16T18:21:23+08:00,Liam Faruq,update-competition-for-pool-timeframe
+91d582a2179b7a68f4b21678a9da4998b06420b0,2025-01-16T17:34:39+08:00,Liam Faruq,setup-competition-pooling
+7c2602f63c8438a029b4cd10aa3ec20292426cb3,2025-01-16T15:27:04+08:00,Liam Faruq,add-pool-counter
+cfcea3b71bbf71bfab21634446aeedf76821d536,2025-01-15T22:32:46+08:00,Liam Faruq,add-pools-bets-sdk-and-amend-pool-instructions
+ba083fc1350377d2fbce30efe9c650b3d986c00f,2025-01-13T16:27:39+11:00,Liam Faruq,add-privy-integration
+9b6d398e45984e1785933e7d025d4ab935d9db1e,2025-01-11T17:37:42+11:00,Liam Faruq,add-bets-pools-for-competition
+135b6edce7768183221bf7da2688059c8f64d93a,2025-01-11T00:00:13+11:00,Liam Faruq,add-privy-wallet-connect-button
+1cb80aa510c61d76dab4c5daba15cf044a4f41e8,2025-01-10T23:47:34+11:00,Liam Faruq,add-privy-wallet
+c6e55442a8c1803e557bb6e08c043edc3f4b08bf,2025-01-09T17:56:29+11:00,SwineCoder101,Merge pull request #17 from talentgram/10-add-pyth-oracle-price-feed-in-the-frontend
+92150b2038f7120a810168d87deea96291f7ed1d,2025-01-09T17:54:31+11:00,Liam Faruq,add-price-feeds-front-end-pyth
+350f3e13b821e81ec5140459f8763e62368de6b2,2025-01-09T16:41:09+11:00,SwineCoder101,Merge pull request #15 from talentgram/6-create-a-betting-form-and-competition-form-for-testing
+012234867320165a1c9c4de1955fec0e605a0a38,2025-01-09T16:39:23+11:00,Liam Faruq,update-routes-with-constants
+41072aebbe9b94fbf0ff7dce93d3eb3cdd6cc3b7,2025-01-09T16:09:51+11:00,Liam Faruq,add-admin-feature-components
+3384bbe3529744d43ce47add1bc4a47e71046c8b,2025-01-09T15:42:37+11:00,SwineCoder101,Merge pull request #13 from talentgram/5-add-competition-config-creation
+2dd29db2cfb8c7ecd66568e9f7d54599c7c3e91c,2025-01-09T15:13:12+11:00,Liam Faruq,update-anchor
+93a0909e984c477dbcbce67ce9b5fdf292656754,2025-01-09T14:50:51+11:00,Liam Faruq,update-pipeline
+388403726d1d52b1a26bb5629dea2a8df644c7f8,2025-01-09T14:48:32+11:00,Liam Faruq,update-borsh-for-pipeline
+794e7165847cefde0d7a4e18d36a8c0e45b4260a,2025-01-09T14:35:32+11:00,Liam Faruq,update-competition-passes
+93610851f40929b2be449aa6ff4c84b51d01dfa5,2025-01-09T14:13:26+11:00,Liam Faruq,competition-creation-working
+883dd8986878bc9c7022c8d3c941394550cb6b22,2025-01-09T13:51:49+11:00,Liam Faruq,ignore-test-validator
+e6eaa0deedec460722df52ec349f9605f4f0390a,2025-01-09T13:40:28+11:00,Liam Faruq,fix-pda-for-competition
+7afd9198939b45eab6f69979c8f6aeddda456e37,2025-01-09T13:38:26+11:00,Liam Faruq,fix-pda-for-competition
+8aa4ac903501c74fcb5a2964f7c81565de46af91,2025-01-08T18:59:34+11:00,Liam Faruq,setup-tests-and-env-for-program
+ac9e18772cb67a9727ba3f3c5eae683446a5717b,2025-01-07T00:36:34+11:00,Liam Faruq,add-test-util-setup
+288211d41fce985db4ba9247a5a539b157fef467,2025-01-06T15:50:08+11:00,Liam Faruq,refactor-sdk-setup-for-test-and-frontend-integration
+160731eee9e280d0cad4e3493237f20ac47be2eb,2025-01-06T15:10:40+11:00,Liam Faruq,initialize-sdk-with-refactor
+7ac88c45dc3872af75533bc3a7f62af3547bbb7a,2025-01-06T14:46:45+11:00,Liam Faruq,clean-anchor-build
+60c48c9ba94df00da64ceda55faecab187296524,2025-01-05T17:42:40+11:00,Liam Faruq,Merge branch '5-add-competition-config-creation' of https://github.com/talentgram/solana-horse-race into 5-add-competition-config-creation
+20833441d62d6861dca48b3f7cc708515365c8e0,2025-01-05T17:41:46+11:00,Liam Faruq,add-structure-for-competition
+f159e5a5f6ae01868d697955d3f879813d839fe4,2025-01-05T17:30:46+11:00,Liam Faruq,add-competition
+8ad19334983272ba0e8a4c0a16281a5da69f2c74,2025-01-05T11:52:40+11:00,SwineCoder101,Merge pull request #2 from talentgram/1-initialize-scaffold-anchor-vite-react
+9da3562d57a04d18788bdb59f010f08f5f5da89c,2025-01-05T11:41:02+11:00,Liam Faruq,update-lock
+2604a130ee5b929f5cedff4c6d2dd70ac829222e,2025-01-05T11:37:34+11:00,Liam Faruq,init-scaffold
+91bb8a9fea925c017910ab054d3bc26150dfc154,2025-01-04T20:58:35+11:00,Liam Faruq,update
